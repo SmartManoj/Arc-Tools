@@ -3,7 +3,7 @@ import matplotlib.colors as mcolors
 import numpy as np
 
 
-def plot_grid(grid, name="grid.png", show=False):
+def plot_grid(grid, name="grid.png", show=False, close=True, ax=None):
     # Define colors
     colors = {
     0: 'black',
@@ -24,7 +24,8 @@ def plot_grid(grid, name="grid.png", show=False):
     cmap = mcolors.ListedColormap([colors[i] for i in sorted(colors.keys())])
 
     # Plot
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots()
     ax.patch.set_edgecolor('red')  
 
     ax.patch.set_linewidth(2)  
@@ -55,28 +56,38 @@ def plot_grid(grid, name="grid.png", show=False):
     border_color = 'white'
     plt.savefig(name, facecolor=background_color, edgecolor=border_color)
     plt.title(name)
-    if show:
-        # Function to format coordinates
-        def format_coord(x, y):
+    def format_coord(x, y):
+        if x >= -0.5 and y >= -0.5:
             col = int(x + 0.5)
             row = int(y + 0.5)
-            z = grid[row][col]
             return f'(x,y) = ({col},{row})'
+        return ''
 
-        ax.format_coord = format_coord
+    ax.format_coord = format_coord
+    if show:
+        # Function to format coordinates
         print(f'Showing interactive plot for {name}...')
-        plt.show(block=True)
-    plt.close()
+        plt.show(block=1)
+    if close:
+        plt.close()
 
 def plot_grids(grids, name="grids.png"):
-    fig, axs = plt.subplots(len(grids), 1, figsize=(10, 5 * len(grids)))
+    # fig, axs = plt.subplots(len(grids), 1, figsize=(10, 5 * len(grids)))
+    # for i, grid in enumerate(grids):
+    #     ax = plot_grid(grid, ax=axs[i])
+    # plt.tight_layout()
+    # plt.show(block=1)
+    # background_color = 'black'
+    # border_color = 'white'
+    # plt.savefig(name, facecolor=background_color, edgecolor=border_color)
+
+    # plot the grids in a single plot
+    fig, axs = plt.subplots(1, len(grids), figsize=(10, 5 * len(grids)))
     for i, grid in enumerate(grids):
-        ax = plot_grid(grid, ax=axs[i])
+        ax = plot_grid(grid, ax=axs[i], close=False)
+        # axs[i].imshow(grid)
     plt.tight_layout()
-    plt.show()
-    background_color = 'black'
-    border_color = 'white'
-    plt.savefig(name, facecolor=background_color, edgecolor=border_color)
+    plt.show(block=1)
 
 
 if __name__ == "__main__":
@@ -92,4 +103,4 @@ if __name__ == "__main__":
     grid = [[0 for _ in range(n)] for _ in range(m)]
     for i, j in a:
         grid[i-1][j-1] = 1
-    plot_grid(grid, name="actual_output3.png", show=True)
+    plot_grids([grid, grid, grid], name="actual_output3.png", )

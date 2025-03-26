@@ -5,8 +5,9 @@ divider line - vertically, horizontally, or L-shaped (top left?)
 ---
 
 99 cbebaa4b
-1. yellow is the centre object? (or no hollow object with no orange dot at corners) or both?
-2. move other objects to the yellow object by matching with the orange dot.
+1. orange dot is the min value of the object.
+2. yellow is the centre object? (or no hollow object with no orange dot at corners) or both?
+3. move other objects to the yellow object by matching with the dot .
 ---
 
 
