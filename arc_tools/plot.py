@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import numpy as np
 
 
-def plot_grid(grid, name="grid.png"):
+def plot_grid(grid, name="grid.png", show=False):
     # Define colors
     colors = {
     0: 'black',
@@ -29,14 +30,35 @@ def plot_grid(grid, name="grid.png"):
     ax.patch.set_linewidth(2)  
 
     ax.imshow(grid, cmap=cmap, norm=norm)
-    # Remove ticks
-    ax.set_xticks([])
-    ax.set_yticks([])
+
+    # Get grid dimensions
+    height, width = np.array(grid).shape
+
+    # Set major ticks for grid lines
+    ax.set_xticks(np.arange(-.5, width, 1), minor=True)
+    ax.set_yticks(np.arange(-.5, height, 1), minor=True)
+
+    # Set ticks and labels for numbering
+    ax.set_xticks(np.arange(0, width, 1))
+    ax.set_yticks(np.arange(0, height, 1))
+    ax.set_xticklabels(np.arange(0, width, 1))
+    ax.set_yticklabels(np.arange(0, height, 1))
+
+    # Add grid lines
+    ax.grid(which='minor', color='grey', linestyle='-', linewidth=0.5)
+
+    # Customize tick parameters
+    # ax.tick_params(axis='both', which='major', length=0) # Hide major tick lines - Removed to show ticks
+    # ax.tick_params(axis='both', which='minor', length=0) # Hide minor tick lines - Removed to show ticks
 
     background_color = 'black'
     border_color = 'white'
     plt.savefig(name, facecolor=background_color, edgecolor=border_color)
-    return ax
+    plt.title(name)
+    if show:
+        print('Showing')
+        plt.show(block=True)
+    plt.close()
 
 def plot_grids(grids, name="grids.png"):
     fig, axs = plt.subplots(len(grids), 1, figsize=(10, 5 * len(grids)))

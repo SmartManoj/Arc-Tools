@@ -34,10 +34,11 @@ for split in ['train', 'test']:
         objects = detect_objects(output2)
         plot_grid(output2, name="actual_output.png")
         print(objects[1].region)
-        for obj in objects[1:]:
+        for obj in objects[1:2]:
             # print(obj.region)
-            output2 = move_object(obj, 10, 12, output2)
-            plot_grid(output2, name="actual_output2.png")
+            # output2 = move_object(obj, 10, 12, output2)
+            plot_grid(output2, name="actual_output2.png", show=1)
+            exit()
             # break
         plot_grid(expected_output, name="expected_output.png")
         if output == expected_output:
