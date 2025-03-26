@@ -56,7 +56,15 @@ def plot_grid(grid, name="grid.png", show=False):
     plt.savefig(name, facecolor=background_color, edgecolor=border_color)
     plt.title(name)
     if show:
-        print('Showing')
+        # Function to format coordinates
+        def format_coord(x, y):
+            col = int(x + 0.5)
+            row = int(y + 0.5)
+            z = grid[row][col]
+            return f'(x,y) = ({col},{row})'
+
+        ax.format_coord = format_coord
+        print(f'Showing interactive plot for {name}...')
         plt.show(block=True)
     plt.close()
 
@@ -84,4 +92,4 @@ if __name__ == "__main__":
     grid = [[0 for _ in range(n)] for _ in range(m)]
     for i, j in a:
         grid[i-1][j-1] = 1
-    plot_grid(grid, name="actual_output3.png")
+    plot_grid(grid, name="actual_output3.png", show=True)
