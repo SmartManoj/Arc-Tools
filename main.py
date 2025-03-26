@@ -2,6 +2,7 @@ import os
 from glob import glob
 import json
 from arc_tools.hollow_count import count_hollows_task
+from arc_tools.grid_object import detect_objects, move_object
 from arc_tools.plot import plot_grid
 
 files = glob('C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/*.json')
@@ -29,8 +30,15 @@ for split in ['train', 'test']:
         for i in range(len(output)):
             for j in range(len(output[i])):
                 output2[i][j] = output[i][j]
-        print(output2)
+        # print(output2)
+        objects = detect_objects(output2)
         plot_grid(output2, name="actual_output.png")
+        print(objects[1].region)
+        for obj in objects[1:]:
+            # print(obj.region)
+            output2 = move_object(obj, 10, 12, output2)
+            plot_grid(output2, name="actual_output2.png")
+            # break
         plot_grid(expected_output, name="expected_output.png")
         if output == expected_output:
             print("Correct")

@@ -57,4 +57,9 @@ if __name__ == "__main__":
     [0, 5, 5, 5, 0, 5, 5, 5, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
-    plot_grid(grid)
+    a= [(9, 10), (9, 11), (10, 11), (9, 12), (11, 11), (10, 12), (9, 13), (11, 12), (11, 10), (10, 13), (12, 12), (11, 13), (10, 14)]
+    m, n = 22, 22
+    grid = [[0 for _ in range(n)] for _ in range(m)]
+    for i, j in a:
+        grid[i-1][j-1] = 1
+    plot_grid(grid, name="actual_output3.png")
