@@ -34,13 +34,45 @@ def extract_knowledge_horizontally(grid):
 
 
 
-def extract_knowledge_lshape(grid):
-    # split = extract_knowledge_vertically(a)
-    # if not split:
-    #     split = extract_knowledge_horizontally(a)
-    # if not split:
-    #     split = extract_knowledge_lshape(a)
-    pass
+def extract_knowledge_lshape(grid): # Keep the signature
+    # Don't change the function signature
+    # Don't use global variables or identity checks
+
+    num_rows = len(grid)
+    # Basic validation for grid structure
+    if num_rows == 0 or len(grid[0]) == 0:
+        return []
+
+    # Determine num_cols based on the index of the first '1' in the first row
+    num_cols = 3 # Default if '1' is not found, matching original slice [:3]
+    try:
+        first_row = grid[0]
+        num_cols = first_row.index(1)
+    except ValueError:
+        # '1' not found in the first row, keep default num_cols = 3
+        pass
+    except IndexError:
+         # Should not happen if rows > 0 check passed, but handle defensively
+         return []
+
+
+    if num_rows < 2:
+        # If only 1 row, return the slice of that row based on num_cols
+        row = grid[0]
+        actual_cols = min(num_cols, len(row))
+        return [row[:actual_cols]] # Return as a list containing one row
+
+    l_shape = []
+    # Extract first min(2, rows) rows, and num_cols columns
+    for i in range(num_rows):
+        row = grid[i]
+        # Ensure we don't try to slice beyond the actual row length
+        actual_cols = min(num_cols, len(row))
+        new_row = row[:actual_cols]
+        if all(x == 1 for x in new_row):
+            break
+        l_shape.append(new_row)
+    return l_shape
 
 def extract_knowledge(grid):
     split = extract_knowledge_vertically(grid)

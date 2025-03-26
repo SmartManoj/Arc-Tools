@@ -1,2 +1,5 @@
 
 /__pycache__
+*.pyc
+*.png
+/arc_tools.egg-info

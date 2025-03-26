@@ -1,13 +1,13 @@
 import os
 from glob import glob
 import json
-from hollow_count import count_hollows_task
-from plot import plot_grid
+from arc_tools.hollow_count import count_hollows_task
+from arc_tools.plot import plot_grid
 
 files = glob('C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/*.json')
 file = files[4]
 # print(file)
-file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/e3721c99.json'
+file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/cbebaa4b.json'
 
 data = json.load(open(file, 'r'))
 skip_train = 0
@@ -23,7 +23,14 @@ for split in ['train', 'test']:
 
         plot_grid(grid, name="input.png")
         output = count_hollows_task(grid)
-        plot_grid(output, name="actual_output.png")
+        # slice -6 * -9
+        output = [[i for i in row[:-8]] for row in output[:-6]]
+        output2 = [[0 for _ in range(22)] for _ in range(22)]
+        for i in range(len(output)):
+            for j in range(len(output[i])):
+                output2[i][j] = output[i][j]
+        print(output2)
+        plot_grid(output2, name="actual_output.png")
         plot_grid(expected_output, name="expected_output.png")
         if output == expected_output:
             print("Correct")

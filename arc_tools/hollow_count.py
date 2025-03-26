@@ -1,6 +1,6 @@
 from collections import deque, defaultdict
 import json
-from extract_knowledge import extract_knowledge
+from arc_tools.extract_knowledge import extract_knowledge
 import copy
 def count_hollows_per_number(grid):
     grid = copy.deepcopy(grid)
