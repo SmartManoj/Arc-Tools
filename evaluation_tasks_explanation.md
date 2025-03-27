@@ -10,8 +10,11 @@ divider line - vertically, horizontally, or L-shaped (top left?)
 3. move other objects to the yellow object by matching with the dot .
 ---
 
-
-
+90 b5ca7ac4
+boxe shape  5x5?
+1. move light blue box to left wall
+2. move red box to right wall
+---
 
 
 

@@ -1,9 +1,9 @@
 from collections import deque, defaultdict
 import json
 from arc_tools.extract_knowledge import extract_knowledge
-import copy
+from copy import deepcopy
 def count_hollows_per_number(grid):
-    grid = copy.deepcopy(grid)
+    grid = deepcopy(grid)
     grid = extract_knowledge(grid)
     rows, cols = len(grid), len(grid[0])
     visited = [[False]*cols for _ in range(rows)]

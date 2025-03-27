@@ -1,9 +1,9 @@
+import json
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
 
-
-def plot_grid(grid, name="grid.png", show=False, close=True, ax=None):
+def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None):
     # Define colors
     colors = {
     0: 'black',
@@ -22,18 +22,20 @@ def plot_grid(grid, name="grid.png", show=False, close=True, ax=None):
 
     # Create a colormap
     cmap = mcolors.ListedColormap([colors[i] for i in sorted(colors.keys())])
+    cmap = mcolors.ListedColormap(
+    ['#000000', '#0074D9','#FF4136','#2ECC40','#FFDC00',
+     '#AAAAAA', '#F012BE', '#FF851B', '#7FDBFF', '#870C25'])
 
     # Plot
     if ax is None:
         fig, ax = plt.subplots()
     ax.patch.set_edgecolor('red')  
-
     ax.patch.set_linewidth(2)  
 
-    ax.imshow(grid, cmap=cmap, norm=norm)
+    ax.imshow(grid.grid, cmap=cmap, norm=norm)
 
     # Get grid dimensions
-    height, width = np.array(grid).shape
+    height, width = np.array(grid.grid).shape
 
     # Set major ticks for grid lines
     ax.set_xticks(np.arange(-.5, width, 1), minor=True)
@@ -46,7 +48,7 @@ def plot_grid(grid, name="grid.png", show=False, close=True, ax=None):
     ax.set_yticklabels(np.arange(0, height, 1))
 
     # Add grid lines
-    ax.grid(which='minor', color='grey', linestyle='-', linewidth=0.5)
+    ax.grid(which='minor', color='#555555', linestyle='-', linewidth=1,  )
 
     # Customize tick parameters
     # ax.tick_params(axis='both', which='major', length=0) # Hide major tick lines - Removed to show ticks
@@ -91,16 +93,12 @@ def plot_grids(grids, name="grids.png"):
 
 
 if __name__ == "__main__":
-    grid = [
-    [1,2,3,4,5,6,7,8,9],
-    [0, 5, 5, 5, 0, 5, 5, 5, 0],
-    [0, 5, 5, 5, 0, 5, 0, 5, 0],
-    [0, 5, 5, 5, 0, 5, 5, 5, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-]
-    a= [(9, 10), (9, 11), (10, 11), (9, 12), (11, 11), (10, 12), (9, 13), (11, 12), (11, 10), (10, 13), (12, 12), (11, 13), (10, 14)]
-    m, n = 22, 22
-    grid = [[0 for _ in range(n)] for _ in range(m)]
-    for i, j in a:
-        grid[i-1][j-1] = 1
-    plot_grids([grid, grid, grid], name="actual_output3.png", )
+    from arc_tools.grid import Grid
+    from arc_tools.grid import find_square_boxes
+
+    data = json.load(open("grid.json", "r"))
+    grid = Grid(data)
+    # find square boxes
+    objects = find_square_boxes(grid, 5)
+    print(len(objects))
+    # plot_grid(grid, name="input.png", show=True)
