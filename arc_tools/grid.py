@@ -61,11 +61,12 @@ class Grid(list):
     def __init__(self, grid: list[list[int]]):
         if type(grid) == Grid:
             raise ValueError(f"Wrong input type: {type(grid)}")
-        self.grid = deepcopy(grid)
-        self.background_color = self.detect_background_color()
-        self.n_rows = len(self.grid)
-        self.n_cols = len(self.grid[0])
-        super().__init__(grid)
+        if grid:
+            self.grid = deepcopy(grid)
+            self.background_color = self.detect_background_color()
+            self.n_rows = len(self.grid)
+            self.n_cols = len(self.grid[0])
+            super().__init__(grid)
     
     def remove_object(self, obj: 'SubGrid'):
         for row in range(obj.region.y1, obj.region.y2 + 1):

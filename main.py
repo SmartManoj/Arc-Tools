@@ -1,3 +1,4 @@
+from arc_tools import grid
 from arc_tools.logger import logger
 from copy import deepcopy
 from itertools import combinations
@@ -17,8 +18,6 @@ file = files[14]
 file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/b5ca7ac4.json'
 data = json.load(open(file, 'r'))
 show_count = 0
-task_count = 0
-skip_train = 0
 
 from collections import Counter, deque # Add deque import
 from arc_tools.grid import SubGrid # Add SubGrid import
@@ -82,46 +81,71 @@ def move_object_without_collision(grid: Grid) -> Grid:
                 right_side_grid.grid[i][j] = left_side_grid.grid[i][j]
     return right_side_grid
 
-if __name__ == "__main__":
-    tasks = [
+task_fns = [
         count_hollows_task,
         check_fit,
         move_object_without_collision
     ]
-    for task in tasks:
-        print(task.__name__)
+def debug_output(grid, expected_output, output):
+    print('Debugging output')
+    # print which cells are different
+    for i in range(len(expected_output.grid)):
+        for j in range(len(expected_output.grid[0])):
+            if expected_output.grid[i][j] != output.grid[i][j]:
+                print(f"Cell {i}, {j} is different")
+    plot_grids([grid, expected_output, output],)
+    breakpoint()
+
+def find_task(grids, expected_outputs):
+    for task_fn in task_fns:
+        print(task_fn.__name__)
         right_task = True
-        for split in ['train', 'test']:
-            is_incorrect = False
-            for task_id in range(len(data[split])):
-                if skip_train and split == 'train':
-                    continue
-                task_count += 1
-                if task_count <= 2 and 0:
-                    continue
-                initial_grid_matrix = (data[split][task_id]['input'])
-                grid = Grid(initial_grid_matrix)
-                # from custom_input import grid
-                expected_output = Grid(data[split][task_id]['output'])
-                plot_grid(expected_output, name="expected_output.png")
-
-                # grid = [[5 if j != 0 else j for j in i[:]] for i in grid]
-
-                plot_grid(grid, name="input.png")
-
-                output = task(grid)
-                plot_grid(output, name="actual_output.png")
-                if output == expected_output:
-                    print(f"Correct: {task.__name__}")
-                else:
-                    print("Incorrect")
-                    is_incorrect = True
-                    break
-            if is_incorrect:
+        for grid, expected_output in zip(grids, expected_outputs):
+            grid = Grid(grid)
+            expected_output = Grid(expected_output)
+            output = task_fn(grid)
+            plot_grid(expected_output, name="expected_output.png")
+            plot_grid(grid, name="input.png")
+            plot_grid(output, name="actual_output.png")
+            if output != expected_output:
+                # debug_output(grid, expected_output, output)
                 right_task = False
                 break
         if right_task:
-            print(f"Found right task: {task.__name__}")
-            break
+            return task_fn
+        print('--------------------------------')
+    return None
+
+def solve_task(data):
+    num_train_tasks = len(data['train'])
+    num_test_tasks = len(data['test'])
+    print(f"Number of train tasks: {num_train_tasks}, Number of test tasks: {num_test_tasks}")
+    actual_task_name = None
+    grids = []
+    expected_outputs = []
+    if not actual_task_name:
+        for task_id in range(num_train_tasks):
+            grids.append(data['train'][task_id]['input'])
+            expected_outputs.append(data['train'][task_id]['output'])
+        task_fn = find_task(grids, expected_outputs)
     else:
-        print("No right task found")
+        task_fn = actual_task_name
+    if task_fn:
+        print(f"Found task: {task_fn.__name__}")
+        for task_id in range(num_test_tasks):
+            grid = Grid(data['test'][task_id]['input'])
+            output = task_fn(grid)
+            plot_grid(output, name="actual_output.png")
+            expected_output = Grid(data['test'][task_id].get('output'))
+            if expected_output:
+                plot_grid(expected_output, name="expected_output.png")
+                if output == expected_output:
+                    print(f"Correct: {task_fn.__name__}")
+                else:
+                    print(f"Incorrect: {task_fn.__name__}, Expected: {expected_output}, Actual: {output}")
+    else:
+        print(f"Task not found")
+
+if __name__ == "__main__":
+    from pprint import pprint
+    solve_task(data)
