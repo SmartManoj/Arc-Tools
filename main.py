@@ -10,13 +10,7 @@ from arc_tools.hollow_count import count_hollows_task
 from arc_tools.check_fit import check_fit
 from arc_tools.plot import plot_grid, plot_grids
 
-files = glob('C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/*.json')
-file = files[14]
-# print(file)
-# file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/e3721c99.json'
-# file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/cbebaa4b.json'
-file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/b5ca7ac4.json'
-data = json.load(open(file, 'r'))
+
 show_count = 0
 
 from collections import Counter, deque # Add deque import
@@ -26,6 +20,30 @@ from typing import Tuple, Set # Add typing imports
 
 from arc_tools.grid import Color
 from arc_tools.grid import move_object
+
+def repeat_reverse_grid(grid_obj: Grid) -> Grid:
+    """
+    Transform a grid by repeating the grid thrice horizontally and stack them vertically in (original, reversed, original) order.
+    """
+    grid = grid_obj.grid
+    result = []
+    original_grids = []
+    reversed_grids = []
+    
+    for row in grid:
+        original = [x for _ in range(3) for x in row]
+        original_grids.append(original)
+        
+        reversed_row = list(reversed(row))
+        reversed_grid = [x for _ in range(3) for x in reversed_row]
+        reversed_grids.append(reversed_grid)
+    
+    for _ in range(3):
+        result.extend(original_grids)
+        result.extend(reversed_grids)
+    
+    return Grid(result[:len(grid) * 3])
+
 def move_object_without_collision(grid: Grid) -> Grid:
     global show_count
     objects = detect_objects(grid, required_object = 'square')
@@ -84,7 +102,8 @@ def move_object_without_collision(grid: Grid) -> Grid:
 task_fns = [
         count_hollows_task,
         check_fit,
-        move_object_without_collision
+        move_object_without_collision,
+        repeat_reverse_grid,
     ]
 def debug_output(grid, expected_output, output):
     print('Debugging output')
@@ -123,6 +142,7 @@ def solve_task(data):
     actual_task_name = None
     grids = []
     expected_outputs = []
+    actual_outputs = []
     if not actual_task_name:
         for task_id in range(num_train_tasks):
             grids.append(data['train'][task_id]['input'])
@@ -130,10 +150,10 @@ def solve_task(data):
         task_fn = find_task(grids, expected_outputs)
     else:
         task_fn = actual_task_name
-    if task_fn:
-        print(f"Found task: {task_fn.__name__}")
-        for task_id in range(num_test_tasks):
-            grid = Grid(data['test'][task_id]['input'])
+    for task_id in range(num_test_tasks):
+        grid = Grid(data['test'][task_id]['input'])
+        if task_fn:
+            print(f"Found task: {task_fn.__name__}")
             output = task_fn(grid)
             plot_grid(output, name="actual_output.png")
             expected_output = Grid(data['test'][task_id].get('output'))
@@ -142,10 +162,22 @@ def solve_task(data):
                 if output == expected_output:
                     print(f"Correct: {task_fn.__name__}")
                 else:
-                    print(f"Incorrect: {task_fn.__name__}, Expected: {expected_output}, Actual: {output}")
-    else:
-        print(f"Task not found")
+                    raise Exception(f"Incorrect: {task_fn.__name__}, Expected: {expected_output}, Actual: {output}")
+            output = {"attempt_1": output.grid, "attempt_2": output.grid}
+        else:
+            print(f"Task not found")
+            output = {"attempt_1": grid.grid, "attempt_2": grid.grid}
+        actual_outputs.append(output)
+    return actual_outputs
 
 if __name__ == "__main__":
+    files = glob('C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/*.json')
+    file = files[14]
+    # print(file)
+    # file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/e3721c99.json'
+    # file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/cbebaa4b.json'
+    file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/b5ca7ac4.json'
+    file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/training/00576224.json'
+    data = json.load(open(file, 'r'))
     from pprint import pprint
     solve_task(data)
