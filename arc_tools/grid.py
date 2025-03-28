@@ -57,12 +57,15 @@ class GridRegion:
     def __str__(self):
         return f"[(x1/y1)=({self.x1}/{self.y1}), (x2/y2)=({self.x2}/{self.y2})]"
 
-class Grid:
+class Grid(list):
     def __init__(self, grid: list[list[int]]):
+        if type(grid) == Grid:
+            raise ValueError(f"Wrong input type: {type(grid)}")
         self.grid = deepcopy(grid)
         self.background_color = self.detect_background_color()
         self.n_rows = len(self.grid)
         self.n_cols = len(self.grid[0])
+        super().__init__(grid)
     
     def remove_object(self, obj: 'SubGrid'):
         for row in range(obj.region.y1, obj.region.y2 + 1):
@@ -74,11 +77,10 @@ class Grid:
     
     def get_values_count(self):
         values = Counter()
-        for i in self.grid:
-            for j in i:
-                value = j
-                if value != getattr(self, 'background_color', None):
-                    values[value] += 1
+        for row in self.grid:
+            for col in row:
+                if col != getattr(self, 'background_color', None):
+                    values[col] += 1
         return values
 
     def detect_background_color(self):
@@ -94,6 +96,8 @@ class Grid:
         return max_key
     
     def __eq__(self, other):
+        if not isinstance(other, Grid):
+            raise ValueError(f"other is not a Grid but a {type(other)}")
         return self.grid == other.grid
 
     def save(self, name: str = "grid.json"):
@@ -239,7 +243,7 @@ def find_square_boxes(grid_obj: Grid, size: int) -> list[SubGrid]:
     return [SubGrid(region, grid_obj) for region in regions]
 
 
-def detect_objects(grid: Grid, required_object: str = None) -> list[SubGrid]:
+def detect_objects(grid: Grid, required_object: str | None = None) -> list[SubGrid]:
     grid_np = np.array(grid.grid)
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
@@ -305,6 +309,8 @@ def move_object(object_to_move: SubGrid, x: int, y: int, grid_obj: Grid) -> Grid
 if __name__ == "__main__":
     file = r'"C:/Users/smart/Desktop/arc - local/main.py"'
     import os
-    os.system(f'python {file}')
+    # os.system(f'python {file}')
 
-    
+    grid1 = Grid([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).grid
+    grid2 = Grid([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).grid
+    print(grid1 == grid2)

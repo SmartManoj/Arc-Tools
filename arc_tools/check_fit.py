@@ -1,18 +1,17 @@
 from copy import deepcopy
 from itertools import combinations
-from arc_tools.plot import plot_grid, plot_grids
-from logger import logger
-from arc_tools.grid import GridPoint, detect_objects
+from arc_tools.logger import logger
+from arc_tools.grid import Grid, GridPoint, detect_objects, SubGrid
 from arc_tools.grid import detect_objects, move_object
+from arc_tools.plot import plot_grids
 
 def calculate_offset(A1: GridPoint, A2: GridPoint): 
-    logger.debug(f"Calculating offset between {A1} and {A2}")
     # calculate offset between A1 and A2
     offset_x = A1.x - A2.x
     offset_y = A1.y - A2.y
     return offset_x, offset_y
 
-def check_fit_recursive(current_grid, remaining_objects, locked_dots_so_far, dot_value):
+def check_fit_recursive(current_grid: Grid, remaining_objects: list[SubGrid], locked_dots_so_far: list[GridPoint], dot_value: int):
     """
     Recursively tries to fit objects onto the grid.
 
@@ -47,7 +46,7 @@ def check_fit_recursive(current_grid, remaining_objects, locked_dots_so_far, dot
         centre_object_dots_position_and_sides = centre_object.get_points_and_sides_of_dots(dot_value)
         obj_dots_position_and_sides = current_obj.get_points_and_sides_of_dots(dot_value)
 
-        logger.debug(f"Attempting to fit object {current_obj.region} ({len(remaining_objects)} total remaining).")
+        logger.debug(f"Attempting to fit object {current_obj.region} ({len(rest_objects)} total remaining).")
         
 
         centre_object_dots_position_and_sides =[i for i in centre_object_dots_position_and_sides if i[0] not in locked_dots_so_far]
@@ -84,7 +83,7 @@ def check_fit_recursive(current_grid, remaining_objects, locked_dots_so_far, dot
 
                     # Create a new grid state by applying the move
                     # Use deepcopy to avoid modifying the grid state needed for backtracking
-                    new_grid = deepcopy(current_grid)
+                    new_grid = current_grid.copy()
                     new_grid = move_object(current_obj, offset_x1, offset_y1, new_grid) # move_object modifies new_grid in place
 
                     # Update locked dots for the next recursive call
@@ -109,32 +108,32 @@ def check_fit_recursive(current_grid, remaining_objects, locked_dots_so_far, dot
         logger.debug(f"Centre object points: {centre_object_dots_position_and_sides}")
         logger.debug(f"Current object points: {obj_dots_position_and_sides}")
         
-        if plot_show>3 and 0:
-            print(plot_show)
-            plot_grids([current_grid, current_obj.get_full_grid().grid])
-            breakpoint()
-        plot_show+=1
-
-        print('--------------------------------')
     return current_grid, False # Indicate failure for this path
 
-def check_fit(grid):
-    initial_grid = deepcopy(grid)
+def check_fit(grid: Grid) -> Grid:
+    initial_grid = grid.copy()
     objects = detect_objects(grid)
     logger.debug(f"Total objects: {len(objects)}")
     for obj in objects:
         if not obj.has_hollow_space()  and obj.has_yellow_block():
             centre_object = obj
             break
-    original_grid = grid
     dot_value = centre_object.get_min_value()
-    output = centre_object.get_full_grid().grid
-    # objects = objects[0:2]
-    # locked_dots = [] # Removed global list initialization
+    output = centre_object.get_full_grid()
     objects.remove(centre_object)
+    
+    
+    logger.info("New count of objects: %d", len(objects))
     # Initial call to the recursive function with an empty list for locked_dots
     output, is_fitted = check_fit_recursive(output, objects, [], dot_value)
     if is_fitted:
         return output
     else:
         return initial_grid
+
+
+if __name__ == "__main__":
+    file = r'"C:/Users/smart/Desktop/arc - local/main.py"'
+    import os
+    os.system(f'python {file}')
+

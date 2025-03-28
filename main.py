@@ -1,4 +1,4 @@
-from asyncio.log import logger
+from arc_tools.logger import logger
 from copy import deepcopy
 from itertools import combinations
 import os
@@ -12,6 +12,8 @@ from arc_tools.plot import plot_grid, plot_grids
 files = glob('C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/*.json')
 file = files[14]
 # print(file)
+# file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/e3721c99.json'
+# file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/cbebaa4b.json'
 file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/b5ca7ac4.json'
 data = json.load(open(file, 'r'))
 show_count = 0
@@ -82,8 +84,8 @@ def move_object_without_collision(grid: Grid) -> Grid:
 
 if __name__ == "__main__":
     tasks = [
-        # count_hollows_task,
-        # check_fit
+        count_hollows_task,
+        check_fit,
         move_object_without_collision
     ]
     for task in tasks:
@@ -121,4 +123,5 @@ if __name__ == "__main__":
         if right_task:
             print(f"Found right task: {task.__name__}")
             break
-
+    else:
+        print("No right task found")

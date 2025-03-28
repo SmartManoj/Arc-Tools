@@ -3,3 +3,4 @@
 *.pyc
 *.png
 /arc_tools.egg-info
+/.mypy_cache/3.12

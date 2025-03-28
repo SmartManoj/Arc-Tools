@@ -2,6 +2,7 @@ from collections import deque, defaultdict
 import json
 from arc_tools.extract_knowledge import extract_knowledge
 from copy import deepcopy
+from arc_tools.grid import Grid
 def count_hollows_per_number(grid):
     grid = deepcopy(grid)
     grid = extract_knowledge(grid)
@@ -50,7 +51,8 @@ def count_hollows_per_number(grid):
         hollow_count_dict[hollow_count.get(num, 0)] = num
     return hollow_count_dict
 
-def count_hollows_task(grid):
+def count_hollows_task(grid_o: Grid) -> Grid:
+    grid = grid_o.grid
     rows = len(grid)
     cols = len(grid[0])
     visited = [[False]*cols for _ in range(rows)]
@@ -139,7 +141,7 @@ def count_hollows_task(grid):
         for x, y in cells:
             grid[x][y] = hollow_count_dict.get(hollow_count, 0)
 
-    return grid
+    return Grid(grid)
 if __name__ == "__main__":
     # Load and slice input grid
     file = open('C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/e3721c99.json', 'r')
