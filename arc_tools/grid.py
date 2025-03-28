@@ -99,6 +99,9 @@ class Grid(list):
         if not isinstance(other, Grid):
             raise ValueError(f"other is not a Grid but a {type(other)}")
         return self.grid == other.grid
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def save(self, name: str = "grid.json"):
         data = json.dumps(self.grid)
