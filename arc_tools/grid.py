@@ -62,30 +62,38 @@ class Grid(list):
         if type(grid) == Grid:
             raise ValueError(f"Wrong input type: {type(grid)}")
         if grid:
-            self.grid = deepcopy(grid)
+            super().__init__(deepcopy(grid))
             self.background_color = self.detect_background_color()
-            self.n_rows = len(self.grid)
-            self.n_cols = len(self.grid[0])
-            super().__init__(grid)
+            self.n_rows = len(self)
+            self.n_cols = len(self[0])
     
+    def replace_color(self, old_color, new_color):
+        for row in range(self.n_rows):
+            for col in range(self.n_cols):
+                if self[row][col] == old_color:
+                    self[row][col] = new_color
+
     def remove_object(self, obj: 'SubGrid'):
         for row in range(obj.region.y1, obj.region.y2 + 1):
             for col in range(obj.region.x1, obj.region.x2 + 1):
-                self.grid[row][col] = self.background_color
+                self[row][col] = self.background_color
     
     def copy(self):
-        return deepcopy(self)
+        c = deepcopy(self)
+        c.background_color = self.background_color
+        return c
     
-    def get_values_count(self):
-        values = Counter()
-        for row in self.grid:
+    def get_values_count(self, all: bool = False) -> Counter:
+        values : Counter = Counter()
+        for row in self:
             for col in row:
-                if col != getattr(self, 'background_color', None):
+                if col != self.background_color or all:
                     values[col] += 1
         return values
 
     def detect_background_color(self):
         # maximum value in the grid
+        self.background_color = None
         return self.get_max_value()
 
     def get_min_value(self):
@@ -97,29 +105,27 @@ class Grid(list):
         return max_key
     
     def __eq__(self, other):
-        if not isinstance(other, Grid):
-            raise ValueError(f"other is not a Grid but a {type(other)}")
-        return self.grid == other.grid
+        return super().__eq__(other)
     
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def save(self, name: str = "grid.json"):
-        data = json.dumps(self.grid)
+        data = json.dumps(list(self))
         with open(name, 'w') as f:
             f.write(data)
 
 class SubGrid(Grid):
-    def __init__(self, region: GridRegion, parent_grid_object: Grid):
+    def __init__(self, region: GridRegion, parent_grid: Grid):
         self.region = region # Keep the attribute name 'region' for consistency
-        self.parent_grid_object = parent_grid_object
-        self.parent_grid = self.parent_grid_object.grid
-        self.grid = self.get_subgrid()
-        self.rows = self.region.y2 - self.region.y1 + 1
-        self.cols = self.region.x2 - self.region.x1 + 1
+        self.parent_grid = parent_grid
+        self.n_rows = self.region.y2 - self.region.y1 + 1
+        self.n_cols = self.region.x2 - self.region.x1 + 1
+        super().__init__(self.get_subgrid())
+        self.background_color = self.parent_grid.background_color
 
     def __str__(self):
-        return f"Region: {self.region}"
+        return f"Region: {self.region}, n_rows: {self.n_rows}, n_cols: {self.n_cols}, background_color: {self.background_color}\n{super().__str__()}"
     
     def get_border_sides(self, point: GridPoint):
         sides = []
@@ -141,6 +147,11 @@ class SubGrid(Grid):
                     positions.append(GridPoint(col, row))
         return positions
     
+    
+                    
+    def copy(self):
+        return deepcopy(self)
+
     def get_points_and_sides_of_dots(self, value):
         points = self.get_points_of_dots(value)
         points_and_sides = []
@@ -157,10 +168,10 @@ class SubGrid(Grid):
     
     def get_full_grid(self) -> Grid:
         n_parent_rows, n_parent_cols = len(self.parent_grid), len(self.parent_grid[0])
-        grid = [[self.parent_grid_object.background_color for _ in range(n_parent_cols)] for _ in range(n_parent_rows)]
-        for row in range(self.region.y1, self.region.y2 + 1):
-            for col in range(self.region.x1, self.region.x2 + 1):
-                grid[row][col] = self.parent_grid[row][col]
+        grid = [[self.parent_grid.background_color for _ in range(n_parent_cols)] for _ in range(n_parent_rows)]
+        for row in range(self.n_rows):
+            for col in range(self.n_cols):
+                grid[row + self.region.y1][col + self.region.x1] = self[row][col]
         return Grid(grid)
     
     def has_yellow_block(self):
@@ -176,31 +187,34 @@ class SubGrid(Grid):
         Uses BFS starting from border 0s to find all externally connected 0s.
         Any remaining 0s are considered internal/hollow.
         """
-        if not self.grid or not self.grid[0]:
+        return self.get_holes_count(max_count=1)
+    
+    def get_holes_count(self, max_count: int | None = None) -> int:
+        if not self or not self[0]:
             return False # Handle empty or invalid grid
 
-        rows, cols = len(self.grid), len(self.grid[0])
+        rows, cols = len(self), len(self[0])
         visited = [[False for _ in range(cols)] for _ in range(rows)]
-        q = deque()
+        q : deque[tuple[int, int]] = deque()
 
         # Add border 0s to the queue and mark as visited
         for r in range(rows):
             # Left border
-            if self.grid[r][0] == 0 and not visited[r][0]:
+            if self[r][0] == 0 and not visited[r][0]:
                 q.append((r, 0))
                 visited[r][0] = True
             # Right border
-            if self.grid[r][cols - 1] == 0 and not visited[r][cols - 1]:
+            if self[r][cols - 1] == 0 and not visited[r][cols - 1]:
                 q.append((r, cols - 1))
                 visited[r][cols - 1] = True
 
         for c in range(cols): # Avoid double-adding corners
             # Top border
-            if self.grid[0][c] == 0 and not visited[0][c]:
+            if self[0][c] == 0 and not visited[0][c]:
                 q.append((0, c))
                 visited[0][c] = True
             # Bottom border
-            if self.grid[rows - 1][c] == 0 and not visited[rows - 1][c]:
+            if self[rows - 1][c] == 0 and not visited[rows - 1][c]:
                 q.append((rows - 1, c))
                 visited[rows - 1][c] = True
 
@@ -209,19 +223,24 @@ class SubGrid(Grid):
             for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
                 nr, nc = r + dr, c + dc
                 if 0 <= nr < rows and 0 <= nc < cols and \
-                self.grid[nr][nc] == 0 and not visited[nr][nc]:
+                self[nr][nc] == self.background_color and not visited[nr][nc]:
                     visited[nr][nc] = True
                     q.append((nr, nc))
 
+        count = 0
         for r in range(rows):
             for c in range(cols):
-                if self.grid[r][c] == 0 and not visited[r][c]:
-                    return True
+                if self[r][c] == self.background_color and not visited[r][c]:
+                    count += 1
+                    if max_count and count == max_count:
+                        return count
 
-        return False 
+        return 0 
+    
 
-def find_square_boxes(grid_obj: Grid, size: int) -> list[SubGrid]:
-    grid = deepcopy(grid_obj.grid)
+
+def find_square_boxes(grid: Grid, size: int) -> list[SubGrid]:
+    grid = deepcopy(grid)
     rows = len(grid)
     cols = len(grid[0])
     regions = []
@@ -231,7 +250,7 @@ def find_square_boxes(grid_obj: Grid, size: int) -> list[SubGrid]:
             is_box = True
             for dr in range(size):
                 for dc in range(size):
-                    if grid[r + dr][c + dc] == grid_obj.background_color:
+                    if grid[r + dr][c + dc] == grid.background_color:
                         is_box = False
                         break
                 if not is_box:
@@ -244,17 +263,18 @@ def find_square_boxes(grid_obj: Grid, size: int) -> list[SubGrid]:
                     for dc in range(size):
                         grid[r + dr][c + dc] = 0
 
-    return [SubGrid(region, grid_obj) for region in regions]
+    return [SubGrid(region, grid) for region in regions]
 
 
-def detect_objects(grid: Grid, required_object: str | None = None) -> list[SubGrid]:
-    grid_np = np.array(grid.grid)
+def detect_objects(grid: Grid, required_object: str | None = None, invert: bool = False) -> list[SubGrid]:
+    grid_np = np.array(grid)
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
     objects = []
+    comp = '__eq__' if invert else '__ne__'
     for r in range(rows):
         for c in range(cols):
-            if grid_np[r, c] != grid.background_color and not visited[r, c]:
+            if getattr(grid_np[r, c], comp)(grid.background_color) and not visited[r, c]:
                 # Start BFS for a new object
                 current_object_points = []
                 q = deque([(r, c)])
@@ -268,7 +288,7 @@ def detect_objects(grid: Grid, required_object: str | None = None) -> list[SubGr
                     for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
                         nr, nc = row + dr, col + dc
                         if 0 <= nr < rows and 0 <= nc < cols and \
-                           grid_np[nr, nc] != grid.background_color and not visited[nr, nc]:
+                           getattr(grid_np[nr, nc], comp)(grid.background_color) and not visited[nr, nc]:
                             visited[nr, nc] = True
                             q.append((nr, nc))
                 
@@ -283,7 +303,7 @@ def detect_objects(grid: Grid, required_object: str | None = None) -> list[SubGr
                 if current_object_points:
                     obj = SubGrid(GridRegion(current_object_points), grid)
                     if required_object == 'square':
-                        if obj.rows == 5 and obj.cols == 5:
+                        if obj.n_rows == 5 and obj.n_cols == 5:
                             objects.append(obj)
                         else:
                             new_objects = find_square_boxes(obj.get_full_grid(), 5)
@@ -296,10 +316,10 @@ def detect_objects(grid: Grid, required_object: str | None = None) -> list[SubGr
     return objects
     
 
-def move_object(object_to_move: SubGrid, x: int, y: int, grid_obj: Grid) -> Grid:
+def move_object(object_to_move: SubGrid, x: int, y: int, grid: Grid) -> Grid:
     # x, y = object_to_move.region.x1 + dx, object_to_move.region.y1 + dy
     # copy the value of the object_to_move to the new position
-    grid = grid_obj.grid
+    grid = grid
     logger.debug(f"Moving object {object_to_move} to {x}, {y}")
     old_grid = deepcopy(object_to_move.parent_grid)
 
@@ -314,7 +334,10 @@ if __name__ == "__main__":
     file = r'"C:/Users/smart/Desktop/arc - local/main.py"'
     import os
     # os.system(f'python {file}')
-
-    grid1 = Grid([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).grid
-    grid2 = Grid([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).grid
-    print(grid1 == grid2)
+    g=[[2, 2, 2, 2, 2], [2, 1, 5, 2, 0], [2, 8, 9, 0, 0], [2, 2, 0, 0, 0], [2, 0, 0, 0, 0]]
+    grid = Grid(g)
+    grid2 = grid.copy()
+    grid2[0][0] = 0
+    print(grid)
+    print(grid2)
+    print(grid==grid2)

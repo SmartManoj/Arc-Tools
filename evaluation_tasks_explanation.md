@@ -22,8 +22,9 @@ divider line - vertically, horizontally, or L-shaped (top left?)
 jigsaw puzzle
 find output grid size by counting the number of objects in the input grid
 1. find color map box
-2. move the jigsaw puzzle pieces to the correct position
-3. replace colors of the objects in the output grid with the color map
+2. piece that having the color map box is the first piece without rotation.
+3. move the jigsaw puzzle pieces to the correct position (do largest piece first)
+4. replace colors of the objects in the output grid with the color map
 ---
 
 

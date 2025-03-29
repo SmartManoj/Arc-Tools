@@ -2,8 +2,13 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
+from arc_tools.logger import logger
 
 def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None):
+    if not grid:
+        logger.debug(f"Grid is empty")
+        breakpoint()
+        return
     # Define colors
     colors = {
     0: 'black',
@@ -32,10 +37,10 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None):
     ax.patch.set_edgecolor('red')  
     ax.patch.set_linewidth(2)  
 
-    ax.imshow(grid.grid, cmap=cmap, norm=norm)
+    ax.imshow(grid, cmap=cmap, norm=norm)
 
     # Get grid dimensions
-    height, width = np.array(grid.grid).shape
+    height, width = np.array(grid).shape
 
     # Set major ticks for grid lines
     ax.set_xticks(np.arange(-.5, width, 1), minor=True)
@@ -73,32 +78,25 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None):
     if close:
         plt.close()
 
-def plot_grids(grids, name="grids.png"):
-    # fig, axs = plt.subplots(len(grids), 1, figsize=(10, 5 * len(grids)))
-    # for i, grid in enumerate(grids):
-    #     ax = plot_grid(grid, ax=axs[i])
-    # plt.tight_layout()
-    # plt.show(block=1)
-    # background_color = 'black'
-    # border_color = 'white'
-    # plt.savefig(name, facecolor=background_color, edgecolor=border_color)
-
+def plot_grids(grids, name="grids.png", show=False):
     # plot the grids in a single plot
     fig, axs = plt.subplots(1, len(grids), figsize=(10, 5 * len(grids)))
     for i, grid in enumerate(grids):
-        ax = plot_grid(grid, ax=axs[i], close=False)
+        ax = plot_grid(grid, ax=axs[i] if len(grids) > 1 else axs, close=False)
         # axs[i].imshow(grid)
     plt.tight_layout()
-    plt.show(block=1)
+    if show:
+        plt.show(block=1)
+    plt.savefig(name)
+    plt.close()
 
 
 if __name__ == "__main__":
     from arc_tools.grid import Grid
     from arc_tools.grid import find_square_boxes
 
-    data = json.load(open("grid.json", "r"))
+    # data = json.load(open("grid.json", "r"))
+    data = [[0,1]]
     grid = Grid(data)
     # find square boxes
-    objects = find_square_boxes(grid, 5)
-    print(len(objects))
-    # plot_grid(grid, name="input.png", show=True)
+    plot_grids([grid], name="input.png", show=0)
