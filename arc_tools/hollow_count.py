@@ -51,8 +51,7 @@ def count_hollows_per_number(grid):
         hollow_count_dict[hollow_count.get(num, 0)] = num
     return hollow_count_dict
 
-def count_hollows_task(grid_o: Grid) -> Grid:
-    grid = grid_o.grid
+def count_hollows_task(grid: Grid) -> Grid:
     rows = len(grid)
     cols = len(grid[0])
     visited = [[False]*cols for _ in range(rows)]

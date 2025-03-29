@@ -10,3 +10,4 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
+
