@@ -48,8 +48,19 @@ def test_find_4x4_boxes():
     assert objects[2].region == GridRegion([GridPoint(0, 5), GridPoint(3, 8)])
 
 
+def test_detect_objects():
+    # TODO: Fix this test
+    g=[[2, 2, 2, 2, 0], [2, 1, 5, 2, 0], [2, 8, 9, 0, 0], [2, 2, 0, 0, 0], [2, 0, 0, 0, 1]]
+    grid = Grid(g)
+    objs = detect_objects(grid,)
+    print(len( objs))
+    obj = objs[0]
+    assert obj.region == GridRegion([GridPoint(0, 0), GridPoint(4, 4)]), f"Expected region {GridRegion([GridPoint(0, 0), GridPoint(4, 4)])}, got {obj.region}"
+    # plot_grids([obj, grid], show=True)
+
 if __name__ == "__main__":
     test_grid_with_hollow()
     test_find_4x4_boxes()
+    test_detect_objects()
     print("All test cases passed")
 

@@ -4,7 +4,7 @@ import json
 import numpy as np
 import logging
 from copy import deepcopy
-from arc_tools.plot import plot_grid
+from arc_tools.plot import plot_grids
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -334,10 +334,10 @@ if __name__ == "__main__":
     file = r'"C:/Users/smart/Desktop/arc - local/main.py"'
     import os
     # os.system(f'python {file}')
-    g=[[2, 2, 2, 2, 2], [2, 1, 5, 2, 0], [2, 8, 9, 0, 0], [2, 2, 0, 0, 0], [2, 0, 0, 0, 0]]
+    g=[[2, 2, 2, 2, 0], [2, 1, 5, 2, 0], [2, 8, 9, 0, 0], [2, 2, 0, 0, 0], [2, 0, 0, 0, 1]]
     grid = Grid(g)
-    grid2 = grid.copy()
-    grid2[0][0] = 0
-    print(grid)
-    print(grid2)
-    print(grid==grid2)
+    objs = detect_objects(grid,)
+    print(len( objs))
+    obj = objs[0]
+    print(obj.region)
+    plot_grids([obj, grid], show=True)
