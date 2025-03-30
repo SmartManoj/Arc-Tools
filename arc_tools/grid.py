@@ -90,10 +90,15 @@ class Grid(list):
                 if col != self.background_color or all:
                     values[col] += 1
         return values
+    
+    def get_total_n_values(self) -> int:
+        return sum(self.get_values_count().values())
 
     def detect_background_color(self):
         # maximum value in the grid
         self.background_color = None
+        if Color.BLACK.value in self.get_values_count():
+            return Color.BLACK.value
         return self.get_max_value()
 
     def get_min_value(self):

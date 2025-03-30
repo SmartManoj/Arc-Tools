@@ -334,7 +334,6 @@ def jigsaw_puzzle(grid: Grid) -> Grid:
         new_grid = jigsaw_recursive(empty_grid, [first_object])
         if not new_grid:
             print("No new grid found")
-            exit()
         if new_grid is not None:
             result = jigsaw_recursive(new_grid, objects)
             if result is not None:
@@ -346,6 +345,43 @@ def jigsaw_puzzle(grid: Grid) -> Grid:
     print(f"Time taken: {datetime.now() - start_time}")
     return grid
 
+def row_col_color_data(grid: Grid) -> Grid:
+    """
+    Create a new grid with row, col, and color data.
+
+    Args:
+        divide the grid into 4 subgrids and return the new grid with row, col, and background color (ratio map), data.
+        
+    """
+    grid_size = len(grid)
+    subgrid_size = grid_size//2
+    # plot_grid(grid, name="input.png", show=True)
+    first_piece =  SubGrid(GridRegion([GridPoint(0, 0), GridPoint(subgrid_size-1, subgrid_size-1)]), grid)
+    second_piece = SubGrid(GridRegion([GridPoint(subgrid_size, 0), GridPoint(2*subgrid_size-1, subgrid_size-1)]), grid)
+    third_piece =  SubGrid(GridRegion([GridPoint(0, subgrid_size), GridPoint(subgrid_size-1, 2*subgrid_size-1)]), grid)
+    fourth_piece = SubGrid(GridRegion([GridPoint(subgrid_size, subgrid_size), GridPoint(2*subgrid_size-1, 2*subgrid_size-1)]), grid)
+    rows = first_piece.get_total_n_values()
+    cols = second_piece.get_total_n_values()
+    # breakpoint()
+    print(f"rows: {rows}, cols: {cols}")
+    # breakpoint()
+    new_grid = []
+    row_ratio = rows//subgrid_size or 1
+    col_ratio = cols//subgrid_size or 1
+    for row in range(rows):
+        new_row = []
+        for col in range(cols):
+            row_idx = row % subgrid_size
+            col_idx = col % subgrid_size
+            new_val = fourth_piece[row_idx][col_idx]
+            if not new_val:
+                new_val = third_piece[(row//row_ratio)%subgrid_size][(col//col_ratio)%subgrid_size]
+            new_row.append(new_val)
+        new_grid.append(new_row)
+    return new_grid
+
+
+
 
 if 1:
     normal_task_fns = [
@@ -354,11 +390,12 @@ if 1:
             move_object_without_collision,
             repeat_reverse_grid,
         ]
-# else:
-#     normal_task_fns = []
+else:
+    normal_task_fns = [row_col_color_data]
 
 jigsaw_task_fns = [
-    jigsaw_puzzle,
+    # jigsaw_puzzle,
+    row_col_color_data, # can occur in normal task
 ]
 
 
@@ -401,13 +438,17 @@ def solve_task(data):
     num_train_tasks = len(data['train'])
     num_test_tasks = len(data['test'])
     print(f"Number of train tasks: {num_train_tasks}, Number of test tasks: {num_test_tasks}")
+    start_train_task_id = 0
+    start_test_task_id = 0
     actual_task_name = None
-    # actual_task_name = jigsaw_puzzle
+    # start_train_task_id = 3
+    # start_test_task_id = 0
+    # actual_task_name = row_col_color_data
     grids = []
     expected_outputs = []
     actual_outputs = []
     if not actual_task_name:
-        for task_id in range(num_train_tasks):
+        for task_id in range(start_train_task_id, num_train_tasks):
             grids.append(data['train'][task_id]['input'])
             expected_outputs.append(data['train'][task_id]['output'])
         task_fn = find_task(grids, expected_outputs)
@@ -415,7 +456,7 @@ def solve_task(data):
             print(f"Task not found")
     else:
         task_fn = actual_task_name
-    for task_id in range(num_test_tasks):
+    for task_id in range(start_test_task_id, num_test_tasks):
         grid = Grid(data['test'][task_id]['input'])
         if task_fn:
             plot_grid(grid, name="input.png")
@@ -443,6 +484,7 @@ if __name__ == "__main__":
     # file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/cbebaa4b.json'
     # file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/b5ca7ac4.json'
     file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/f560132c.json'
+    file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/f931b4a8.json'
     # file = r'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/training/00576224.json'
     data = json.load(open(file, 'r'))
     from pprint import pprint

@@ -7,7 +7,7 @@ from arc_tools.logger import logger
 def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None):
     if not grid:
         logger.debug(f"Grid is empty")
-        breakpoint()
+        # breakpoint()
         return
     # Define colors
     colors = {

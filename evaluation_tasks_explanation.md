@@ -1,4 +1,5 @@
-
+MISC:
+If 0 is present in a grid, will it be always the background color?
 
 90 b5ca7ac4
 boxe shape  5x5?
@@ -27,4 +28,12 @@ find output grid size by counting the number of objects in the input grid
 4. replace colors of the objects in the output grid with the color map
 ---
 
+118 f931b4a8
+input grid: divide the grid into 4 subgrids 
+first piece: row
+second piece: col
+third piece: background color (ratio map)
+fourth piece: data
+
+output grid: A grid with row, col, and data else background color (ratio map).
 
