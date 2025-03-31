@@ -1,6 +1,5 @@
 
 from arc_tools.grid import detect_objects
-from arc_tools.grid import find_square_boxes
 from arc_tools.grid import Grid, GridRegion, GridPoint
 def test_grid_with_hollow():
     grid_with_hollow = [
@@ -41,7 +40,7 @@ def test_find_4x4_boxes():
     ]
     grid = Grid(grid)
     print(grid.background_color)
-    objects = find_square_boxes(grid, 4)
+    objects = (grid, 4)
     assert len(objects) == 3, f"Expected 3 objects, got {len(objects)}"
     assert objects[0].region == GridRegion([GridPoint(0, 0), GridPoint(3, 3)])
     assert objects[1].region == GridRegion([GridPoint(4, 2), GridPoint(7, 5)])

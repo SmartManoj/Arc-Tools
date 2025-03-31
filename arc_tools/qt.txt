@@ -1,0 +1,7 @@
+# crop the region 22,18 24,28
+obj = SubGrid(GridRegion([GridPoint(18, 22), GridPoint(24, 28)]), grid).get_full_grid()
+input_grid.save()
+plot_grid(obj, show=1)
+plot_grid(input_grid, show=1)
+plot_grids(objs, show=1)
+plot_grids(non_corner_objects, show=1)

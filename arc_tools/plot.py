@@ -59,15 +59,13 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None):
     # ax.tick_params(axis='both', which='major', length=0) # Hide major tick lines - Removed to show ticks
     # ax.tick_params(axis='both', which='minor', length=0) # Hide minor tick lines - Removed to show ticks
 
-    background_color = 'black'
-    border_color = 'white'
-    plt.savefig(name, facecolor=background_color, edgecolor=border_color)
+    plt.savefig(name, facecolor='black', edgecolor='white')
     plt.title(name)
     def format_coord(x, y):
         if x >= -0.5 and y >= -0.5:
             col = int(x + 0.5)
             row = int(y + 0.5)
-            return f'(x,y) = ({col},{row})'
+            return f'(row,col) = ({row},{col})\n(x,y) = ({col},{row})'
         return ''
 
     ax.format_coord = format_coord
@@ -87,16 +85,15 @@ def plot_grids(grids, name="grids.png", show=False):
     plt.tight_layout()
     if show:
         plt.show(block=1)
-    plt.savefig(name)
+    plt.savefig(name, facecolor='black', edgecolor='white')
     plt.close()
 
 
 if __name__ == "__main__":
     from arc_tools.grid import Grid
-    from arc_tools.grid import find_square_boxes
 
     # data = json.load(open("grid.json", "r"))
     data = [[0,1]]
     grid = Grid(data)
     # find square boxes
-    plot_grids([grid], name="input.png", show=0)
+    plot_grids([grid], name="input.png", show=1)

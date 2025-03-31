@@ -1,5 +1,4 @@
-MISC:
-If 0 is present in a grid, will it be always the background color?
+
 
 90 b5ca7ac4
 boxe shape  5x5?
