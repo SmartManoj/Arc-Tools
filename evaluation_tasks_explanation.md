@@ -1,7 +1,14 @@
 
+87 abc82100
+light blue box is the key object.
+nearby two objects of different color is the color replacement map.
+(need to replace the color with the one that touched the key object)
+replace dots with the object using the color replacement map.
+
+---
 
 90 b5ca7ac4
-boxe shape  5x5?
+box shape  5x5?
 1. move light blue box to left wall
 2. move red box to right wall
 ---
