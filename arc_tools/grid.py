@@ -43,6 +43,10 @@ class GridPoint:
     
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
+    
+    def __hash__(self):
+        return hash((self.x, self.y))
+
 
 class GridRegion:
     def __init__(self, points: list[GridPoint]):
@@ -50,12 +54,16 @@ class GridRegion:
         self.x2 = max(p.x for p in points)
         self.y1 = min(p.y for p in points)
         self.y2 = max(p.y for p in points)
+        self.width = self.x2 - self.x1 + 1
+        self.height = self.y2 - self.y1 + 1 
     
     def __eq__(self, other):
         return self.x1 == other.x1 and self.x2 == other.x2 and self.y1 == other.y1 and self.y2 == other.y2
 
     def __str__(self):
         return f"[(x1/y1)=({self.x1}/{self.y1}), (x2/y2)=({self.x2}/{self.y2})]"
+    
+    
 
 class CustomIndexError(IndexError):
     def __init__(self, message):
@@ -105,6 +113,22 @@ class Grid(SafeList):
             for col in range(self.n_cols):
                 if self[row][col] == old_color:
                     self[row][col] = new_color
+        return self
+    
+    def replace_dot(self, dot_color, obj: 'SubGrid', dx: int, dy: int, first_grid: 'Grid'):
+        logger.info(f"Replacing dot {dot_color} with object {obj} at {dx}, {dy}")
+        for row in range(self.n_rows):
+            for col in range(self.n_cols):
+                if first_grid[row][col] == dot_color:
+                    first_grid[row][col] = self.background_color
+                    for obj_row in range(min(obj.n_rows, self.n_rows - row - dy)):
+                        for obj_col in range(min(obj.n_cols, self.n_cols - col - dx)):
+                            new_row = row + obj_row + dy
+                            new_col = col + obj_col + dx
+                            if new_row >= 0 and new_col >= 0:
+                                if self[new_row][new_col] in [self.background_color, dot_color]:
+                                    self[new_row][new_col] = obj[obj_row][obj_col]
+        return self
     
     def crop(self, region: GridRegion):
         return Grid([[self[row][col] for col in range(region.x1, region.x2 + 1)] for row in range(region.y1, region.y2 + 1)])
@@ -113,7 +137,8 @@ class Grid(SafeList):
         for row in range(obj.region.y1, obj.region.y2 + 1):
             for col in range(obj.region.x1, obj.region.x2 + 1):
                 self[row][col] = self.background_color
-    
+        return self
+
     def copy(self):
         c = deepcopy(self)
         c.background_color = self.background_color
@@ -127,7 +152,7 @@ class Grid(SafeList):
                     values[col] += 1
         return values
     
-    def get_total_n_values(self) -> int:
+    def get_total_dots(self) -> int:
         return sum(self.get_values_count().values())
 
     def detect_background_color(self):
@@ -157,6 +182,26 @@ class Grid(SafeList):
         with open(name, 'w') as f:
             f.write(data)
 
+    def remove_corner_grid(self, grid_size=1, relative_to: 'SubGrid' = None):
+        top_left_corner = GridPoint(0, 0)
+        top_right_corner = GridPoint(0, len(self[0])-1 - grid_size + 1)
+        bottom_left_corner = GridPoint(len(self)-1 - grid_size + 1, 0)
+        bottom_right_corner = GridPoint(len(self)-1 - grid_size + 1, len(self[0])-1 - grid_size + 1)
+        if relative_to:
+            top_left_corner = GridPoint(relative_to.region.x1 - grid_size, relative_to.region.y1 - grid_size)
+            top_right_corner = GridPoint(relative_to.region.x2 + 1, relative_to.region.y1 - grid_size)
+            bottom_left_corner = GridPoint(relative_to.region.x1 - grid_size, relative_to.region.y2 + 1)
+            bottom_right_corner = GridPoint(relative_to.region.x2 + 1, relative_to.region.y2 + 1)
+        corners_list = [top_left_corner, top_right_corner, bottom_left_corner, bottom_right_corner]
+        for corners in corners_list:
+            for y in range(corners.y, corners.y + grid_size):
+                for x in range(corners.x, corners.x + grid_size):
+                    if y < 0 or x < 0 or y >= len(self) or x >= len(self[0]):
+                        continue
+                    self[y][x] = 0
+        return self 
+        
+
 class SubGrid(Grid):
     def __init__(self, region: GridRegion, parent_grid: Grid):
         self.region = region # Keep the attribute name 'region' for consistency
@@ -167,7 +212,13 @@ class SubGrid(Grid):
         self.background_color = self.parent_grid.background_color
 
     def __str__(self):
-        return f"Region: {self.region}, n_rows: {self.n_rows}, n_cols: {self.n_cols}, background_color: {self.background_color}\n{super().__str__()}"
+        return f"Region: {self.region}, n_rows: {self.n_rows}, n_cols: {self.n_cols}, background_color: {self.background_color}"
+    
+    def expand(self, n: int):
+        return SubGrid(GridRegion([
+            GridPoint(max(self.region.x1 - n, 0), max(self.region.y1 - n, 0)),
+            GridPoint(min(self.region.x2 + n, self.parent_grid.n_cols - 1), min(self.region.y2 + n, self.parent_grid.n_rows - 1))
+        ]), self.parent_grid)
     
     def get_border_sides(self, point: GridPoint):
         sides = []
@@ -342,15 +393,25 @@ def split_into_square_boxes(grid: Grid, size: int) -> list[SubGrid]:
     return [SubGrid(region, grid) for region in regions]
 
 
-def detect_objects(grid: Grid, required_object: str | None = None, invert: bool = False) -> list[SubGrid]:
+def detect_objects(grid: Grid, required_object: str | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None) -> list[SubGrid]:
     grid_np = np.array(grid)
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
     objects = []
-    comp = '__eq__' if invert else '__ne__'
+    
+    def compare(a):
+        val = a != grid.background_color
+        if ignore_color:
+            val = val and a != ignore_color
+        if required_color:
+            val = val and a == required_color
+        if invert:
+            return not val
+        return val
+    
     for r in range(rows):
         for c in range(cols):
-            if getattr(grid_np[r, c], comp)(grid.background_color) and not visited[r, c]:
+            if compare(grid_np[r, c]) and not visited[r, c]:
                 # Start BFS for a new object
                 current_object_points = []
                 q = deque([(r, c)])
@@ -364,7 +425,7 @@ def detect_objects(grid: Grid, required_object: str | None = None, invert: bool 
                     for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
                         nr, nc = row + dr, col + dc
                         if 0 <= nr < rows and 0 <= nc < cols and \
-                           getattr(grid_np[nr, nc], comp)(grid.background_color) and not visited[nr, nc]:
+                           compare(grid_np[nr, nc]) and not visited[nr, nc]:
                             visited[nr, nc] = True
                             q.append((nr, nc))
                 

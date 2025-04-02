@@ -10,7 +10,12 @@ def remove_pngs():
     for file in glob('*.png'):
         os.remove(file)
 
-def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None):
+plot_grid_count = 0
+def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, save=True, save_all=False):
+    global plot_grid_count
+    if name == "grid.png" and save_all:
+        plot_grid_count += 1
+        name = f"grid_{plot_grid_count}.png"
     if not grid:
         logger.debug(f"Grid is empty")
         # breakpoint()
@@ -65,13 +70,14 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None):
     # ax.tick_params(axis='both', which='major', length=0) # Hide major tick lines - Removed to show ticks
     # ax.tick_params(axis='both', which='minor', length=0) # Hide minor tick lines - Removed to show ticks
 
-    plt.savefig(name, facecolor='black', edgecolor='white')
+    if save:
+        plt.savefig(name, facecolor='black', edgecolor='white')
     plt.title(name)
     def format_coord(x, y):
         if x >= -0.5 and y >= -0.5:
             col = int(x + 0.5)
             row = int(y + 0.5)
-            return f'(row,col) = ({row},{col})\n(x,y) = ({col},{row})'
+            return f'(row,col) = ({row},{col})\t(x,y) = ({col},{row})'
         return ''
 
     ax.format_coord = format_coord
@@ -82,15 +88,20 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None):
     if close:
         plt.close()
 
-def plot_grids(grids, name="grids.png", show=False):
+plot_grids_count = 0
+def plot_grids(grids, name="grids.png", show=False, save_all=False):
+    global plot_grids_count
     # plot the grids in a single plot
     fig, axs = plt.subplots(1, len(grids), figsize=(10, 5 * len(grids)))
     for i, grid in enumerate(grids):
-        ax = plot_grid(grid, ax=axs[i] if len(grids) > 1 else axs, close=False)
+        ax = plot_grid(grid, ax=axs[i] if len(grids) > 1 else axs, close=False, save=False)
         # axs[i].imshow(grid)
     plt.tight_layout()
     if show:
         plt.show(block=1)
+    if name == "grids.png" and save_all:
+        plot_grids_count += 1
+        name = f"grids_{plot_grids_count}.png"
     plt.savefig(name, facecolor='black', edgecolor='white')
     plt.close()
 

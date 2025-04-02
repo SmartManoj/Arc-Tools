@@ -1,10 +1,11 @@
 
-87 abc82100
+87 abc82100 dot_to_object
 light blue box is the key object.
 nearby two objects of different color is the color replacement map.
 (need to replace the color with the one that touched the key object)
-replace dots with the object using the color replacement map.
-
+extract all the information from the grid.
+replace dots with the object using the color replacement map (don't replace already replaced dots).
+remove the key object and the color replacement map from the grid.
 ---
 
 90 b5ca7ac4 move_object_without_collision
