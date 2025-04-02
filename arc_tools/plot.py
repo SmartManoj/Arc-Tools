@@ -3,6 +3,12 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
 from arc_tools.logger import logger
+from glob import glob
+import os
+
+def remove_pngs():
+    for file in glob('*.png'):
+        os.remove(file)
 
 def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None):
     if not grid:
