@@ -1,3 +1,9 @@
+66 88bcf3b4 rope_stretch
+find two connected objects.
+straight object is the pole.
+other object is the rope.
+stretch the rope opposite to the pole and the initial touching side.
+---
 
 87 abc82100 dot_to_object
 light blue box is the key object.

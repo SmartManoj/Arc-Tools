@@ -63,7 +63,8 @@ class GridRegion:
     def __str__(self):
         return f"[(x1/y1)=({self.x1}/{self.y1}), (x2/y2)=({self.x2}/{self.y2})]"
     
-    
+    def __hash__(self):
+        return hash((self.x1, self.x2, self.y1, self.y2))
 
 class CustomIndexError(IndexError):
     def __init__(self, message):
@@ -90,8 +91,11 @@ class Grid(SafeList):
             grid = [SafeList(row) for row in grid]
             super().__init__(grid)
             self.background_color = self.detect_background_color()
-            self.n_rows = len(self)
-            self.n_cols = len(self[0])
+            self.height = len(self)
+            self.width = len(self[0])
+    
+    def __hash__(self) -> int:
+        return hash((tuple(tuple(row) for row in self), self.background_color))
     
     def compare(self, other):
         if len(self) != len(other):
@@ -109,20 +113,20 @@ class Grid(SafeList):
         return True
     
     def replace_color(self, old_color, new_color):
-        for row in range(self.n_rows):
-            for col in range(self.n_cols):
+        for row in range(self.height):
+            for col in range(self.width):
                 if self[row][col] == old_color:
                     self[row][col] = new_color
         return self
     
     def replace_dot(self, dot_color, obj: 'SubGrid', dx: int, dy: int, first_grid: 'Grid'):
         logger.info(f"Replacing dot {dot_color} with object {obj} at {dx}, {dy}")
-        for row in range(self.n_rows):
-            for col in range(self.n_cols):
+        for row in range(self.height):
+            for col in range(self.width):
                 if first_grid[row][col] == dot_color:
                     first_grid[row][col] = self.background_color
-                    for obj_row in range(min(obj.n_rows, self.n_rows - row - dy)):
-                        for obj_col in range(min(obj.n_cols, self.n_cols - col - dx)):
+                    for obj_row in range(min(obj.height, self.height - row - dy)):
+                        for obj_col in range(min(obj.width, self.width - col - dx)):
                             new_row = row + obj_row + dy
                             new_col = col + obj_col + dx
                             if new_row >= 0 and new_col >= 0:
@@ -152,8 +156,18 @@ class Grid(SafeList):
                     values[col] += 1
         return values
     
+    def has_yellow_block(self):
+        return Color.YELLOW.value in self.get_unique_values()
+    
+    def get_unique_values(self):
+        return list(self.get_values_count().keys())
+    
+
     def get_total_dots(self) -> int:
         return sum(self.get_values_count().values())
+    
+    def get_total_unique_dots(self) -> int:
+        return len(self.get_unique_values())
 
     def detect_background_color(self):
         # maximum value in the grid
@@ -206,18 +220,21 @@ class SubGrid(Grid):
     def __init__(self, region: GridRegion, parent_grid: Grid):
         self.region = region # Keep the attribute name 'region' for consistency
         self.parent_grid = parent_grid
-        self.n_rows = self.region.y2 - self.region.y1 + 1
-        self.n_cols = self.region.x2 - self.region.x1 + 1
         super().__init__(self.get_subgrid())
+        self.height = self.region.y2 - self.region.y1 + 1
+        self.width = self.region.x2 - self.region.x1 + 1
         self.background_color = self.parent_grid.background_color
 
+    def __hash__(self) -> int:
+        return hash((self.region, self.parent_grid, self.background_color))
+    
     def __str__(self):
-        return f"Region: {self.region}, n_rows: {self.n_rows}, n_cols: {self.n_cols}, background_color: {self.background_color}"
+        return f"Region: {self.region}, height: {self.height}, width: {self.width}, background_color: {self.background_color}"
     
     def expand(self, n: int):
         return SubGrid(GridRegion([
             GridPoint(max(self.region.x1 - n, 0), max(self.region.y1 - n, 0)),
-            GridPoint(min(self.region.x2 + n, self.parent_grid.n_cols - 1), min(self.region.y2 + n, self.parent_grid.n_rows - 1))
+            GridPoint(min(self.region.x2 + n, self.parent_grid.width - 1), min(self.region.y2 + n, self.parent_grid.height - 1))
         ]), self.parent_grid)
     
     def get_border_sides(self, point: GridPoint):
@@ -238,9 +255,9 @@ class SubGrid(Grid):
         bottom_left = (self.region.x1, self.region.y2)
         bottom_right = (self.region.x2, self.region.y2)
         parent_top_left = (0,0)
-        parent_top_right = (self.parent_grid.n_cols - 1,0)
-        parent_bottom_left = (0,self.parent_grid.n_rows - 1)
-        parent_bottom_right = (self.parent_grid.n_cols - 1,self.parent_grid.n_rows - 1)
+        parent_top_right = (self.parent_grid.width - 1,0)
+        parent_bottom_left = (0,self.parent_grid.height - 1)
+        parent_bottom_right = (self.parent_grid.width - 1,self.parent_grid.height - 1)
         return top_left == parent_top_left or \
                top_right == parent_top_right or \
                bottom_left == parent_bottom_left or \
@@ -252,17 +269,17 @@ class SubGrid(Grid):
         bottom_left = (self.region.x1, self.region.y2)
         bottom_right = (self.region.x2, self.region.y2)
         parent_top_left = (0,0)
-        parent_top_right = (self.parent_grid.n_cols - 1,0)
-        parent_bottom_left = (0,self.parent_grid.n_rows - 1)
-        parent_bottom_right = (self.parent_grid.n_cols - 1,self.parent_grid.n_rows - 1)
+        parent_top_right = (self.parent_grid.width - 1,0)
+        parent_bottom_left = (0,self.parent_grid.height - 1)
+        parent_bottom_right = (self.parent_grid.width - 1,self.parent_grid.height - 1)
         if top_left == parent_top_left:
             return 0, 0
         elif top_right == parent_top_right:
-            return self.parent_grid.n_cols - new_object.n_cols, 0
+            return self.parent_grid.width - new_object.width, 0
         elif bottom_left == parent_bottom_left:
-            return 0, self.parent_grid.n_rows - new_object.n_rows
+            return 0, self.parent_grid.height - new_object.height
         elif bottom_right == parent_bottom_right:
-            return self.parent_grid.n_cols - new_object.n_cols, self.parent_grid.n_rows - new_object.n_rows
+            return self.parent_grid.width - new_object.width, self.parent_grid.height - new_object.height
         else:
             return new_object.region.x1, new_object.region.y1
     
@@ -296,16 +313,12 @@ class SubGrid(Grid):
     def get_full_grid(self) -> Grid:
         n_parent_rows, n_parent_cols = len(self.parent_grid), len(self.parent_grid[0])
         grid = [[self.parent_grid.background_color for _ in range(n_parent_cols)] for _ in range(n_parent_rows)]
-        for row in range(self.n_rows):
-            for col in range(self.n_cols):
+        for row in range(self.height):
+            for col in range(self.width):
                 grid[row + self.region.y1][col + self.region.x1] = self[row][col]
         return Grid(grid)
     
-    def has_yellow_block(self):
-        return Color.YELLOW.value in self.get_unique_values()
     
-    def get_unique_values(self):
-        return list(self.get_values_count().keys())
 
     def has_hollow_space(self):
         """
@@ -393,7 +406,7 @@ def split_into_square_boxes(grid: Grid, size: int) -> list[SubGrid]:
     return [SubGrid(region, grid) for region in regions]
 
 
-def detect_objects(grid: Grid, required_object: str | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None) -> list[SubGrid]:
+def detect_objects(grid: Grid, required_object: str | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False) -> list[SubGrid]:
     grid_np = np.array(grid)
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
@@ -411,11 +424,13 @@ def detect_objects(grid: Grid, required_object: str | None = None, invert: bool 
     
     for r in range(rows):
         for c in range(cols):
-            if compare(grid_np[r, c]) and not visited[r, c]:
+            current_color = grid_np[r, c]
+            if compare(current_color) and not visited[r, c]:
                 # Start BFS for a new object
                 current_object_points = []
                 q = deque([(r, c)])
                 visited[r, c] = True
+                
 
                 while q:
                     row, col = q.popleft()
@@ -426,9 +441,10 @@ def detect_objects(grid: Grid, required_object: str | None = None, invert: bool 
                         nr, nc = row + dr, col + dc
                         if 0 <= nr < rows and 0 <= nc < cols and \
                            compare(grid_np[nr, nc]) and not visited[nr, nc]:
+                            if single_color_only and grid_np[nr, nc] != current_color:
+                                continue
                             visited[nr, nc] = True
                             q.append((nr, nc))
-                
                 # filter only the corner points
                 current_object_points = [
                     p for p in current_object_points 
@@ -440,7 +456,7 @@ def detect_objects(grid: Grid, required_object: str | None = None, invert: bool 
                 if current_object_points:
                     obj = SubGrid(GridRegion(current_object_points), grid)
                     if required_object == 'square':
-                        if obj.n_rows == 5 and obj.n_cols == 5:
+                        if obj.height == 5 and obj.width == 5:
                             objects.append(obj)
                         else:
                             new_objects = split_into_square_boxes(obj.get_full_grid(), 5)
@@ -526,10 +542,20 @@ if __name__ == "__main__":
     file = r'"C:/Users/smart/Desktop/arc - local/main.py"'
     import os
     # os.system(f'python {file}')
-    g=[[2, 2, 2, 2, 0], [2, 1, 5, 2, 0], [2, 8, 9, 0, 0], [2, 2, 0, 0, 0], [2, 0, 0, 0, 1]]
-    a= [1,2,3]
-    a = SafeList(a)
-    b = [1,3,3]
-    b = SafeList(b)
-    print(a == b)
-    exit()
+    g=[[0, 0 ,1, 1, 2, 2, 0, 0]]
+    print("Input grid:", g)
+    output = detect_objects(Grid(g), single_color_only=1)
+    # expected =  [[[1]], [[1]], [[2]]]
+    expected =  [[[1, 2]]]
+    print("Output:", output)
+    print("Expected:", expected)
+    print("Output type:", type(output))
+    print("Expected type:", type(expected))
+    print("Output length:", len(output))
+    print("Expected length:", len(expected))
+    if len(output) == len(expected):
+        for i in range(len(output)):
+            print(f"Output[{i}]:", output[i])
+            print(f"Expected[{i}]:", expected[i])
+            print(f"Values match:", [[[output[i][0][0]]]] == [expected[i]])
+    assert [[[obj[0][0]]] for obj in output] == expected

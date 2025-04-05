@@ -32,7 +32,7 @@ def merge_nearby_objects_as_square(objects: list[SubGrid], background_color: int
     new_objects = []
     # First, keep any objects that are already 5x5
     for obj in objects:
-        if obj.n_rows == 5 and obj.n_cols == 5:
+        if obj.height == 5 and obj.width == 5:
             new_objects.append(obj)
     objects = [o for o in objects if o not in new_objects]
 
@@ -40,7 +40,7 @@ def merge_nearby_objects_as_square(objects: list[SubGrid], background_color: int
         return new_objects
     
     # Sort remaining objects by size
-    remaining_objects = sorted(objects, key=lambda x: x.n_cols* x.n_rows, reverse=True)
+    remaining_objects = sorted(objects, key=lambda x: x.width* x.height, reverse=True)
     
     while remaining_objects:
         current_obj = remaining_objects[0]
@@ -88,8 +88,8 @@ def merge_nearby_objects_as_square(objects: list[SubGrid], background_color: int
             
             # Place all aligned objects in the grid
             for obj in aligned_objects:
-                for i in range(obj.n_rows):
-                    for j in range(obj.n_cols):
+                for i in range(obj.height):
+                    for j in range(obj.width):
                         if obj[i][j] != background_color:
                             grid_y = obj.region.y1 + i
                             grid_x = obj.region.x1 + j
@@ -134,8 +134,8 @@ def color_swap_and_move_to_corner(input_grid: Grid) -> Grid:
             related_objects = [o for o in non_corner_objects if value in o.get_values_count()]
             new_object = related_objects[-1].copy()
             for o in related_objects:
-                for row in range(o.n_rows):
-                    for col in range(o.n_cols):
+                for row in range(o.height):
+                    for col in range(o.width):
                         if o[row][col] != grid.background_color:
                             new_object[row][col] = value
             x, y = obj.get_corner_position(new_object)

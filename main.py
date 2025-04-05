@@ -13,6 +13,7 @@ from arc_tools.check_fit import check_fit
 from arc_tools.plot import plot_grid, plot_grids, remove_pngs
 from arc_tools.squash import squash_grid
 from task_118 import row_col_color_data
+from task_66 import rope_stretch
 from train_tasks import color_swap_and_move_to_corner, repeat_reverse_grid
 from task_87 import dot_to_object
 show_count = 0
@@ -41,7 +42,8 @@ else:
     normal_task_fns = [
         # row_col_color_data,
         # color_swap_and_move_to_corner,
-        dot_to_object,
+        # dot_to_object,
+        rope_stretch,
     ]
 
 jigsaw_task_fns = [
@@ -89,13 +91,13 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
 def solve_task(data):
     num_train_tasks = len(data['train'])
     num_test_tasks = len(data['test'])
-    print(f"Number of train tasks: {num_train_tasks}, Number of test tasks: {num_test_tasks}")
+    logger.info(f"Number of train tasks: {num_train_tasks}, Number of test tasks: {num_test_tasks}")
     start_train_task_id = 1
     start_test_task_id = 1
     actual_task_name = None
     # start_train_task_id = 3
     # start_test_task_id = 2
-    # actual_task_name = dot_to_object
+    # actual_task_name = rope_stretch
     grids = []
     expected_outputs = []
     actual_outputs = []

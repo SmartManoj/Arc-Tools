@@ -80,7 +80,7 @@ def fit_piece(grid: Grid, piece: Grid, remaining_pieces: Sequence[Grid]) -> Grid
                     # Check each object to see if it's a hole (background color)
                     for obj in objects:
                         hole_count = obj.get_values_count(all=True)[new_grid.background_color]
-                        if obj.n_rows < min_piece.n_rows or obj.n_cols < min_piece.n_cols or hole_count < min_piece_size:
+                        if obj.height < min_piece.height or obj.width < min_piece.width or hole_count < min_piece_size:
                             can_place = False
                             breakpoint()
                             break
@@ -108,7 +108,7 @@ def fit_piece(grid: Grid, piece: Grid, remaining_pieces: Sequence[Grid]) -> Grid
                             space_filled = False
                             for p in remaining_pieces:
                                 # Try to fit the piece at this border space
-                                if p.n_rows <= 2 and p.n_cols <= 2:  # Only consider small pieces
+                                if p.height <= 2 and p.width <= 2:  # Only consider small pieces
                                     for py in range(len(p)):
                                         for px in range(len(p[0])):
                                             if p[py][px] != new_grid.background_color:
@@ -225,7 +225,7 @@ def jigsaw_puzzle(grid: Grid) -> Grid:
         print("No key object found")
         return grid
     
-    key_object_colors = [key_object[row][col] for row in range(key_object.n_rows) for col in range(key_object.n_cols)]
+    key_object_colors = [key_object[row][col] for row in range(key_object.height) for col in range(key_object.width)]
     key_object_colors = [i for i in key_object_colors if i != background_color]
     
     # Create list of puzzle pieces
