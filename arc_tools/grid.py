@@ -478,7 +478,8 @@ def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid) -> Grid:
         for col in range(object_to_move.region.x1, object_to_move.region.x2 + 1):
             value = old_grid[row][col]
             if value != grid.background_color:
-                grid[row+dy][col+dx] = value
+                if 0 <= row+dy < len(grid) and 0 <= col+dx < len(grid[0]):
+                    grid[row+dy][col+dx] = value
 
     return grid
 
@@ -537,6 +538,21 @@ def move_object_without_collision(grid: Grid) -> Grid:
             if left_side_grid[i][j] != left_side_grid.background_color:
                 right_side_grid[i][j] = left_side_grid[i][j]
     return right_side_grid
+
+def rotate_object(object: SubGrid) -> SubGrid:
+    """
+    Rotate a object 90 degrees clockwise.
+    
+    Args:
+        object: The object to rotate
+        
+    Returns:
+        SubGrid: The rotated object
+    """
+    rows = object.height
+    cols = object.width
+    new_grid = [[object[rows-1-j][i] for j in range(rows)] for i in range(cols)]
+    return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid))
 
 if __name__ == "__main__":
     file = r'"C:/Users/smart/Desktop/arc - local/main.py"'

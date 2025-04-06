@@ -8,20 +8,6 @@ from arc_tools.plot import plot_grids
 from arc_tools.squash import squash_grid
 
 show_count = 0
-def rotate_grid(grid: Grid) -> SubGrid:
-    """
-    Rotate a grid 90 degrees clockwise.
-    
-    Args:
-        grid: The grid to rotate
-        
-    Returns:
-        Grid: The rotated grid
-    """
-    rows = len(grid)
-    cols = len(grid[0])
-    new_grid = [[grid[rows-1-j][i] for j in range(rows)] for i in range(cols)]
-    return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid))
 
 def fit_piece(grid: Grid, piece: Grid, remaining_pieces: Sequence[Grid]) -> Grid:
     """
@@ -180,7 +166,7 @@ def jigsaw_recursive(grid: Grid, pieces: list[SubGrid]) -> Grid | None:
                 result = jigsaw_recursive(new_grid, remaining_pieces)
                 if result is not None:
                     return result
-            piece = rotate_grid(piece)
+            piece = rotate_object(piece)
 
     return None
 

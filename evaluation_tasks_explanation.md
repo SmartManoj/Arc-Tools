@@ -5,6 +5,14 @@ other object is the rope.
 stretch the rope opposite to the pole and the initial touching side.
 ---
 
+81 a25697e4 fit_or_swap_fit
+two objects
+a - one color is fixed
+b - two colors are movable
+fit b into a (one color should be fully fitted.)
+if swap is needed, swap the two colors too.
+---
+
 87 abc82100 dot_to_object
 light blue box is the key object.
 nearby two objects of different color is the color replacement map.

@@ -14,6 +14,7 @@ from arc_tools.plot import plot_grid, plot_grids, remove_pngs
 from arc_tools.squash import squash_grid
 from task_118 import row_col_color_data
 from task_66 import rope_stretch
+from task_81 import fit_or_swap_fit
 from train_tasks import color_swap_and_move_to_corner, repeat_reverse_grid
 from task_87 import dot_to_object
 show_count = 0
@@ -43,7 +44,8 @@ else:
         # row_col_color_data,
         # color_swap_and_move_to_corner,
         # dot_to_object,
-        rope_stretch,
+        # rope_stretch,
+        fit_or_swap_fit
     ]
 
 jigsaw_task_fns = [
@@ -97,7 +99,7 @@ def solve_task(data):
     actual_task_name = None
     # start_train_task_id = 3
     # start_test_task_id = 2
-    # actual_task_name = rope_stretch
+    # actual_task_name = fit_or_swap_fit
     grids = []
     expected_outputs = []
     actual_outputs = []
