@@ -17,6 +17,7 @@ from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
 from train_tasks import color_swap_and_move_to_corner, repeat_reverse_grid
 from task_87 import dot_to_object
+from task_1 import project_lines_with_gaps
 show_count = 0
 
 from collections import Counter, deque # Add deque import
@@ -98,8 +99,8 @@ def solve_task(data):
     start_train_task_id = 1
     start_test_task_id = 1
     actual_task_name = None
-    # start_train_task_id = 3
-    # start_test_task_id = 2
+    # start_train_task_id = 4
+    # start_test_task_id = 3
     # actual_task_name = fit_or_swap_fit
     grids = []
     expected_outputs = []
@@ -114,7 +115,7 @@ def solve_task(data):
         else:
             logger.info(f"Task not found")
     else:
-        task_fn = actual_task_name
+        task_fn = globals()[actual_task_name]
     for task_idx in range(start_test_task_id - 1, num_test_tasks):
         grid = Grid(data['test'][task_idx]['input'])
         if task_fn:
