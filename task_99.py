@@ -111,6 +111,11 @@ def check_fit_recursive(current_grid: Grid, remaining_objects: list[SubGrid], lo
     return current_grid, False # Indicate failure for this path
 
 def check_fit(grid: Grid) -> Grid:
+    '''
+    1. orange dot is the min value of the object.
+    2. yellow is the centre object? (or no hollow object with no orange dot at corners) or both?
+    3. move other objects to the yellow object by matching with the dot.
+    '''
     initial_grid = grid.copy()
     objects = detect_objects(grid)
     logger.debug(f"Total objects: {len(objects)}")
@@ -133,7 +138,6 @@ def check_fit(grid: Grid) -> Grid:
 
 
 if __name__ == "__main__":
-    file = r'"C:/Users/smart/Desktop/arc - local/main.py"'
     import os
-    os.system(f'python {file}')
+    os.system("main.py cbebaa4b check_fit")
 

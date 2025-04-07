@@ -1,5 +1,6 @@
 from arc_tools.grid import Grid, GridPoint, GridRegion, SubGrid, detect_objects, move_object
 
+# 1 00576224
 def repeat_reverse_grid(grid: Grid) -> Grid:
     """
     Transform a grid by repeating the grid thrice horizontally and stack them vertically in (original, reversed, original) order.
@@ -113,6 +114,7 @@ def merge_nearby_objects_as_square(objects: list[SubGrid], background_color: int
     
     return new_objects
 
+# 709 b74ca5d1 
 def color_swap_and_move_to_corner(input_grid: Grid) -> Grid:
     """
     Swap colors of the objects (5x5) in the grid and move objects by their key value to the relevent corner.

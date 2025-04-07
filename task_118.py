@@ -4,11 +4,13 @@ from arc_tools.plot import plot_grid, plot_grids
 
 def row_col_color_data(grid: Grid) -> Grid:
     """
-    Create a new grid with row, col, and color data.
+    input grid: divide the grid into 4 subgrids 
+    first piece: row
+    second piece: col
+    third piece: background color (ratio map)
+    fourth piece: data
 
-    Args:
-        divide the grid into 4 subgrids and return the new grid with row, col, and background color (ratio map), data.
-        
+    output grid: A grid with row, col, and data else background color (ratio map).
     """
     grid.background_color = 0
     grid_size = len(grid)

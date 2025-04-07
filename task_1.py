@@ -8,11 +8,11 @@ from copy import deepcopy
 
 def project_lines_with_gaps(grid):
     '''
-    The vertical line is the divider.
-    Find the left and right regions based on the divider.
-    Project the left region to the right region.
-    add one dot for each color in the left region at the interval of the color count.
-    If the left region is empty, project the right region to the left region.
+    The vertical line acts as the divider.
+    Identify the left and right regions relative to the divider.
+    Transfer the left region to the right region.
+    Insert one dot for each color in the left region at intervals based on the color count.
+    If the left region is empty, transfer the right region to the left region.
     '''
     # Find the vertical line divider (column with all same color)
     divider_col = None

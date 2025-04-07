@@ -172,13 +172,11 @@ def jigsaw_recursive(grid: Grid, pieces: list[SubGrid]) -> Grid | None:
 
 def jigsaw_puzzle(grid: Grid) -> Grid:
     """
-    Solve a jigsaw puzzle by fitting pieces together.
-    
-    Args:
-        grid: The input grid containing puzzle pieces
-        
-    Returns:
-        Grid: The solved puzzle grid
+    find output grid size by counting the number of objects in the input grid
+    1. find color map box
+    2. piece that having the color map box is the first piece without rotation.
+    3. move the jigsaw puzzle pieces to the correct position (do largest piece first)
+    4. replace colors of the objects in the output grid with the color map
     """
     global show_count
     show_count = 0  # Reset show count

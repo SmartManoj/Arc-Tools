@@ -52,6 +52,11 @@ def count_hollows_per_number(grid):
     return hollow_count_dict
 
 def count_hollows_task(grid: Grid) -> Grid:
+    '''
+    divider line - vertically, horizontally, or L-shaped (top left?) 
+    1. extract hollow counts of the objects from the smaller grid
+    2. change the object color according to the hollow count, if hollow count is not found, then remove the object
+    '''
     rows = len(grid)
     cols = len(grid[0])
     visited = [[False]*cols for _ in range(rows)]
@@ -142,13 +147,5 @@ def count_hollows_task(grid: Grid) -> Grid:
 
     return Grid(grid)
 if __name__ == "__main__":
-    # Load and slice input grid
-    file = open('C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/e3721c99.json', 'r')
-    data = json.load(file)
-    grid = (data['train'][0]['input'])[:5]
-
-
-    hollow_count_dict = count_hollows_per_number(grid)
-
-    from pprint import pprint
-    pprint(hollow_count_dict)
+    import os
+    os.system("main.py e3721c99 count_hollows_task")

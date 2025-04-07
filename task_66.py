@@ -5,6 +5,12 @@ from itertools import combinations
 from arc_tools.logger import logger
 
 def rope_stretch(grid):
+    '''
+    find two connected objects.
+    straight object is the pole.
+    other object is the rope.
+    stretch the rope opposite to the pole and the initial touching side.
+    '''
     # TODO: test all paths logic
     initial_grid = grid.copy()
     objects = detect_objects(grid)

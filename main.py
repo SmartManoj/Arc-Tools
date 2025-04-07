@@ -8,16 +8,13 @@ import os
 from glob import glob
 import json
 from arc_tools.grid import Grid, GridPoint, GridRegion, detect_objects, move_object_without_collision
-from arc_tools.hollow_count import count_hollows_task
-from arc_tools.check_fit import check_fit
+from task_111 import count_hollows_task
+from task_99 import check_fit
 from arc_tools.plot import plot_grid, plot_grids, remove_pngs
 from arc_tools.squash import squash_grid
-from task_118 import row_col_color_data
-from task_66 import rope_stretch
-from task_81 import fit_or_swap_fit
+
 from train_tasks import color_swap_and_move_to_corner, repeat_reverse_grid
-from task_87 import dot_to_object
-from task_1 import project_lines_with_gaps
+from evaluation_tasks import *
 show_count = 0
 
 from collections import Counter, deque # Add deque import
@@ -27,8 +24,6 @@ from typing import Sequence # Add typing imports
 
 from arc_tools.grid import Color
 from arc_tools.grid import move_object
-from jigsaw import jigsaw_puzzle
-
 
 
 remove_pngs()

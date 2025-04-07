@@ -23,9 +23,11 @@ def find_nearby_two_dots(sgrid: SubGrid, parent_grid: Grid) -> SubGrid:
 def dot_to_object(grid: Grid) -> Grid:
     """
     light blue box is the key object.
-    nearby two dots of different color is the color replacement map.
-    (need to place the color with the one that touched the key object)
-    replace dots with the object using the color replacement map.
+    nearby two objects of different color is the color replacement map.
+    (need to replace the color with the one that touched the key object)
+    extract all the information from the grid.
+    replace dots with the object using the color replacement map (don't replace already replaced dots).
+    remove the key object and the color replacement map from the grid.
     """
     objects = detect_objects(grid, required_color=Color.LIGHTBLUE.value)
     for obj in objects[::-1]:
