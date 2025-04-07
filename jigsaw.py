@@ -1,5 +1,5 @@
 from typing import Sequence
-from arc_tools.grid import Grid, SubGrid, GridRegion, GridPoint, detect_objects
+from arc_tools.grid import Grid, SubGrid, GridRegion, GridPoint, detect_objects, rotate_object
 
 
 from datetime import datetime
@@ -158,7 +158,7 @@ def jigsaw_recursive(grid: Grid, pieces: list[SubGrid]) -> Grid | None:
             new_grid = fit_piece(grid, piece, pieces)
             if new_grid != grid:  # If piece was successfully fitted
                 show_count += 1
-                print(f"show_count: {show_count}")
+                # print(f"show_count: {show_count}")
                 if show_count and 0:
                     plot_grids([new_grid, *remaining_pieces], name=f"grid_{show_count}.png", show=0)
                 # Create new list of remaining pieces, excluding the original piece
@@ -233,4 +233,9 @@ def jigsaw_puzzle(grid: Grid) -> Grid:
     print("No solution found")
     print(f"Time taken: {datetime.now() - start_time}")
     return grid
+
+if __name__ == "__main__":
+    import os
+    os.system("main.py f560132c jigsaw_puzzle")
+
 

@@ -120,7 +120,7 @@ class Grid(SafeList):
         return self
     
     def replace_dot(self, dot_color, obj: 'SubGrid', dx: int, dy: int, first_grid: 'Grid'):
-        logger.info(f"Replacing dot {dot_color} with object {obj} at {dx}, {dy}")
+        logger.debug(f"Replacing dot {dot_color} with object {obj} at {dx}, {dy}")
         for row in range(self.height):
             for col in range(self.width):
                 if first_grid[row][col] == dot_color:

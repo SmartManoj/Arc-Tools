@@ -68,18 +68,13 @@ def dot_to_object(grid: Grid) -> Grid:
         grid[color_replacement_map.region.y1][color_replacement_map.region.x1] = background_color
         grid[color_replacement_map.region.y2][color_replacement_map.region.x2] = background_color
         if color_replacement_map.region.x2 + 1 == obj.region.x1 or color_replacement_map.region.y2 + 1 == obj.region.y1:
-            print('first')
             dot_color, object_color = first_value, second_value
         else:
-            print('second')
             dot_color, object_color = second_value, first_value
-        print(dot_color, object_color)
         obj = obj.replace_color(Color.LIGHTBLUE.value, object_color)
-        print(obj)
         dx, dy = obj.region.x1 - color_replacement_map.region.x1  , obj.region.y1 - color_replacement_map.region.y1
         # move one step forward towards the object
         # if obj is above, move up
-        print('old dx', dx, 'old dy', dy)
         if obj.region.y2 < color_replacement_map.region.y1:
             dy += 1
         # if obj is below, move down
@@ -91,20 +86,17 @@ def dot_to_object(grid: Grid) -> Grid:
         # if obj is right, move right
         else:
             dx -= 2
-        print('new dx', dx, 'new dy', dy)
         replacement_details.append((dot_color, obj, dx, dy))
         grid = grid.remove_object(obj)
         plot_grid(grid, show=0, save_all=True)
     first_grid = grid.copy()
-    print(replacement_details)
     for dot_color, obj, dx, dy in replacement_details:
         grid = grid.replace_dot(dot_color, obj, dx, dy, first_grid)
         plot_grids([grid, first_grid], show=0, save_all=True)
-    print(flush=1)
-    plot_grid(grid, show=0, save_all=True)
+    # plot_grid(grid, show=0, save_all=True)
     return grid
 
 
 if __name__ == "__main__":
     import os
-    os.system("main.py abc82100")
+    os.system("main.py abc82100 dot_to_object")

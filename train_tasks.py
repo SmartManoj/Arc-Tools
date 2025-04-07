@@ -155,3 +155,7 @@ def color_swap_and_move_to_corner(input_grid: Grid) -> Grid:
                     grid[row][col] = next(iter(obj_colors - {grid[row][col]}))
     return grid
 
+if __name__ == "__main__":
+    import os
+    os.system("main.py b74ca5d1 color_swap_and_move_to_corner")
+

@@ -40,7 +40,7 @@ divider line - vertically, horizontally, or L-shaped (top left?)
 2. change the object color according to the hollow count, if hollow count is not found, then remove the object
 ---
 
-117 f560132c jigsaw puzzle
+117 f560132c jigsaw_puzzle
 find output grid size by counting the number of objects in the input grid
 1. find color map box
 2. piece that having the color map box is the first piece without rotation.

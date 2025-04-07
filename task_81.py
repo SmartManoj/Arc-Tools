@@ -210,4 +210,4 @@ def fit_or_swap_fit(grid):
 
 if __name__ == "__main__":
     import os
-    os.system("main.py a25697e4")
+    os.system("main.py a25697e4 fit_or_swap_fit")

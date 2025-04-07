@@ -1,6 +1,6 @@
 
 from arc_tools.grid import Grid, GridPoint, GridRegion, SubGrid
-from arc_tools.plot import plot_grid
+from arc_tools.plot import plot_grid, plot_grids
 
 def row_col_color_data(grid: Grid) -> Grid:
     """
@@ -10,6 +10,7 @@ def row_col_color_data(grid: Grid) -> Grid:
         divide the grid into 4 subgrids and return the new grid with row, col, and background color (ratio map), data.
         
     """
+    grid.background_color = 0
     grid_size = len(grid)
     subgrid_size = grid_size//2
     # plot_grid(grid, name="input.png", show=True)
@@ -17,11 +18,9 @@ def row_col_color_data(grid: Grid) -> Grid:
     second_piece = SubGrid(GridRegion([GridPoint(subgrid_size, 0), GridPoint(2*subgrid_size-1, subgrid_size-1)]), grid)
     third_piece =  SubGrid(GridRegion([GridPoint(0, subgrid_size), GridPoint(subgrid_size-1, 2*subgrid_size-1)]), grid)
     fourth_piece = SubGrid(GridRegion([GridPoint(subgrid_size, subgrid_size), GridPoint(2*subgrid_size-1, 2*subgrid_size-1)]), grid)
+    # plot_grids([first_piece, second_piece, third_piece, fourth_piece], show=1, save_all=True)
     rows = first_piece.get_total_dots()
     cols = second_piece.get_total_dots()
-    # breakpoint()
-    print(f"rows: {rows}, cols: {cols}")
-    # breakpoint()
     new_grid = []
     row_ratio = rows//subgrid_size or 1
     col_ratio = cols//subgrid_size or 1
@@ -36,4 +35,9 @@ def row_col_color_data(grid: Grid) -> Grid:
             new_row.append(new_val)
         new_grid.append(new_row)
     return Grid(new_grid)
+
+if __name__ == "__main__":
+    import os
+    os.system("main.py f931b4a8 row_col_color_data")
+
 

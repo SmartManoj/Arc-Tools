@@ -347,4 +347,4 @@ def rope_stretch(grid):
 
 if __name__ == "__main__":
     import os
-    os.system("main.py 88bcf3b4")
+    os.system("main.py 88bcf3b4 rope_stretch")

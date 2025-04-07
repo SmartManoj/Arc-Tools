@@ -56,7 +56,6 @@ jigsaw_task_fns = [
 
 
 def debug_output(grid, expected_output, output):
-    print('Debugging output')
     # print which cells are different
     for i in range(len(expected_output)):
         for j in range(len(expected_output[0])):
@@ -70,8 +69,10 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
         task_fns = normal_task_fns
     else:
         task_fns = jigsaw_task_fns
+    if actual_task_name:
+        task_fns = [globals()[actual_task_name]]
     for task_fn in task_fns:
-        print(task_fn.__name__)
+        logger.info(task_fn.__name__)
         right_task = True
         for task_id, (grid, expected_output) in enumerate(zip(grids, expected_outputs), start_train_task_id):
             grid = Grid(grid)
@@ -84,10 +85,10 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
                 # debug_output(grid, expected_output, output)
                 right_task = False
                 break
-            print(f'task {task_id} passed')
+            logger.info(f'Train task {task_id} passed')
         if right_task:
             return task_fn
-        print('--------------------------------')
+        logger.info('--------------------------------')
     return None
 
 def solve_task(data):
@@ -109,9 +110,9 @@ def solve_task(data):
             expected_outputs.append(data['train'][task_idx]['output'])
         task_fn = find_task(grids, expected_outputs, start_train_task_id)
         if task_fn:
-            print(f"Found task: {task_fn.__name__}")
+            logger.info(f"Found task: {task_fn.__name__}")
         else:
-            print(f"Task not found")
+            logger.info(f"Task not found")
     else:
         task_fn = actual_task_name
     for task_idx in range(start_test_task_id - 1, num_test_tasks):
@@ -125,7 +126,7 @@ def solve_task(data):
             plot_grid(output, name="actual_output.png")
             if expected_output:
                 if output.compare(expected_output):
-                    print(f"Test task {task_idx + 1} passed")
+                    logger.info(f"Test task {task_idx + 1} passed")
                 else:
                     raise Exception(f"Incorrect task {task_idx + 1}: {task_fn.__name__}, Expected: {expected_output}, Actual: {output}")
             output = {"attempt_1": output, "attempt_2": output}
@@ -140,11 +141,11 @@ if __name__ == "__main__":
     task_hash = 'abc82100'
     if sys.argv[1:]:
         task_hash = sys.argv[1]
+    actual_task_name = sys.argv[2] if sys.argv[2:] else None
     split = ['evaluation', 'training']
     for s in split:
         file = rf'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/{s}/{task_hash}.json'
         if os.path.exists(file):
             break
     data = json.load(open(file, 'r'))
-    from pprint import pprint
     solve_task(data)
