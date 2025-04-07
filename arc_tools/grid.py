@@ -419,7 +419,7 @@ def split_into_square_boxes(grid: Grid, size: int) -> list[SubGrid]:
     return [SubGrid(region, grid) for region in regions]
 
 
-def detect_objects(grid: Grid, required_object: str | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False) -> list[SubGrid]:
+def detect_objects(grid: Grid, required_object: str | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True) -> list[SubGrid]:
     grid_np = np.array(grid)
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
@@ -448,9 +448,12 @@ def detect_objects(grid: Grid, required_object: str | None = None, invert: bool 
                 while q:
                     row, col = q.popleft()
                     current_object_points.append(GridPoint(col, row)) # x=col, y=row
-
+                    if go_diagonal:
+                        directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+                    else:
+                        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
                     # Check neighbors (8-connectivity: up, down, left, right, and diagonals)
-                    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]:
+                    for dr, dc in directions:
                         nr, nc = row + dr, col + dc
                         if 0 <= nr < rows and 0 <= nc < cols and \
                            compare(grid_np[nr, nc]) and not visited[nr, nc]:

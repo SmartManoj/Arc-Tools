@@ -94,7 +94,7 @@ def solve_task(data):
     start_train_task_id = 1
     start_test_task_id = 1
     actual_task_name = None
-    start_train_task_id = 1
+    # start_train_task_id = 2
     # start_test_task_id = 3
     # actual_task_name = fit_or_swap_fit
     grids = []
