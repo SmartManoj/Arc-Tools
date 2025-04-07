@@ -1,6 +1,59 @@
+from arc_tools.grid import Color
 from arc_tools.grid import Grid, GridPoint, GridRegion, SubGrid, detect_objects, move_object
+from arc_tools.plot import plot_grid
 
-# 1 00576224
+# 1 00576224 repeat_reverse_grid
+# 6 017c7c7b repeat_and_swap_color
+# 709 b74ca5d1 color_swap_and_move_to_corner
+
+def repeat_and_swap_color(grid: Grid) -> Grid:
+    """
+    Find the repeated region and extend it by 3 rows. Replace blue with red.
+    """
+    # Create a copy of the grid to avoid modifying the original
+    result = grid.copy()
+    
+    # Find the repeated region
+    # height is not fixed, so we need to find the repeated region
+    # take n elements and check next n elements
+    # if they are the same, then we have found the repeated region
+    pattern = None
+    for i in range(1, len(result) + 1):
+        pattern = result[:i]
+        for j in range(i, len(result), len(pattern)):
+            sliced = result[j:j+len(pattern)]
+            if sliced != pattern[:len(sliced)]:
+                break
+        else:
+            break
+    
+    if pattern is None:
+        pattern = result
+    # plot_grid(pattern, name="pattern.png",show=1)
+    
+    # Create a new grid with exactly 3 additional rows
+    new_height = len(result) + 3
+    new_grid = [[result.background_color for _ in range(len(result[0]))] for _ in range(new_height)]
+    
+    # Copy the original grid
+    for i in range(len(result)):
+        for j in range(len(result[0])):
+            new_grid[i][j] = result[i][j]
+    
+    # Add the pattern for the additional rows
+    for i in range(3):
+        for j in range(len(pattern[0])):
+            new_grid[i+len(result)][j] = pattern[(i + len(result)) % len(pattern)][j]
+    
+    # Swap colors 
+    for i in range(len(new_grid)):
+        for j in range(len(new_grid[0])):
+            if new_grid[i][j] == Color.BLUE.value:
+                new_grid[i][j] = Color.RED.value
+    
+    return Grid(new_grid)
+
+
 def repeat_reverse_grid(grid: Grid) -> Grid:
     """
     Transform a grid by repeating the grid thrice horizontally and stack them vertically in (original, reversed, original) order.
@@ -114,7 +167,7 @@ def merge_nearby_objects_as_square(objects: list[SubGrid], background_color: int
     
     return new_objects
 
-# 709 b74ca5d1 
+
 def color_swap_and_move_to_corner(input_grid: Grid) -> Grid:
     """
     Swap colors of the objects (5x5) in the grid and move objects by their key value to the relevent corner.
@@ -159,5 +212,5 @@ def color_swap_and_move_to_corner(input_grid: Grid) -> Grid:
 
 if __name__ == "__main__":
     import os
-    os.system("main.py b74ca5d1 color_swap_and_move_to_corner")
-
+    # os.system("main.py b74ca5d1 color_swap_and_move_to_corner")
+    os.system("main.py 017c7c7b repeat_and_swap_color")
