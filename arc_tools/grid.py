@@ -231,6 +231,19 @@ class SubGrid(Grid):
     def __str__(self):
         return f"Region: {self.region}, height: {self.height}, width: {self.width}, background_color: {self.background_color}"
     
+    def __eq__(self, other):
+        if not isinstance(other, SubGrid):
+            return False
+        return (self.region == other.region and 
+                self.parent_grid == other.parent_grid and 
+                self.background_color == other.background_color and
+                super().__eq__(other))
+    
+    def set_center_color(self):
+        center_x = (self.region.x1 + self.region.x2) // 2
+        center_y = (self.region.y1 + self.region.y2) // 2
+        self.center_color = self.parent_grid[center_y][center_x]
+        
     def expand(self, n: int):
         return SubGrid(GridRegion([
             GridPoint(max(self.region.x1 - n, 0), max(self.region.y1 - n, 0)),
@@ -519,3 +532,7 @@ if __name__ == "__main__":
             print(f"Expected[{i}]:", expected[i])
             print(f"Values match:", [[[output[i][0][0]]]] == [expected[i]])
     assert [[[obj[0][0]]] for obj in output] == expected
+
+if __name__ == "__main__":
+    SubGrid.__eq__
+    pass
