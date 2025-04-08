@@ -73,8 +73,7 @@ def get_corner_direction(obj: SubGrid) -> tuple:
 
 def shoot_light(grid: Grid) -> Grid:
     '''
-    L-shaped guns shoot light in the corner direction of the L.
-    Once it touches an object, the color of the light is changed to the color of the object and reflected.
+    L-shaped guns shoot light in the direction of the centre of L. Once the light touches an object, it changes it's color to the object's color, and it is reflected.
     '''
     result = grid.copy()
     objects = detect_objects(result, single_color_only=True, go_diagonal=False)
