@@ -68,7 +68,6 @@ def fit_piece(grid: Grid, piece: Grid, remaining_pieces: Sequence[Grid]) -> Grid
                         hole_count = obj.get_values_count(all=True)[new_grid.background_color]
                         if obj.height < min_piece.height or obj.width < min_piece.width or hole_count < min_piece_size:
                             can_place = False
-                            breakpoint()
                             break
                 
                 # check if any piece can fit the border with small space
@@ -142,10 +141,7 @@ def jigsaw_recursive(grid: Grid, pieces: list[SubGrid]) -> Grid | None:
         return grid
     
     # Try to fit each remaining piece
-    try:
-        pieces.sort(key=lambda x: list(x.get_values_count().values())[0], reverse=True)
-    except Exception as e:
-        breakpoint()
+    pieces.sort(key=lambda x: list(x.get_values_count().values())[0], reverse=True)
         
     for piece in pieces:
         grid = grid.copy()

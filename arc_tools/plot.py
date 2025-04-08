@@ -11,6 +11,7 @@ def remove_pngs():
         os.remove(file)
 
 plot_grid_count = 0
+disable_show = 0
 def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, save=True, save_all=False, title=None):
     global plot_grid_count
     if name == "grid.png" and save_all:
@@ -81,7 +82,7 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, sa
         return ''
 
     ax.format_coord = format_coord
-    if show:
+    if show and not disable_show:
         # Function to format coordinates
         print(f'Showing interactive plot for {name}...')
         plt.show(block=1)
@@ -97,7 +98,7 @@ def plot_grids(grids, name="grids.png", show=False, save_all=False, title=None):
         ax = plot_grid(grid, ax=axs[i] if len(grids) > 1 else axs, close=False, save=False, title=title)
         # axs[i].imshow(grid)
     plt.tight_layout()
-    if show:
+    if show and not disable_show:
         plt.show(block=1)
     if name == "grids.png" and save_all:
         plot_grids_count += 1

@@ -42,10 +42,21 @@ class GridPoint:
         return self.__str__()
     
     def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
+        if isinstance(other, GridPoint):
+            return self.x == other.x and self.y == other.y
+        elif isinstance(other, tuple):
+            return self.x == other[0] and self.y == other[1]
+        return False
     
     def __hash__(self):
         return hash((self.x, self.y))
+    
+    def __contains__(self, other):
+        if isinstance(other, GridPoint):
+            return self.x == other.x and self.y == other.y
+        elif isinstance(other, tuple):
+            return self.x == other[0] and self.y == other[1]
+        return False
 
 
 class GridRegion:
@@ -74,9 +85,13 @@ class CustomIndexError(IndexError):
 class SafeList(list):
     def __getitem__(self, index):
         try:
-            return super().__getitem__(index)
+            if 0 <= index < len(self):
+                return super().__getitem__(index)
         except IndexError:
-            raise CustomIndexError(f"SafeList: Index {index} is out of bounds for list of length {len(self)}") from None
+            # raise CustomIndexError(f"SafeList: Index {index} is out of bounds for list of length {len(self)}") from None
+            pass
+        return SafeList([])
+    
     
     def __setitem__(self, index, value):
         try:
@@ -522,5 +537,6 @@ def rotate_object(object: SubGrid) -> SubGrid:
 if __name__ == "__main__":
     g = [[1]]
     g = Grid(g)
-    g[0][1] = 1
+    gp = GridPoint(0, 1)
+    print((1,2) in [gp])
     pass

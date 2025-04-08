@@ -1,5 +1,5 @@
 import logging
-formatter = logging.Formatter('%(filename)s:%(lineno)d - %(message)s')
+formatter = logging.Formatter('%(levelname)s: %(filename)s:%(lineno)d - %(message)s')
 logger = logging.getLogger('arc_tools')
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)

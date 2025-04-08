@@ -58,7 +58,7 @@ def debug_output(grid, expected_output, output):
             if expected_output[i][j] != output[i][j]:
                 print(f"Cell {i}, {j} is different")
     plot_grids([grid, expected_output, output], show=1)
-    breakpoint()
+    # breakpoint()
 
 def find_task(grids, expected_outputs, start_train_task_id=1):
     if len(grids[0][0]) == len(expected_outputs[0][0]):
@@ -71,7 +71,6 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
         logger.info(task_fn.__name__)
         right_task = True
         for task_id, (grid, expected_output) in enumerate(zip(grids, expected_outputs), start_train_task_id):
-            grid = Grid(grid)
             expected_output = Grid(expected_output)
             plot_grid(expected_output, name="expected_output.png")
             plot_grid(grid, name="input.png")
@@ -97,14 +96,14 @@ def solve_task(data):
     start_test_task_id = 1
     actual_task_name = None
     # start_train_task_id = 2
-    # start_test_task_id = 3
+    # start_test_task_id = 2
     # actual_task_name = fit_or_swap_fit
     grids = []
     expected_outputs = []
     actual_outputs = []
     if not actual_task_name:
         for task_idx in range(start_train_task_id - 1, num_train_tasks):
-            grids.append(data['train'][task_idx]['input'])
+            grids.append(Grid(data['train'][task_idx]['input']))
             expected_outputs.append(data['train'][task_idx]['output'])
         task_fn = find_task(grids, expected_outputs, start_train_task_id)
         if task_fn:

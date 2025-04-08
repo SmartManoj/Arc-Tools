@@ -202,8 +202,6 @@ def color_swap_and_move_to_corner(input_grid: Grid) -> Grid:
     #  swap colors in non corner objects
     for obj in non_corner_objects:
         obj_colors = set(obj.get_values_count().keys())
-        if len(obj_colors) == 1:
-            breakpoint()
         for row in range(obj.region.y1, obj.region.y2 + 1):
             for col in range(obj.region.x1, obj.region.x2 + 1):
                 if grid[row][col] != grid.background_color:
