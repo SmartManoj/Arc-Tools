@@ -2,9 +2,7 @@ from collections import Counter
 from arc_tools import grid
 from arc_tools.grid import Grid, detect_objects, Color, SubGrid, GridRegion, GridPoint
 from arc_tools.plot import plot_grid, plot_grids
-from itertools import combinations
 from arc_tools.logger import logger
-from copy import deepcopy
 
 
 

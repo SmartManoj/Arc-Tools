@@ -1,4 +1,3 @@
-from copy import deepcopy
 from itertools import combinations
 from arc_tools.logger import logger
 from arc_tools.grid import Grid, GridPoint, detect_objects, SubGrid

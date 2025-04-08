@@ -1,10 +1,10 @@
 from collections import deque, defaultdict
 import json
 from arc_tools.extract_knowledge import extract_knowledge
-from copy import deepcopy
 from arc_tools.grid import Grid
+
 def count_hollows_per_number(grid):
-    grid = deepcopy(grid)
+    grid = grid.copy()
     grid = extract_knowledge(grid)
     rows, cols = len(grid), len(grid[0])
     visited = [[False]*cols for _ in range(rows)]
