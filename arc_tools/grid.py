@@ -76,7 +76,8 @@ class SafeList(list):
         try:
             return super().__getitem__(index)
         except IndexError:
-            raise CustomIndexError(f"SafeList: Index {index} is out of bounds for list of length {len(self)}") from None
+            # raise CustomIndexError(f"SafeList: Index {index} is out of bounds for list of length {len(self)}") from None
+            return -1
     
     def __setitem__(self, index, value):
         try:
