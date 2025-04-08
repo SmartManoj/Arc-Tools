@@ -18,11 +18,11 @@ class Color(MyEnum):
     RED = 2
     GREEN = 3
     YELLOW = 4
-    GRAY = 5
-    PURPLE = 6
+    LIGHTGRAY = 5
+    MAGENTA = 6
     ORANGE = 7
     LIGHTBLUE = 8
-    BROWN = 9
+    MAROON = 9
 
 class BorderSide(MyEnum):
     LEFT = 0
@@ -76,9 +76,14 @@ class SafeList(list):
         try:
             return super().__getitem__(index)
         except IndexError:
-            raise CustomIndexError(f"Index {index} is out of bounds for list of length {len(self)}") from None
-        
+            raise CustomIndexError(f"SafeList: Index {index} is out of bounds for list of length {len(self)}") from None
     
+    def __setitem__(self, index, value):
+        try:
+            return super().__setitem__(index, value)
+        except IndexError:
+            # raise CustomIndexError(f"SafeList assignment: Index {index} is out of bounds for list of length {len(self)}") from None
+            pass
     
     
 
@@ -515,27 +520,7 @@ def rotate_object(object: SubGrid) -> SubGrid:
     return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid))
 
 if __name__ == "__main__":
-    file = r'"C:/Users/smart/Desktop/arc - local/main.py"'
-    import os
-    # os.system(f'python {file}')
-    g=[[0, 0 ,1, 1, 2, 2, 0, 0]]
-    print("Input grid:", g)
-    output = detect_objects(Grid(g), single_color_only=1)
-    # expected =  [[[1]], [[1]], [[2]]]
-    expected =  [[[1, 2]]]
-    print("Output:", output)
-    print("Expected:", expected)
-    print("Output type:", type(output))
-    print("Expected type:", type(expected))
-    print("Output length:", len(output))
-    print("Expected length:", len(expected))
-    if len(output) == len(expected):
-        for i in range(len(output)):
-            print(f"Output[{i}]:", output[i])
-            print(f"Expected[{i}]:", expected[i])
-            print(f"Values match:", [[[output[i][0][0]]]] == [expected[i]])
-    assert [[[obj[0][0]]] for obj in output] == expected
-
-if __name__ == "__main__":
-    SubGrid.__eq__
+    g = [[1]]
+    g = Grid(g)
+    g[0][1] = 1
     pass

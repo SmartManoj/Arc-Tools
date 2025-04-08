@@ -11,7 +11,7 @@ def remove_pngs():
         os.remove(file)
 
 plot_grid_count = 0
-def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, save=True, save_all=False):
+def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, save=True, save_all=False, title=None):
     global plot_grid_count
     if name == "grid.png" and save_all:
         plot_grid_count += 1
@@ -27,11 +27,11 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, sa
     2: 'red',
     3: 'green',
     4: 'yellow',
-    5: 'gray',
-    6: 'purple',
+    5: 'lightgray',
+    6: 'magenta',
     7: 'orange',
     8: 'lightblue',
-    9: 'brown',
+    9: 'maroon',
 
     }
     norm = mcolors.BoundaryNorm(boundaries=range(len(colors)+1), ncolors=len(colors))
@@ -72,7 +72,7 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, sa
 
     if save:
         plt.savefig(name, facecolor='black', edgecolor='white')
-    plt.title(name)
+    plt.title(title or name)
     def format_coord(x, y):
         if x >= -0.5 and y >= -0.5:
             col = int(x + 0.5)
@@ -89,12 +89,12 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, sa
         plt.close()
 
 plot_grids_count = 0
-def plot_grids(grids, name="grids.png", show=False, save_all=False):
+def plot_grids(grids, name="grids.png", show=False, save_all=False, title=None):
     global plot_grids_count
     # plot the grids in a single plot
     fig, axs = plt.subplots(1, len(grids), figsize=(10, 5 * len(grids)))
     for i, grid in enumerate(grids):
-        ax = plot_grid(grid, ax=axs[i] if len(grids) > 1 else axs, close=False, save=False)
+        ax = plot_grid(grid, ax=axs[i] if len(grids) > 1 else axs, close=False, save=False, title=title)
         # axs[i].imshow(grid)
     plt.tight_layout()
     if show:
