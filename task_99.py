@@ -88,7 +88,6 @@ def check_fit_recursive(current_grid: Grid, remaining_objects: list[SubGrid], lo
                     # Update locked dots for the next recursive call
                     new_locked_dots = locked_dots_so_far + [a1, a2] 
 
-                    # breakpoint()
                     # Recurse with the updated state
                     final_grid, success = check_fit_recursive(new_grid, rest_objects, new_locked_dots, dot_value)
 

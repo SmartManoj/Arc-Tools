@@ -58,7 +58,6 @@ def debug_output(grid, expected_output, output):
             if expected_output[i][j] != output[i][j]:
                 print(f"Cell {i}, {j} is different")
     plot_grids([grid, expected_output, output], show=1)
-    # breakpoint()
 
 def find_task(grids, expected_outputs, start_train_task_id=1):
     if len(grids[0][0]) == len(expected_outputs[0][0]):

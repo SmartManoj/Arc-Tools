@@ -19,7 +19,6 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, sa
         name = f"grid_{plot_grid_count}.png"
     if not grid:
         logger.debug(f"Grid is empty")
-        # breakpoint()
         return
     # Define colors
     colors = {
