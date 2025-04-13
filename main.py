@@ -97,7 +97,6 @@ def solve_task(data):
     actual_task_name = None
     # start_train_task_id = 3
     # start_test_task_id = 2
-    # actual_task_name = fit_or_swap_fit
     grids = []
     expected_outputs = []
     actual_outputs = []
@@ -134,8 +133,6 @@ def solve_task(data):
     return actual_outputs
 
 if __name__ == "__main__":
-    files = glob('C:/Users/smart/Desktop/GD/ARC-AGI-2/data/evaluation/*.json')
-    file = files[14]
     task_hash = 'abc82100'
     if sys.argv[1:]:
         task_hash = sys.argv[1]

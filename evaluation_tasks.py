@@ -9,6 +9,7 @@ from task_8 import borderize
 from task_9 import highlight_plus
 from task_10 import just_walk
 from task_11 import glue_it
+from task_12 import grow_and_crop
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object

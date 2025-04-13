@@ -139,6 +139,13 @@ class Grid(SafeList):
                     self[row][col] = new_color
         return self
     
+    def replace_all_color(self, new_color):
+        for row in range(self.height):
+            for col in range(self.width):
+                if self[row][col] != self.background_color:
+                    self[row][col] = new_color
+        return self
+    
     def replace_dot(self, dot_color, obj: 'SubGrid', dx: int, dy: int, first_grid: 'Grid'):
         logger.debug(f"Replacing dot {dot_color} with object {obj} at {dx}, {dy}")
         for row in range(self.height):
@@ -200,11 +207,11 @@ class Grid(SafeList):
         return self.get_max_value()
 
     def get_min_value(self):
-        min_key, _ = min(self.get_values_count().items(), key=lambda x: x[1])
+        min_key, _ = min(self.get_values_count().items(), key=lambda x: x[1], default=(None, 0))
         return min_key
     
     def get_max_value(self):
-        max_key, _ = max(self.get_values_count().items(), key=lambda x: x[1])
+        max_key, _ = max(self.get_values_count().items(), key=lambda x: x[1], default=(None, 0))
         return max_key
     
     def __eq__(self, other):
