@@ -157,10 +157,12 @@ class Grid(SafeList):
     def crop(self, region: GridRegion):
         return Grid([[self[row][col] for col in range(region.x1, region.x2 + 1)] for row in range(region.y1, region.y2 + 1)])
 
-    def remove_object(self, obj: 'SubGrid'):
+    def remove_object(self, obj: 'SubGrid', color: int | None = None):
+        if color is None:
+            color = self.background_color
         for row in range(obj.region.y1, obj.region.y2 + 1):
             for col in range(obj.region.x1, obj.region.x2 + 1):
-                self[row][col] = self.background_color
+                self[row][col] = color
         return self
 
     def copy(self):
@@ -465,8 +467,16 @@ def split_into_square_boxes(grid: Grid, size: int) -> list[SubGrid]:
 
     return [SubGrid(region, grid) for region in regions]
 
+class Shape:
+    pass
 
-def detect_objects(grid: Grid, required_object: str | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True) -> list[SubGrid]:
+class Square(Shape):
+    def __init__(self, size: int):
+        self.size = size
+        
+        
+
+def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True) -> list[SubGrid]:
     grid_np = np.array(grid)
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
@@ -518,11 +528,12 @@ def detect_objects(grid: Grid, required_object: str | None = None, invert: bool 
                 ]
                 if current_object_points:
                     obj = SubGrid(GridRegion(current_object_points), grid)
-                    if required_object == 'square':
-                        if obj.height == 5 and obj.width == 5:
+                    if isinstance(required_object, Square):
+                        size = required_object.size
+                        if obj.height == size and obj.width == size:
                             objects.append(obj)
                         else:
-                            new_objects = split_into_square_boxes(obj.get_full_grid(), 5)
+                            new_objects = split_into_square_boxes(obj.get_full_grid(), size)
                             logger.debug(f"Found {len(new_objects)} square boxes")
                             for new_obj in new_objects:
                                 objects.append(new_obj)

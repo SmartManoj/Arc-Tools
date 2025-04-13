@@ -11,7 +11,7 @@ def remove_pngs():
         os.remove(file)
 
 plot_grid_count = 0
-disable_show = 0
+disable_show = 1
 def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, save=True, save_all=False, title=None):
     global plot_grid_count
     if name == "grid.png" and save_all:

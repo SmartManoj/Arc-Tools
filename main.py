@@ -10,6 +10,7 @@ import json
 from arc_tools.grid import Grid, GridPoint, GridRegion, detect_objects
 from task_111 import count_hollows_task
 from task_99 import check_fit
+from task_10 import just_walk
 from arc_tools.plot import plot_grid, plot_grids, remove_pngs
 from arc_tools.squash import squash_grid
 
@@ -94,7 +95,7 @@ def solve_task(data):
     start_train_task_id = 1
     start_test_task_id = 1
     actual_task_name = None
-    # start_train_task_id = 4
+    start_train_task_id = 3
     # start_test_task_id = 2
     # actual_task_name = fit_or_swap_fit
     grids = []

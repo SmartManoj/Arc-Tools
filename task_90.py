@@ -1,5 +1,5 @@
 from arc_tools import logger
-from arc_tools.grid import Grid, Color, detect_objects, move_object
+from arc_tools.grid import Grid, Color, Square, detect_objects, move_object
 
 def move_object_without_collision(grid: Grid) -> Grid:
     '''
@@ -8,7 +8,7 @@ def move_object_without_collision(grid: Grid) -> Grid:
     2. move red box to right wall
     '''
     global show_count
-    objects = detect_objects(grid, required_object = 'square')
+    objects = detect_objects(grid, required_object = Square(5))
     blue_objects = [obj for obj in objects if obj[0][0]==Color.LIGHTBLUE.value]
     blue_objects.sort(key=lambda x: x.region.x1)
     red_objects = [obj for obj in objects if obj[0][0]==Color.RED.value]
