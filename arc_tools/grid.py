@@ -233,6 +233,33 @@ class Grid(SafeList):
                     if y < 0 or x < 0 or y >= len(self) or x >= len(self[0]):
                         continue
                     self[y][x] = 0
+        return self
+    
+    def extend_grid(self, new_height: int, new_width: int):
+        """
+        Extends the grid to at least new_height x new_width, filling new cells with background_color.
+        """
+        if new_height <= self.height and new_width <= self.width:
+            return
+        # Extend rows
+        for row in self:
+            if new_width > self.width:
+                row.extend(SafeList([self.background_color] * (new_width - self.width)))
+            if new_width < 0:
+                row.insert(0, SafeList([self.background_color] * (-new_width)))
+        
+        self.width = len(self[0])
+
+        # Add new rows if needed
+        if new_height > self.height:
+            for _ in range(self.height, new_height):
+                self.append(SafeList([self.background_color] * self.width))
+        if new_height < 0:
+            for _ in range(-new_height):
+                self.insert(0, SafeList([self.background_color] * self.width))
+
+        self.height = len(self)
+        
         return self 
         
 
@@ -316,7 +343,7 @@ class SubGrid(Grid):
         else:
             return new_object.region.x1, new_object.region.y1
     
-    def get_points_of_dots(self, value):
+    def get_position_of_dot(self, value):
         positions = []
         for row in range(self.region.y1, self.region.y2 + 1):
             for col in range(self.region.x1, self.region.x2 + 1):
@@ -330,7 +357,7 @@ class SubGrid(Grid):
         return deepcopy(self)
 
     def get_points_and_sides_of_dots(self, value):
-        points = self.get_points_of_dots(value)
+        points = self.get_position_of_dot(value)
         points_and_sides = []
         for point in points:
             points_and_sides.append((point, self.get_border_sides(point)))
@@ -505,18 +532,34 @@ def detect_objects(grid: Grid, required_object: str | None = None, invert: bool 
     return objects
     
 
-def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid) -> Grid:
-    # x, y = object_to_move.region.x1 + dx, object_to_move.region.y1 + dy
-    # copy the value of the object_to_move to the new position
+def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False) -> Grid:
+    """
+    Moves the object_to_move by (dx, dy) in the grid, extending the grid if necessary.
+    """
     logger.debug(f"Moving object {object_to_move} to {dx}, {dy} in grid of type {type(grid)}")
-    old_grid = deepcopy(object_to_move.get_full_grid())
+    old_grid = object_to_move.get_full_grid().copy()
+    if extend_grid:
+        # Calculate new bounds
+        min_row = object_to_move.region.y1 + dy
+        min_col = object_to_move.region.x1 + dx
+        max_row = object_to_move.region.y2 + dy
+        max_col = object_to_move.region.x2 + dx
+        # Extend grid if needed
+        required_height = max(max_row + 1, grid.height)
+        required_width = max(max_col + 1, grid.width)
+        if required_height > grid.height or required_width > grid.width:
+            grid.extend_grid(required_height, required_width)
+        
+        # negative extend grid
+        if min_row < 0 or min_col < 0:
+            grid.extend_grid(-min_row, -min_col)
+    # Move the object
     for row in range(object_to_move.region.y1, object_to_move.region.y2 + 1):
         for col in range(object_to_move.region.x1, object_to_move.region.x2 + 1):
             value = old_grid[row][col]
             if value != grid.background_color:
                 if 0 <= row+dy < len(grid) and 0 <= col+dx < len(grid[0]):
                     grid[row+dy][col+dx] = value
-
     return grid
 
 def rotate_object(object: SubGrid) -> SubGrid:
