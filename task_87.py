@@ -29,7 +29,7 @@ def dot_to_object(grid: Grid) -> Grid:
     replace dots with the object using the color replacement map (don't replace already replaced dots).
     remove the key object and the color replacement map from the grid.
     """
-    objects = detect_objects(grid, required_color=Color.LIGHTBLUE.value)
+    objects = detect_objects(grid, required_color=Color.LIGHTBLUE)
     for obj in objects[::-1]:
         if len(obj.get_unique_values()) != 1:
             # split the object vertically if height > width
@@ -39,9 +39,9 @@ def dot_to_object(grid: Grid) -> Grid:
                 center_y = obj.region.y2
                 region1 = GridRegion([GridPoint(obj.region.x1, obj.region.y1), GridPoint(center_x, obj.region.y2)])
                 region2 = GridRegion([GridPoint(center_x + 1, obj.region.y1), GridPoint(obj.region.x2, obj.region.y2)])
-                obj1 = detect_objects(SubGrid(region1, grid).get_full_grid(), required_color=Color.LIGHTBLUE.value)[0]
+                obj1 = detect_objects(SubGrid(region1, grid).get_full_grid(), required_color=Color.LIGHTBLUE)[0]
                 obj1 = SubGrid(obj1.region, grid)
-                obj2 = detect_objects(SubGrid(region2, grid).get_full_grid(), required_color=Color.LIGHTBLUE.value)[0]
+                obj2 = detect_objects(SubGrid(region2, grid).get_full_grid(), required_color=Color.LIGHTBLUE)[0]
                 obj2 = SubGrid(obj2.region, grid)
                 objects.append(obj1)
                 objects.append(obj2)
@@ -52,9 +52,9 @@ def dot_to_object(grid: Grid) -> Grid:
                 center_y = obj.region.height // 2 - 1
                 region1 = GridRegion([GridPoint(obj.region.x1, obj.region.y1), GridPoint(obj.region.x2, center_y)])
                 region2 = GridRegion([GridPoint(obj.region.x1, center_y + 1), GridPoint(obj.region.x2, obj.region.y2)])
-                obj1 = detect_objects(SubGrid(region1, grid).get_full_grid(), required_color=Color.LIGHTBLUE.value)[0]
+                obj1 = detect_objects(SubGrid(region1, grid).get_full_grid(), required_color=Color.LIGHTBLUE)[0]
                 obj1 = SubGrid(obj1.region, grid)
-                obj2 = detect_objects(SubGrid(region2, grid).get_full_grid(), required_color=Color.LIGHTBLUE.value)[0]
+                obj2 = detect_objects(SubGrid(region2, grid).get_full_grid(), required_color=Color.LIGHTBLUE)[0]
                 obj2 = SubGrid(obj2.region, grid)
                 objects.append(obj1)
                 objects.append(obj2)

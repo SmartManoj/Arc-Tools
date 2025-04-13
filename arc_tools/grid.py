@@ -487,7 +487,7 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
         if ignore_color:
             val = val and a != ignore_color
         if required_color:
-            val = val and a == required_color
+            val = val and a == required_color.value
         if invert:
             return not val
         return val
