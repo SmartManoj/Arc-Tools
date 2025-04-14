@@ -142,7 +142,7 @@ if __name__ == "__main__":
     actual_task_name = sys.argv[2] if sys.argv[2:] else None
     split = ['evaluation', 'training']
     for s in split:
-        file = rf'C:/Users/smart/Desktop/GD/ARC-AGI-2/data/{s}/{task_hash}.json'
+        file = rf'../ARC-AGI-2/data/{s}/{task_hash}.json'
         if os.path.exists(file):
             break
     data = json.load(open(file, 'r'))
