@@ -71,7 +71,7 @@ def move_and_check(grid, movable_obj, fixed_obj, move_point, fixed_obj_color):
                 break
     
     fixed_obj_total_dots = fixed_obj.get_total_dots()
-    new_grid = copy_object(movable_obj, 
+    copy_object(movable_obj, 
                           move_point.x - new_x1 - movable_obj.region.x1,
                           move_point.y - new_y1 - movable_obj.region.y1,
                           new_grid)

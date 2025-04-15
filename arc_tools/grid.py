@@ -543,14 +543,15 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
     return objects
     
     
-def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False) -> Grid:
+def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False) -> SubGrid:
     """
     Moves the object_to_move by (dx, dy) in the grid, extending the grid if necessary.
     """
     logger.debug(f"Moving object {object_to_move} to {dx}, {dy} in grid of type {type(grid)}")
     grid.remove_object(object_to_move)
     return copy_object(object_to_move, dx, dy, grid, extend_grid)
-def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False) -> Grid:
+
+def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False) -> SubGrid:
     """
     Copies the object_to_move by (dx, dy) in the grid, extending the grid if necessary.
     """
@@ -578,7 +579,13 @@ def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
             if value != grid.background_color:
                 if 0 <= row+dy < len(grid) and 0 <= col+dx < len(grid[0]):
                     grid[row+dy][col+dx] = value
-    return grid
+
+    copied_obj = object_to_move.copy()
+    copied_obj.region.x1 = max(copied_obj.region.x1 + dx, 0)
+    copied_obj.region.x2 = min(copied_obj.region.x2 + dx, grid.width - 1)
+    copied_obj.region.y1 = max(copied_obj.region.y1 + dy, 0)
+    copied_obj.region.y2 = min(copied_obj.region.y2 + dy, grid.height - 1)
+    return copied_obj
 
 def rotate_object(object: SubGrid) -> SubGrid:
     """

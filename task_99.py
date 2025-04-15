@@ -82,7 +82,7 @@ def check_fit_recursive(current_grid: Grid, remaining_objects: list[SubGrid], lo
                     # Create a new grid state by applying the move
                     # Use deepcopy to avoid modifying the grid state needed for backtracking
                     new_grid = current_grid.copy()
-                    new_grid = copy_object(current_obj, offset_x1, offset_y1, new_grid) # move_object modifies new_grid in place
+                    copy_object(current_obj, offset_x1, offset_y1, new_grid) # move_object modifies new_grid in place
 
                     # Update locked dots for the next recursive call
                     new_locked_dots = locked_dots_so_far + [a1, a2] 
