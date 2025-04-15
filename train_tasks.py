@@ -1,4 +1,4 @@
-from arc_tools.grid import Color
+from arc_tools.grid import Color, copy_object
 from arc_tools.grid import Grid, GridPoint, GridRegion, SubGrid, detect_objects, move_object
 from arc_tools.plot import plot_grid
 
@@ -196,7 +196,7 @@ def color_swap_and_move_to_corner(input_grid: Grid) -> Grid:
             x, y = obj.get_corner_position(new_object)
             # plot_grids([obj, new_object], show=1)
             dx, dy = x - new_object.region.x1, y - new_object.region.y1
-            grid=move_object(new_object, dx, dy, grid)
+            grid=copy_object(new_object, dx, dy, grid)
 
 
     #  swap colors in non corner objects

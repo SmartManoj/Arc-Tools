@@ -1,5 +1,5 @@
 from arc_tools import grid
-from arc_tools.grid import Grid, detect_objects, Color, SubGrid, GridRegion, GridPoint, move_object, rotate_object
+from arc_tools.grid import Grid, copy_object, detect_objects, Color, SubGrid, GridRegion, GridPoint, move_object, rotate_object
 from arc_tools.plot import plot_grid, plot_grids
 from itertools import combinations
 from arc_tools.logger import logger
@@ -71,7 +71,7 @@ def move_and_check(grid, movable_obj, fixed_obj, move_point, fixed_obj_color):
                 break
     
     fixed_obj_total_dots = fixed_obj.get_total_dots()
-    new_grid = move_object(movable_obj, 
+    new_grid = copy_object(movable_obj, 
                           move_point.x - new_x1 - movable_obj.region.x1,
                           move_point.y - new_y1 - movable_obj.region.y1,
                           new_grid)

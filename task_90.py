@@ -32,7 +32,6 @@ def move_object_without_collision(grid: Grid) -> Grid:
                     break
             
             if all_rows_clear:
-                left_side_grid.remove_object(obj)
                 left_side_grid = move_object(obj, -(obj.region.x1 - i), 0, left_side_grid)
                 break
     right_side_grid = grid.copy()
@@ -51,7 +50,6 @@ def move_object_without_collision(grid: Grid) -> Grid:
                     break
             
             if all_rows_clear:
-                right_side_grid.remove_object(obj)
                 right_side_grid = move_object(obj, (i - obj.region.x2), 0, right_side_grid)
                 break
     # merge left with right

@@ -542,12 +542,19 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
     logger.debug(f"Found {len(objects)} objects")
     return objects
     
-
+    
 def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False) -> Grid:
     """
     Moves the object_to_move by (dx, dy) in the grid, extending the grid if necessary.
     """
     logger.debug(f"Moving object {object_to_move} to {dx}, {dy} in grid of type {type(grid)}")
+    grid.remove_object(object_to_move)
+    return copy_object(object_to_move, dx, dy, grid, extend_grid)
+def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False) -> Grid:
+    """
+    Copies the object_to_move by (dx, dy) in the grid, extending the grid if necessary.
+    """
+    logger.debug(f"Copying object {object_to_move} to {dx}, {dy} in grid of type {type(grid)}")
     old_grid = object_to_move.get_full_grid().copy()
     if extend_grid:
         # Calculate new bounds

@@ -1,7 +1,6 @@
 from itertools import combinations
 from arc_tools.logger import logger
-from arc_tools.grid import Grid, GridPoint, detect_objects, SubGrid
-from arc_tools.grid import detect_objects, move_object
+from arc_tools.grid import Grid, GridPoint, detect_objects, SubGrid, copy_object
 from arc_tools.plot import plot_grids
 
 def calculate_offset(A1: GridPoint, A2: GridPoint): 
@@ -83,7 +82,7 @@ def check_fit_recursive(current_grid: Grid, remaining_objects: list[SubGrid], lo
                     # Create a new grid state by applying the move
                     # Use deepcopy to avoid modifying the grid state needed for backtracking
                     new_grid = current_grid.copy()
-                    new_grid = move_object(current_obj, offset_x1, offset_y1, new_grid) # move_object modifies new_grid in place
+                    new_grid = copy_object(current_obj, offset_x1, offset_y1, new_grid) # move_object modifies new_grid in place
 
                     # Update locked dots for the next recursive call
                     new_locked_dots = locked_dots_so_far + [a1, a2] 

@@ -26,8 +26,6 @@ def glue_it(grid: Grid) -> Grid:
     # remove the orange patch from the second object
     obj2.replace_color(Color.ORANGE.value, obj1.background_color)
 
-
-    grid.remove_object(obj2)
     grid = move_object(obj2, orange_pos_obj1.x - orange_pos_obj2.x, orange_pos_obj1.y - orange_pos_obj2.y - 1, grid, extend_grid=True)
     grid = detect_objects(grid)[0]
     return grid
