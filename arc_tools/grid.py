@@ -146,6 +146,26 @@ class Grid(SafeList):
                     self[row][col] = new_color
         return self
     
+    def fill_color(self, point: GridPoint, new_color: int):
+        # use bfs to fill the color
+        queue = deque([point])
+        old_color = self[point.y][point.x]
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+        while queue:
+            point = queue.popleft()
+            if self[point.y][point.x] == new_color:
+                continue
+            old_color = self[point.y][point.x]
+            self[point.y][point.x] = new_color
+            for dx, dy in directions:
+                new_col = point.x + dx
+                new_row = point.y + dy
+                if 0 <= new_col < self.width and 0 <= new_row < self.height:
+                    if self[new_row][new_col] == old_color:
+                        queue.append(GridPoint(new_col, new_row))
+
+        return self
+    
     def replace_dot(self, dot_color, obj: 'SubGrid', dx: int, dy: int, first_grid: 'Grid'):
         logger.debug(f"Replacing dot {dot_color} with object {obj} at {dx}, {dy}")
         for row in range(self.height):
@@ -373,7 +393,7 @@ class SubGrid(Grid):
         return points_and_sides
     
     def get_subgrid(self):
-        grid = [[0 for _ in range(self.region.x2 - self.region.x1 + 1)] for _ in range(self.region.y2 - self.region.y1 + 1)]
+        grid = SafeList([SafeList([0 for _ in range(self.region.x2 - self.region.x1 + 1)]) for _ in range(self.region.y2 - self.region.y1 + 1)])
         for row in range(self.region.y1, self.region.y2 + 1):
             for col in range(self.region.x1, self.region.x2 + 1):
                 grid[row - self.region.y1][col - self.region.x1] = self.parent_grid[row][col]
@@ -483,7 +503,7 @@ class Square(Shape):
         
         
 
-def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True) -> list[SubGrid]:
+def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None) -> list[SubGrid]:
     grid_np = np.array(grid)
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
@@ -510,6 +530,7 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                 
 
                 while q:
+                    
                     row, col = q.popleft()
                     current_object_points.append(GridPoint(col, row)) # x=col, y=row
                     if go_diagonal:
@@ -523,6 +544,8 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                            compare(grid_np[nr, nc]) and not visited[nr, nc]:
                             if single_color_only and grid_np[nr, nc] != current_color:
                                 continue
+                            if max_count and len(current_object_points) >= max_count:
+                                break
                             visited[nr, nc] = True
                             q.append((nr, nc))
                 # filter only the corner points
