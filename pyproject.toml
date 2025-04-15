@@ -11,3 +11,6 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.10"
 
+[tool.mypy]
+disable_error_code = "import"
+

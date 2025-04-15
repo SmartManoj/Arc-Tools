@@ -1,4 +1,4 @@
-from arc_tools import logger
+from arc_tools.logger import logger
 from arc_tools.grid import Grid, Color, Square, detect_objects, move_object
 
 def move_object_without_collision(grid: Grid) -> Grid:

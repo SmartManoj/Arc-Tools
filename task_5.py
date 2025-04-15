@@ -38,8 +38,12 @@ def transform_object(obj: SubGrid) -> SubGrid:
         new_grid[0][1] = color
         new_grid[0][2] = color
         new_grid[0][3] = color
-    
-    return Grid(new_grid)
+    grid = Grid(new_grid)
+    region = GridRegion([
+        GridPoint(0, 0),
+        GridPoint(grid.width - 1, grid.height - 1)
+    ])
+    return SubGrid(region, grid)
 
 def mapper(grid: Grid) -> Grid:
     '''

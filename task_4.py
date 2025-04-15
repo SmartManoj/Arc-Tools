@@ -70,7 +70,9 @@ def get_corner_direction(obj: SubGrid) -> tuple:
     # Check for mirrored L shapes (rotated 270 degrees)
     if x2 == x3 and y1 == y3 and y1 == y2 + 1:
         return (1, 1)
-
+    
+    assert False, "Unreachable: not a valid L-shape"
+    
 def shoot_light(grid: Grid) -> Grid:
     '''
     L-shaped guns shoot light in the direction of the centre of L. Once the light touches an object, it changes it's color to the object's color, and it is reflected.

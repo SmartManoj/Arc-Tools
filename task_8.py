@@ -13,11 +13,10 @@ def get_outermost_corners(objects: list[SubGrid], input_grid: Grid, border_color
     Also establishes parent-child relationships between objects.
     """
     bg = input_grid.background_color
-    results = []
     
     # Initialize parent attribute for all objects
     for obj in objects:
-        obj.parent = None
+        obj.parent = None # type: ignore
     
     
     parent_objects = []
@@ -142,7 +141,7 @@ def borderize(grid: Grid) -> Grid:
     '''
     Draw the borders based on the corner dots.
     '''
-    dots_with_color = deque()
+    dots_with_color: list[tuple[GridPoint, Color]] = []
     border_color = grid.get_max_value()
     objects = detect_objects(grid, ignore_color=border_color, go_diagonal=False)
     objects = get_outermost_corners(objects, grid, border_color)
@@ -157,17 +156,17 @@ def borderize(grid: Grid) -> Grid:
                 up, down, left, right = grid[y-1][x], grid[y+1][x], grid[y][x-1], grid[y][x+1]
                 if sum([side == grid.background_color for side in [up, down, left, right]]) == 2:
                     grid[y][x] = -1
-                    dots_with_color.insert(max(0, idx - 1), (GridPoint(x, y), -1))
+                    dots_with_color.insert(max(0, idx - 1), (GridPoint(x, y), Color(-1)))
 
     k = 0
     while dots_with_color:
-        dot, initial_obj_color = dots_with_color.popleft()
+        dot, initial_obj_color = dots_with_color.pop(0)
         k += 1
         if k > 10 and 0:
             break
         logger.debug(f"Processing dot {k} {dot}; Remaining: {len(dots_with_color)}")
         obj_color = grid[dot.y][dot.x]
-        if initial_obj_color != obj_color:
+        if initial_obj_color != obj_color.value:
             continue
         initial_x, initial_y = dot.x, dot.y
         if k>=3 and 0:

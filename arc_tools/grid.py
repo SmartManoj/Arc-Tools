@@ -4,7 +4,7 @@ import json
 import numpy as np
 import logging
 from copy import deepcopy
-from arc_tools.plot import plot_grid, plot_grids
+from typing import Optional
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -114,7 +114,7 @@ class Grid(SafeList):
             self.height = len(self)
             self.width = len(self[0])
     
-    def __hash__(self) -> int:
+    def __hash__(self) -> int: # type: ignore
         return hash((tuple(tuple(row) for row in self), self.background_color))
     
     def compare(self, other):
@@ -218,7 +218,7 @@ class Grid(SafeList):
         with open(name, 'w') as f:
             f.write(data)
 
-    def remove_corner_grid(self, grid_size=1, relative_to: 'SubGrid' = None):
+    def remove_corner_grid(self, grid_size: int = 1, relative_to: Optional['SubGrid'] = None):
         top_left_corner = GridPoint(0, 0)
         top_right_corner = GridPoint(0, len(self[0])-1 - grid_size + 1)
         bottom_left_corner = GridPoint(len(self)-1 - grid_size + 1, 0)
@@ -274,7 +274,7 @@ class SubGrid(Grid):
         self.width = self.region.x2 - self.region.x1 + 1
         self.background_color = self.parent_grid.background_color
 
-    def __hash__(self) -> int:
+    def __hash__(self) -> int: # type: ignore
         return hash((self.region, self.parent_grid, self.background_color))
     
     def __str__(self):
@@ -485,7 +485,7 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
     def compare(a):
         val = a != grid.background_color
         if ignore_color:
-            val = val and a != ignore_color
+            val = val and a != ignore_color.value
         if required_color:
             val = val and a == required_color.value
         if invert:
@@ -598,6 +598,8 @@ def rotate_object(object: SubGrid) -> SubGrid:
 if __name__ == "__main__":
     g = [[1]]
     g = Grid(g)
+    d = {}
+    d[g]=1
     gp = GridPoint(0, 1)
     print((1,2) in [gp])
     pass
