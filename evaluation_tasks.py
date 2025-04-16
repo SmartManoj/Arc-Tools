@@ -13,6 +13,7 @@ from task_12 import grow_and_crop
 from task_13 import tetris_pipe
 from task_14 import shooting_lines
 from task_15 import frame_fit
+from task_16 import extrapolation
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object

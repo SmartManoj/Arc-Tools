@@ -622,6 +622,18 @@ def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
     copied_obj.region.y2 = min(copied_obj.region.y2 + dy, grid.height - 1)
     return copied_obj
 
+def flip_horizontally(object: Grid) -> Grid:
+    rows = object.height
+    cols = object.width
+    new_grid = [[object[rows-1-j][i] for i in range(cols)] for j in range(rows)]
+    return Grid(new_grid)
+
+def flip_vertically(object: Grid) -> Grid:
+    rows = object.height
+    cols = object.width
+    new_grid = [[object[j][cols-1-i] for i in range(cols)] for j in range(rows)]
+    return Grid(new_grid)
+
 def rotate_object(object: SubGrid) -> SubGrid:
     """
     Rotate a object 90 degrees clockwise.
@@ -638,10 +650,6 @@ def rotate_object(object: SubGrid) -> SubGrid:
     return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid))
 
 if __name__ == "__main__":
-    g = [[1]]
+    g = [[1,2], [3,4]]
     g = Grid(g)
-    d = {}
-    d[g]=1
-    gp = GridPoint(0, 1)
-    print((1,2) in [gp])
-    pass
+    print(flip_horizontally(g))

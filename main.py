@@ -95,11 +95,13 @@ def solve_task(data):
     start_train_task_id = 1
     start_test_task_id = 1
     actual_task_name = None
-    # start_train_task_id = 3
+    # start_train_task_id = 4
     # start_test_task_id = 2
     grids = []
     expected_outputs = []
     actual_outputs = []
+    with open('reference_output.json', 'w') as f:
+        json.dump(data['train'][0]['output'], f)
     if not actual_task_name:
         for task_idx in range(start_train_task_id - 1, num_train_tasks):
             grids.append(Grid(data['train'][task_idx]['input']))
