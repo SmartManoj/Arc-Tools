@@ -295,7 +295,7 @@ class Grid(SafeList):
 
 class SubGrid(Grid):
     def __init__(self, region: GridRegion, parent_grid: Grid, obj_color: int | None = None):
-        self.region = region # Keep the attribute name 'region' for consistency
+        self.region = region
         self.parent_grid = parent_grid
         super().__init__(self.get_subgrid(obj_color))
         self.height = self.region.y2 - self.region.y1 + 1
@@ -306,6 +306,11 @@ class SubGrid(Grid):
     def __hash__(self) -> int: # type: ignore
         return hash((self.region, self.parent_grid, self.background_color))
     
+    def new_region(self, dx1: int = 0, dy1: int = 0, dx2: int = 0, dy2: int = 0, region: GridRegion | None = None):
+        if not region:
+            region = GridRegion([GridPoint(self.region.x1 + dx1, self.region.y1 + dy1), GridPoint(self.region.x2 + dx2, self.region.y2 + dy2)])
+        return SubGrid(region, self.parent_grid, self.obj_color)
+
     def __str__(self):
         return f"Region: {self.region}, height: {self.height}, width: {self.width}, background_color: {self.background_color}"
     
@@ -531,9 +536,7 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                 q = deque([(r, c)])
                 visited[r, c] = True
                 
-
                 while q:
-                    
                     row, col = q.popleft()
                     current_object_points.append(GridPoint(col, row)) # x=col, y=row
                     if go_diagonal:
@@ -607,13 +610,15 @@ def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
         if min_row < 0 or min_col < 0:
             grid.extend_grid(-min_row, -min_col)
     # copy the object
-    for row in range(object_to_move.region.y1, object_to_move.region.y2 + 1):
-        for col in range(object_to_move.region.x1, object_to_move.region.x2 + 1):
-            value = old_grid[row][col]
+    for row in range(object_to_move.height):
+        for col in range(object_to_move.width):
+            value = object_to_move[row][col]
+            row_index = row + object_to_move.region.y1
+            col_index = col + object_to_move.region.x1
             if value != grid.background_color:
-                if 0 <= row+dy < len(grid) and 0 <= col+dx < len(grid[0]):
-                    if greedy or grid[row+dy][col+dx] == grid.background_color:
-                        grid[row+dy][col+dx] = value
+                if 0 <= row_index+dy < len(grid) and 0 <= col_index+dx < len(grid[0]):
+                    if greedy or grid[row_index+dy][col_index+dx] == grid.background_color:
+                        grid[row_index+dy][col_index+dx] = value
 
     copied_obj = object_to_move.copy()
     copied_obj.region.x1 = max(copied_obj.region.x1 + dx, 0)
