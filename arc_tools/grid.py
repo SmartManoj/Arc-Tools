@@ -184,12 +184,13 @@ class Grid(SafeList):
     def crop(self, region: GridRegion):
         return Grid([[self[row][col] for col in range(region.x1, region.x2 + 1)] for row in range(region.y1, region.y2 + 1)])
 
-    def remove_object(self, obj: 'SubGrid', color: int | None = None):
-        if color is None:
-            color = self.background_color
-        for row in range(obj.region.y1, obj.region.y2 + 1):
-            for col in range(obj.region.x1, obj.region.x2 + 1):
-                self[row][col] = color
+    def remove_object(self, obj: 'SubGrid', background_color: int | None = None):
+        if background_color is None:
+            background_color = self.background_color
+        for row in range(obj.height):
+            for col in range(obj.width):
+                if obj[row][col] != background_color:
+                    self[row+obj.region.y1][col+obj.region.x1] = background_color
         return self
 
     def copy(self):
@@ -293,13 +294,14 @@ class Grid(SafeList):
         
 
 class SubGrid(Grid):
-    def __init__(self, region: GridRegion, parent_grid: Grid):
+    def __init__(self, region: GridRegion, parent_grid: Grid, obj_color: int | None = None):
         self.region = region # Keep the attribute name 'region' for consistency
         self.parent_grid = parent_grid
-        super().__init__(self.get_subgrid())
+        super().__init__(self.get_subgrid(obj_color))
         self.height = self.region.y2 - self.region.y1 + 1
         self.width = self.region.x2 - self.region.x1 + 1
         self.background_color = self.parent_grid.background_color
+        self.obj_color = obj_color
 
     def __hash__(self) -> int: # type: ignore
         return hash((self.region, self.parent_grid, self.background_color))
@@ -392,11 +394,12 @@ class SubGrid(Grid):
             points_and_sides.append((point, self.get_border_sides(point)))
         return points_and_sides
     
-    def get_subgrid(self):
+    def get_subgrid(self, obj_color: int | None = None):
         grid = SafeList([SafeList([0 for _ in range(self.region.x2 - self.region.x1 + 1)]) for _ in range(self.region.y2 - self.region.y1 + 1)])
         for row in range(self.region.y1, self.region.y2 + 1):
             for col in range(self.region.x1, self.region.x2 + 1):
-                grid[row - self.region.y1][col - self.region.x1] = self.parent_grid[row][col]
+                if obj_color is None or self.parent_grid[row][col] == obj_color:
+                    grid[row - self.region.y1][col - self.region.x1] = self.parent_grid[row][col]
         return grid
     
     def get_full_grid(self) -> Grid:
@@ -468,7 +471,7 @@ class SubGrid(Grid):
     
 
 
-def split_into_square_boxes(grid: Grid, size: int) -> list[SubGrid]:
+def split_into_square_boxes(grid: Grid, size: int, obj_color: int | None = None) -> list[SubGrid]:
     grid = deepcopy(grid)
     rows = len(grid)
     cols = len(grid[0])
@@ -492,7 +495,7 @@ def split_into_square_boxes(grid: Grid, size: int) -> list[SubGrid]:
                     for dc in range(size):
                         grid[r + dr][c + dc] = 0
 
-    return [SubGrid(region, grid) for region in regions]
+    return [SubGrid(region, grid, obj_color) for region in regions]
 
 class Shape:
     pass
@@ -557,13 +560,14 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                     or p.y == max(p.y for p in current_object_points)
                 ]
                 if current_object_points:
-                    obj = SubGrid(GridRegion(current_object_points), grid)
+                    obj_color = current_color if single_color_only else None
+                    obj = SubGrid(GridRegion(current_object_points), grid, obj_color)
                     if isinstance(required_object, Square):
                         size = required_object.size
                         if obj.height == size and obj.width == size:
                             objects.append(obj)
                         else:
-                            new_objects = split_into_square_boxes(obj.get_full_grid(), size)
+                            new_objects = split_into_square_boxes(obj.get_full_grid(), size, obj_color)
                             logger.debug(f"Found {len(new_objects)} square boxes")
                             for new_obj in new_objects:
                                 objects.append(new_obj)
@@ -581,7 +585,7 @@ def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
     grid.remove_object(object_to_move)
     return copy_object(object_to_move, dx, dy, grid, extend_grid)
 
-def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False) -> SubGrid:
+def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False, greedy: bool = True) -> SubGrid:
     """
     Copies the object_to_move by (dx, dy) in the grid, extending the grid if necessary.
     """
@@ -602,13 +606,14 @@ def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
         # negative extend grid
         if min_row < 0 or min_col < 0:
             grid.extend_grid(-min_row, -min_col)
-    # Move the object
+    # copy the object
     for row in range(object_to_move.region.y1, object_to_move.region.y2 + 1):
         for col in range(object_to_move.region.x1, object_to_move.region.x2 + 1):
             value = old_grid[row][col]
             if value != grid.background_color:
                 if 0 <= row+dy < len(grid) and 0 <= col+dx < len(grid[0]):
-                    grid[row+dy][col+dx] = value
+                    if greedy or grid[row+dy][col+dx] == grid.background_color:
+                        grid[row+dy][col+dx] = value
 
     copied_obj = object_to_move.copy()
     copied_obj.region.x1 = max(copied_obj.region.x1 + dx, 0)
