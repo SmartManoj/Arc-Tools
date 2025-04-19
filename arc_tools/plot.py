@@ -70,10 +70,10 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, sa
     # ax.tick_params(axis='both', which='major', length=0) # Hide major tick lines - Removed to show ticks
     # ax.tick_params(axis='both', which='minor', length=0) # Hide minor tick lines - Removed to show ticks
 
+    plt.title(title or name)
     if save:
         name = f'{os.environ["initial_file"]}_{name}'
         plt.savefig(name, facecolor='black', edgecolor='white')
-    plt.title(title or name)
     def format_coord(x, y):
         if x >= -0.5 and y >= -0.5:
             col = int(x + 0.5)
