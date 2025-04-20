@@ -17,6 +17,7 @@ from task_16 import extrapolation
 from task_17 import launch_rocket
 from task_18 import flow_water
 from task_19 import rotate_and_stack
+from task_20 import open_gatewall
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object

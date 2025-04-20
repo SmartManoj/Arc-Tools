@@ -115,6 +115,12 @@ class Grid(SafeList):
     def __hash__(self) -> int: # type: ignore
         return hash((tuple(tuple(row) for row in self), self.background_color))
     
+    def get(self, x: int, y: int) -> int:
+        return self[y][x]
+    
+    def set(self, x: int, y: int, value: int):
+        self[y][x] = value
+    
     def compare(self, other):
         if len(self) != len(other):
             print(f"Length mismatch: {len(self)} != {len(other)}")
