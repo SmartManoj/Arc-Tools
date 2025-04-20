@@ -35,11 +35,8 @@ class GridPoint:
         self.x = x
         self.y = y
     
-    def __str__(self):
-        return f"({self.x}, {self.y})"
-    
     def __repr__(self):
-        return self.__str__()
+        return f"({self.x}, {self.y})"
     
     def __eq__(self, other):
         if isinstance(other, GridPoint):
@@ -71,7 +68,7 @@ class GridRegion:
     def __eq__(self, other):
         return self.x1 == other.x1 and self.x2 == other.x2 and self.y1 == other.y1 and self.y2 == other.y2
 
-    def __str__(self):
+    def __repr__(self):
         return f"[(x1/y1)=({self.x1}/{self.y1}), (x2/y2)=({self.x2}/{self.y2})]"
     
     def __hash__(self):
@@ -103,16 +100,17 @@ class SafeList(list):
     
 
 class Grid(SafeList):
-    def __init__(self, grid: list[list[int]]):
+    def __init__(self, grid: list[list[int]], background_color: int | None = None):
         if type(grid) == Grid:
             raise ValueError(f"Wrong input type: {type(grid)}")
         if grid:
             grid = deepcopy(grid)
             grid = [SafeList(row) for row in grid]
             super().__init__(grid)
-            self.background_color = self.detect_background_color()
+            self.background_color = background_color or self.detect_background_color()
             self.height = len(self)
             self.width = len(self[0])
+            self.region = GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)])
     
     def __hash__(self) -> int: # type: ignore
         return hash((tuple(tuple(row) for row in self), self.background_color))
@@ -182,7 +180,7 @@ class Grid(SafeList):
         return self
     
     def crop(self, region: GridRegion):
-        return Grid([[self[row][col] for col in range(region.x1, region.x2 + 1)] for row in range(region.y1, region.y2 + 1)])
+        return Grid([[self[row][col] for col in range(region.x1, region.x2 + 1)] for row in range(region.y1, region.y2 + 1)], self.background_color)
 
     def remove_object(self, obj: 'SubGrid', background_color: int | None = None):
         if background_color is None:
@@ -291,13 +289,19 @@ class Grid(SafeList):
         self.height = len(self)
         
         return self 
-        
+    
+    def display(self):
+        for row in self:
+            for col in row:
+                print(col, end=" ")
+            print()
 
 class SubGrid(Grid):
     def __init__(self, region: GridRegion, parent_grid: Grid, obj_color: int | None = None):
-        self.region = region
         self.parent_grid = parent_grid
+        self.region = region
         super().__init__(self.get_subgrid(obj_color))
+        self.region = region # reinitialize the region
         self.height = self.region.y2 - self.region.y1 + 1
         self.width = self.region.x2 - self.region.x1 + 1
         self.background_color = self.parent_grid.background_color
@@ -311,7 +315,7 @@ class SubGrid(Grid):
             region = GridRegion([GridPoint(self.region.x1 + dx1, self.region.y1 + dy1), GridPoint(self.region.x2 + dx2, self.region.y2 + dy2)])
         return SubGrid(region, self.parent_grid, self.obj_color)
 
-    def __str__(self):
+    def __repr__(self):
         return f"Region: {self.region}, height: {self.height}, width: {self.width}, background_color: {self.background_color}"
     
     def __eq__(self, other):
@@ -588,18 +592,26 @@ def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
     grid.remove_object(object_to_move)
     return copy_object(object_to_move, dx, dy, grid, extend_grid)
 
-def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False, greedy: bool = True) -> SubGrid:
+def place_object(object_to_place: SubGrid, x: int, y: int, grid: Grid) -> SubGrid:
     """
-    Copies the object_to_move by (dx, dy) in the grid, extending the grid if necessary.
+    Places the object_to_place at (x, y) in the grid, extending the grid if necessary.
     """
-    logger.debug(f"Copying object {object_to_move} to {dx}, {dy} in grid of type {type(grid)}")
-    old_grid = object_to_move.get_full_grid().copy()
+    for row in range(object_to_place.height):
+        for col in range(object_to_place.width):
+            grid[y+row][x+col] = object_to_place[row][col]
+    return object_to_place
+
+def copy_object(object_to_copy: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False, greedy: bool = True) -> SubGrid:
+    """
+    Copies the object_to_copy by (dx, dy) in the grid, extending the grid if necessary.
+    """
+    logger.debug(f"Copying object {object_to_copy} to {dx}, {dy} in grid of type {type(grid)}")
     if extend_grid:
         # Calculate new bounds
-        min_row = object_to_move.region.y1 + dy
-        min_col = object_to_move.region.x1 + dx
-        max_row = object_to_move.region.y2 + dy
-        max_col = object_to_move.region.x2 + dx
+        min_row = object_to_copy.region.y1 + dy
+        min_col = object_to_copy.region.x1 + dx
+        max_row = object_to_copy.region.y2 + dy
+        max_col = object_to_copy.region.x2 + dx
         # Extend grid if needed
         required_height = max(max_row + 1, grid.height)
         required_width = max(max_col + 1, grid.width)
@@ -610,17 +622,18 @@ def copy_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
         if min_row < 0 or min_col < 0:
             grid.extend_grid(-min_row, -min_col)
     # copy the object
-    for row in range(object_to_move.height):
-        for col in range(object_to_move.width):
-            value = object_to_move[row][col]
-            row_index = row + object_to_move.region.y1
-            col_index = col + object_to_move.region.x1
+    dx, dy = object_to_copy.region.x1, object_to_copy.region.y1
+    for row in range(object_to_copy.height):
+        for col in range(object_to_copy.width):
+            value = object_to_copy[row][col]
+            row_index = row + dy
+            col_index = col + dx
             if value != grid.background_color:
-                if 0 <= row_index+dy < len(grid) and 0 <= col_index+dx < len(grid[0]):
-                    if greedy or grid[row_index+dy][col_index+dx] == grid.background_color:
-                        grid[row_index+dy][col_index+dx] = value
+                if 0 <= row_index < len(grid) and 0 <= col_index < len(grid[0]):
+                    if greedy or grid[row_index][col_index] == grid.background_color:
+                        grid[row_index][col_index] = value
 
-    copied_obj = object_to_move.copy()
+    copied_obj = object_to_copy.copy()
     copied_obj.region.x1 = max(copied_obj.region.x1 + dx, 0)
     copied_obj.region.x2 = min(copied_obj.region.x2 + dx, grid.width - 1)
     copied_obj.region.y1 = max(copied_obj.region.y1 + dy, 0)
@@ -639,7 +652,7 @@ def flip_vertically(object: Grid) -> Grid:
     new_grid = [[object[j][cols-1-i] for i in range(cols)] for j in range(rows)]
     return Grid(new_grid)
 
-def rotate_object(object: SubGrid) -> SubGrid:
+def rotate_object(object: Grid) -> Grid:
     """
     Rotate a object 90 degrees clockwise.
     
@@ -652,9 +665,28 @@ def rotate_object(object: SubGrid) -> SubGrid:
     rows = object.height
     cols = object.width
     new_grid = [[object[rows-1-j][i] for j in range(rows)] for i in range(cols)]
-    return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid))
+    if type(object) == SubGrid:
+        return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid))
+    else:
+        return Grid(new_grid)
+
+def rotate_object_counter_clockwise(object: Grid) -> Grid:
+    """
+    Rotate a object 90 degrees counter-clockwise.
+    """
+    rows = object.height
+    cols = object.width
+    new_grid = [[object[j][cols-1-i] for j in range(rows)] for i in range(cols)]
+    if type(object) == SubGrid:
+        return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid))
+    else:
+        return Grid(new_grid)
 
 if __name__ == "__main__":
     g = [[1,2], [3,4]]
     g = Grid(g)
-    print(flip_horizontally(g))
+    g.display()
+    sg = SubGrid(GridRegion([GridPoint(0, 0), GridPoint(1, 1)]), g, )
+    sg.display()
+    print(rotate_object(sg).display())
+    print(rotate_object_counter_clockwise(sg).display())
