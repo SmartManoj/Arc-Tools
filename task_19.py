@@ -22,7 +22,7 @@ def rotate_and_stack(grid: Grid) -> Grid:
             elif k == 2:
                 if grid[y-1][0] != Color.BLUE.value:
                     grid = rotate_object_counter_clockwise(grid)
-            else:
+            elif k == 3:
                 if grid[y-1][x-1] != Color.BLUE.value:
                     grid =  rotate_object_counter_clockwise(grid)
             blue_at_the_top = grid[0][1] == Color.BLUE.value
