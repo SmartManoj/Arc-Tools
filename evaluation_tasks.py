@@ -20,6 +20,7 @@ from task_19 import rotate_and_stack
 from task_20 import open_gatewall
 from task_21 import sort_by_size
 from task_22 import clean_the_room
+from task_23 import squeeze
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object

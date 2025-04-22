@@ -38,7 +38,7 @@ else:
         # color_swap_and_move_to_corner,
         # dot_to_object,
         # rope_stretch,
-        fit_or_swap_fit
+        # fit_or_swap_fit
     ]
 
 jigsaw_task_fns = [
@@ -91,7 +91,7 @@ def solve_task(data):
     start_train_task_id = 1
     start_test_task_id = 1
     actual_task_name = None
-    # start_train_task_id = 2
+    start_train_task_id = 1
     # start_test_task_id = 2
     grids = []
     expected_outputs = []

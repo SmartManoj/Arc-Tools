@@ -129,12 +129,12 @@ class Grid(SafeList):
     
     def compare(self, other):
         if len(self) != len(other):
-            print(f"Length mismatch: {len(self)} != {len(other)}")
+            print(f"Row length mismatch: {len(self)} != {len(other)}")
             return False
         for i in range(len(self)):
             if self[i] != other[i]:
                 if len(self[i]) != len(other[i]):
-                    print(f"Row length mismatch at index {i}: {len(self[i])} != {len(other[i])}")
+                    print(f"Column length mismatch for row {i+1}: {len(self[i])} != {len(other[i])}")
                     return False
                 for j in range(len(self[i])):
                     if self[i][j] != other[i][j]:
@@ -208,6 +208,15 @@ class Grid(SafeList):
         c.background_color = self.background_color
         return c
     
+    def get_frame(self):
+        # set all dots to background color
+        copy = self.copy()
+        for row in range(self.height):
+            for col in range(self.width):
+                if copy[row][col] != self.background_color:
+                    copy[row][col] = self.background_color
+        return copy
+
     def get_values_count(self, all: bool = False) -> Counter:
         values : Counter = Counter()
         for row in self:
@@ -450,31 +459,27 @@ class SubGrid(Grid):
         return self.get_holes_count(max_count=1)
     
     def get_holes_count(self, max_count: int | None = None) -> int:
-        if not self or not self[0]:
-            return False # Handle empty or invalid grid
-
         rows, cols = len(self), len(self[0])
         visited = [[False for _ in range(cols)] for _ in range(rows)]
         q : deque[tuple[int, int]] = deque()
 
-        # Add border 0s to the queue and mark as visited
         for r in range(rows):
             # Left border
-            if self[r][0] == 0 and not visited[r][0]:
+            if self[r][0] == self.background_color and not visited[r][0]:
                 q.append((r, 0))
                 visited[r][0] = True
             # Right border
-            if self[r][cols - 1] == 0 and not visited[r][cols - 1]:
+            if self[r][cols - 1] == self.background_color and not visited[r][cols - 1]:
                 q.append((r, cols - 1))
                 visited[r][cols - 1] = True
 
         for c in range(cols): # Avoid double-adding corners
             # Top border
-            if self[0][c] == 0 and not visited[0][c]:
+            if self[0][c] == self.background_color and not visited[0][c]:
                 q.append((0, c))
                 visited[0][c] = True
             # Bottom border
-            if self[rows - 1][c] == 0 and not visited[rows - 1][c]:
+            if self[rows - 1][c] == self.background_color and not visited[rows - 1][c]:
                 q.append((rows - 1, c))
                 visited[rows - 1][c] = True
 
