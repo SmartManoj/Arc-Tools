@@ -1,6 +1,6 @@
 import json
 from arc_tools import logger
-from arc_tools.grid import Color, Grid, SubGrid, copy_object, detect_objects, rotate_object, GridRegion, GridPoint, flip_horizontally, move_object, place_object, rotate_object_counter_clockwise
+from arc_tools.grid import Color, Grid, SubGrid, detect_objects, place_object_on_new_grid, rotate_object, GridRegion, GridPoint, rotate_object_counter_clockwise
 from arc_tools.plot import plot_grid, plot_grids
 # logger.setLevel(10)
 
@@ -62,7 +62,7 @@ def rotate_and_stack(grid: Grid) -> Grid:
     for obj in objects:
         # center the object
         x, y = (max_width - obj.width) // 2, current_height
-        place_object(obj, x, y, new_grid)
+        place_object_on_new_grid(obj, x, y, new_grid)
         current_height += obj.height
     return new_grid
 

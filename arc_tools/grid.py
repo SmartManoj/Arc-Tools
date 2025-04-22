@@ -5,6 +5,8 @@ import numpy as np
 import logging
 from copy import deepcopy
 from typing import Optional
+
+from arc_tools.plot import plot_grids
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -80,9 +82,13 @@ class CustomIndexError(IndexError):
         super().__init__(self.message)
 
 class SafeList(list):
+    def __init__(self, grid: list[list[int]], allow_negative_index: bool = False):
+        self.allow_negative_index = allow_negative_index
+        super().__init__(grid)
+
     def __getitem__(self, index):
         try:
-            if 0 <= index < len(self):
+            if type(index) != int or (0 <= index < len(self) or (self.allow_negative_index and index < 0)):
                 return super().__getitem__(index)
         except IndexError:
             # raise CustomIndexError(f"SafeList: Index {index} is out of bounds for list of length {len(self)}") from None
@@ -100,13 +106,13 @@ class SafeList(list):
     
 
 class Grid(SafeList):
-    def __init__(self, grid: list[list[int]], background_color: int | None = None):
+    def __init__(self, grid: list[list[int]], background_color: int | None = None, allow_negative_index: bool = False):
         if type(grid) == Grid:
             raise ValueError(f"Wrong input type: {type(grid)}")
         if grid:
             grid = deepcopy(grid)
-            grid = [SafeList(row) for row in grid]
-            super().__init__(grid)
+            grid = [SafeList(row, allow_negative_index) for row in grid]
+            super().__init__(grid, allow_negative_index)
             self.background_color = background_color or self.detect_background_color()
             self.height = len(self)
             self.width = len(self[0])
@@ -306,12 +312,19 @@ class SubGrid(Grid):
     def __init__(self, region: GridRegion, parent_grid: Grid, obj_color: int | None = None):
         self.parent_grid = parent_grid
         self.region = region
-        super().__init__(self.get_subgrid(obj_color))
+        super().__init__(self.get_subgrid(obj_color), allow_negative_index=True)
         self.region = region # reinitialize the region
         self.height = self.region.y2 - self.region.y1 + 1
         self.width = self.region.x2 - self.region.x1 + 1
         self.background_color = self.parent_grid.background_color
-        self.obj_color = obj_color
+        if obj_color is None:
+            if self.get_total_unique_dots() == 1:
+                self.color = self.get_max_value()
+            else:
+                self.color = None
+        else:
+            self.color = obj_color
+
 
     def __hash__(self) -> int: # type: ignore
         return hash((self.region, self.parent_grid, self.background_color))
@@ -319,7 +332,7 @@ class SubGrid(Grid):
     def new_region(self, dx1: int = 0, dy1: int = 0, dx2: int = 0, dy2: int = 0, region: GridRegion | None = None):
         if not region:
             region = GridRegion([GridPoint(self.region.x1 + dx1, self.region.y1 + dy1), GridPoint(self.region.x2 + dx2, self.region.y2 + dy2)])
-        return SubGrid(region, self.parent_grid, self.obj_color)
+        return SubGrid(region, self.parent_grid, self.color)
 
     def __repr__(self):
         return f"Region: {self.region}, height: {self.height}, width: {self.width}, background_color: {self.background_color}"
@@ -410,7 +423,7 @@ class SubGrid(Grid):
         return points_and_sides
     
     def get_subgrid(self, obj_color: int | None = None):
-        grid = SafeList([SafeList([0 for _ in range(self.region.x2 - self.region.x1 + 1)]) for _ in range(self.region.y2 - self.region.y1 + 1)])
+        grid = SafeList([SafeList([self.parent_grid.background_color for _ in range(self.region.x2 - self.region.x1 + 1)]) for _ in range(self.region.y2 - self.region.y1 + 1)])
         for row in range(self.region.y1, self.region.y2 + 1):
             for col in range(self.region.x1, self.region.x2 + 1):
                 if obj_color is None or self.parent_grid[row][col] == obj_color:
@@ -594,11 +607,11 @@ def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
     """
     Moves the object_to_move by (dx, dy) in the grid, extending the grid if necessary.
     """
-    logger.debug(f"Moving object {object_to_move} to {dx}, {dy} in grid of type {type(grid)}")
+    logger.debug(f"Moving object {object_to_move} by {dx}, {dy} in grid of type {type(grid)}")
     grid.remove_object(object_to_move)
-    return copy_object(object_to_move, dx, dy, grid, extend_grid)
+    return copy_object(object_to_move, dx, dy, grid, extend_grid, silent=True)
 
-def place_object(object_to_place: SubGrid, x: int, y: int, grid: Grid) -> SubGrid:
+def place_object_on_new_grid(object_to_place: SubGrid, x: int, y: int, grid: Grid) -> SubGrid:
     """
     Places the object_to_place at (x, y) in the grid, extending the grid if necessary.
     """
@@ -607,11 +620,23 @@ def place_object(object_to_place: SubGrid, x: int, y: int, grid: Grid) -> SubGri
             grid[y+row][x+col] = object_to_place[row][col]
     return object_to_place
 
-def copy_object(object_to_copy: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False, greedy: bool = True) -> SubGrid:
+def place_object(object_to_place: SubGrid, x: int, y: int, grid: Grid, remove_object: bool = True) -> SubGrid:
+    """
+    Places the object_to_place at (x, y) in the grid, extending the grid if necessary.
+    """
+    dx = x - object_to_place.region.x1
+    dy = y - object_to_place.region.y1
+    if remove_object:
+        grid.remove_object(object_to_place)
+    return move_object(object_to_place, dx, dy, grid)
+
+
+def copy_object(object_to_copy: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False, greedy: bool = True, silent: bool = False) -> SubGrid:
     """
     Copies the object_to_copy by (dx, dy) in the grid, extending the grid if necessary.
     """
-    logger.debug(f"Copying object {object_to_copy} to {dx}, {dy} in grid of type {type(grid)}")
+    if not silent:
+        logger.debug(f"Copying object {object_to_copy} by {dx}, {dy} in grid of type {type(grid)}")
     if extend_grid:
         # Calculate new bounds
         min_row = object_to_copy.region.y1 + dy
@@ -628,7 +653,7 @@ def copy_object(object_to_copy: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
         if min_row < 0 or min_col < 0:
             grid.extend_grid(-min_row, -min_col)
     # copy the object
-    dx, dy = object_to_copy.region.x1, object_to_copy.region.y1
+    dx, dy = object_to_copy.region.x1 + dx, object_to_copy.region.y1 + dy
     for row in range(object_to_copy.height):
         for col in range(object_to_copy.width):
             value = object_to_copy[row][col]
@@ -672,9 +697,9 @@ def rotate_object(object: Grid) -> Grid:
     cols = object.width
     new_grid = [[object[rows-1-j][i] for j in range(rows)] for i in range(cols)]
     if type(object) == SubGrid:
-        return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid))
+        return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid, object.background_color), object.color)
     else:
-        return Grid(new_grid)
+        return Grid(new_grid, object.background_color)
 
 def rotate_object_counter_clockwise(object: Grid) -> Grid:
     """
@@ -689,10 +714,17 @@ def rotate_object_counter_clockwise(object: Grid) -> Grid:
         return Grid(new_grid)
 
 if __name__ == "__main__":
-    g = [[1,2], [3,4]]
-    g = Grid(g)
-    g.display()
-    sg = SubGrid(GridRegion([GridPoint(0, 0), GridPoint(1, 1)]), g, )
-    sg.display()
-    print(rotate_object(sg).display())
-    print(rotate_object_counter_clockwise(sg).display())
+    # Create a test grid
+    test_grid = Grid([
+        [0, 0, 0, 0],
+        [0, 1, 1, 0],
+        [0, 1, 1, 0],
+        [0, 0, 0, 0]
+    ])
+    
+    # Create a SubGrid from the colored region
+    region = GridRegion([GridPoint(1, 1), GridPoint(2, 2)])
+    test_object = SubGrid(region, test_grid)
+    
+    print("Original grid:")
+    test_grid.display()

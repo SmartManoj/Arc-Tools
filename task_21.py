@@ -1,7 +1,7 @@
 import json
 import os
 from arc_tools import logger
-from arc_tools.grid import Color, Grid, SubGrid, copy_object, detect_objects, rotate_object, GridRegion, GridPoint, flip_horizontally, move_object, place_object, rotate_object_counter_clockwise
+from arc_tools.grid import Color, Grid, SubGrid, detect_objects, place_object_on_new_grid
 from arc_tools.plot import plot_grid, plot_grids
 import numpy as np
 # logger.setLevel(10)
@@ -43,12 +43,12 @@ def sort_by_size(grid: Grid):
         # Place hollow square if available
         if i < len(hollow_squares):
             hollow = hollow_squares[i]
-            place_object(hollow, 0, i*4, output)
+            place_object_on_new_grid(hollow, 0, i*4, output)
         
         # Place solid square if available
         if i < len(solid_squares):
             solid = solid_squares[i]
-            place_object(solid, 4, i*4, output)
+            place_object_on_new_grid(solid, 4, i*4, output)
     
     return output
 

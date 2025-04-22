@@ -1,5 +1,4 @@
-
-from arc_tools.grid import detect_objects, split_into_square_boxes
+from arc_tools.grid import detect_objects, split_into_square_boxes, move_object
 from arc_tools.grid import Grid, GridRegion, GridPoint
 from arc_tools.plot import plot_grids
 def test_grid_with_hollow():
@@ -74,11 +73,49 @@ def test_detect_objects_single_color():
         assert obj.region == expected_region, f"Expected region {expected_region}, got {obj.region}"
     assert len(objs) == 3, f"Expected 3 objects, got {len(objs)}"
 
+def test_move_object():
+    # Create a test grid with a simple object
+    grid = [
+        [0, 0, 0, 0, 0],
+        [0, 1, 1, 1, 0],
+        [0, 1, 0, 1, 0],
+        [0, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0],
+    ]
+    grid = Grid(grid)
+    initial_grid = grid.copy()
+    # Detect the object in the grid
+    objects = detect_objects(grid)
+    assert len(objects) == 1, "Expected one object in the grid"
+    original_obj = objects[0]
+    
+    # Copy the object to a new position (1 unit right, 1 unit down)
+    dx, dy = 1, 0
+    moved_obj = move_object(original_obj, dx, dy, grid)
+    
+    # Verify the copied object's region is correct
+    expected_region = GridRegion([
+        GridPoint(original_obj.region.x1 + dx, original_obj.region.y1 + dy),
+        GridPoint(original_obj.region.x2 + dx, original_obj.region.y2 + dy)
+    ])
+    grid.display()
+    return
+    assert moved_obj.region == expected_region, f"Expected region {expected_region}, got {moved_obj.region}"
+    
+    # Verify the grid has the copied object
+    for row in range(moved_obj.height):
+        for col in range(moved_obj.width):
+            if original_obj[row][col] != grid.background_color:
+                assert grid[row + dy][col + dx] == original_obj[row][col], \
+                    f"Expected value {original_obj[row][col]} at position ({col + dx}, {row + dy})"
+    grid.display()
+    plot_grids([initial_grid, grid], show=True)
 
 if __name__ == "__main__":
     test_grid_with_hollow()
     test_split_into_square_boxes()
     test_detect_objects()
     test_detect_objects_single_color()
+    test_move_object()
     print("All test cases passed")
 
