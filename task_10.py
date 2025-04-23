@@ -13,7 +13,7 @@ def just_walk(grid: Grid) -> Grid:
     '''
     # Detect top left objects (color sequence)
     # replace max color object with background color
-    max_color = grid.get_max_value()
+    max_color = grid.get_max_color()
     if max_color != grid[0][0]:
         max_color, grid.background_color = grid.background_color, max_color
     clean_grid = grid.copy()

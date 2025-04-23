@@ -235,13 +235,13 @@ class Grid(SafeList):
         most_common_values = list(key for key, _ in self.get_values_count().most_common(2))
         if Color.BLACK.value in most_common_values:
             return Color.BLACK.value
-        return self.get_max_value()
+        return self.get_max_color()
 
-    def get_min_value(self):
+    def get_min_color(self):
         min_key, _ = min(self.get_values_count().items(), key=lambda x: x[1], default=(None, 0))
         return min_key
     
-    def get_max_value(self):
+    def get_max_color(self):
         max_key, _ = max(self.get_values_count().items(), key=lambda x: x[1], default=(None, 0))
         return max_key
     
@@ -319,7 +319,7 @@ class SubGrid(Grid):
         self.background_color = self.parent_grid.background_color
         if obj_color is None:
             if self.get_total_unique_dots() == 1:
-                self.color = self.get_max_value()
+                self.color = self.get_max_color()
             else:
                 self.color = None
         else:

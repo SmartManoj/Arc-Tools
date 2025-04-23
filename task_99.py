@@ -120,7 +120,7 @@ def check_fit(grid: Grid) -> Grid:
         if not obj.has_hollow_space()  and obj.has_yellow_block():
             centre_object = obj
             break
-    dot_value = centre_object.get_min_value()
+    dot_value = centre_object.get_min_color()
     output = centre_object.get_full_grid()
     objects.remove(centre_object)
     

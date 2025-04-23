@@ -18,9 +18,9 @@ def extrapolation(grid: Grid) -> Grid:
     with open('reference_output.json', 'r') as f:
         full_grid = Grid(json.load(f))
     
-    full_grid.replace_color(full_grid.get_max_value(), -1)
+    full_grid.replace_color(full_grid.get_max_color(), -1)
     full_grid.replace_color(full_grid.background_color, grid.background_color)
-    full_grid.replace_color(-1, grid.get_max_value())
+    full_grid.replace_color(-1, grid.get_max_color())
 
     for _ in range(8):
         if check_subgrid(grid, full_grid):

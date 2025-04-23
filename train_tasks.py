@@ -185,7 +185,7 @@ def color_swap_and_move_to_corner(input_grid: Grid) -> Grid:
     # plot_grids([*corner_objects, ], show=1)
     if 1:
         for obj in corner_objects:
-            value = obj.get_min_value()
+            value = obj.get_min_color()
             related_objects = [o for o in non_corner_objects if value in o.get_values_count()]
             new_object = related_objects[-1].copy()
             for o in related_objects:

@@ -111,7 +111,7 @@ def grow_and_crop(grid: Grid) -> Grid:
     dy2 = eval2(dy, subs)
     dx2 = eval2(dx, subs)
     new_dots_2, new_color_2 = compare_objects(obj_1, obj_2, dx2, dy2)
-    color_sequence = [obj_0.get_max_value()]
+    color_sequence = [obj_0.get_max_color()]
     if second_object_color:
         color_sequence.append(second_object_color)
     for i in (new_color_1, new_color_2):
@@ -124,7 +124,7 @@ def grow_and_crop(grid: Grid) -> Grid:
         if object_color_changed:
             obj_colors = next_obj.get_unique_values()
             if len(obj_colors) == 1:
-                next_obj.replace_color(next_obj.get_max_value(), new_color)
+                next_obj.replace_color(next_obj.get_max_color(), new_color)
             else:
                 # new rule
                 # swap colors of the objects
@@ -157,7 +157,7 @@ def grow_and_crop(grid: Grid) -> Grid:
         next_obj = SubGrid(next_obj.region, grid)
 
         cropped_grid = grid.crop(cropped_region)
-        if cropped_grid.get_max_value():
+        if cropped_grid.get_max_color():
             break
         objects.append(next_obj)
     return cropped_grid

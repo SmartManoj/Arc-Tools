@@ -142,7 +142,7 @@ def borderize(grid: Grid) -> Grid:
     Draw the borders based on the corner dots.
     '''
     dots_with_color: list[tuple[GridPoint, Color]] = []
-    border_color = grid.get_max_value()
+    border_color = grid.get_max_color()
     objects = detect_objects(grid, ignore_color=border_color, go_diagonal=False)
     objects = get_outermost_corners(objects, grid, border_color)
     for obj in objects:

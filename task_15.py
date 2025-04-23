@@ -24,7 +24,7 @@ def frame_fit(grid: Grid) -> Grid:
     left_objects = detect_objects(left_region, single_color_only=True)
     for obj in left_objects:
         copy_count = 0
-        obj_color = obj.get_max_value()
+        obj_color = obj.get_max_color()
         for y in range(0, right_region.height):
             if right_region[y][0] == obj_color:
                 for x in range(0, right_region.width):

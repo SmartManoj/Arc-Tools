@@ -24,7 +24,7 @@ def rope_stretch(grid):
         grid.remove_object(rope)
         is_vertical = pole.height > pole.width
         rope_dots = rope.get_total_dots()
-        rope_color = rope.get_max_value()
+        rope_color = rope.get_max_color()
         if is_vertical:
             attached_side = 'left' if rope.region.x2 < pole.region.x1 else 'right' 
             if attached_side == 'left':

@@ -9,7 +9,7 @@ def transform_object(obj: SubGrid) -> SubGrid:
     Transform object based on its color and direction
     """
     # Get the object's color
-    color = obj.get_max_value()
+    color = obj.get_max_color()
     
     # Create a new grid for the transformed object
     
@@ -97,7 +97,7 @@ def mapper(grid: Grid) -> Grid:
     new_x, new_y = right_objects[0].region.x1, right_objects[0].region.y1 + 1
     for left_obj in left_objects:
         # Get the color of the right object to determine transformation
-        color = left_obj.get_max_value()
+        color = left_obj.get_max_color()
         # Transform the right object
         transformed_obj = transform_object(left_obj)
         left_direction = color in [Color.RED.value, Color.GREEN.value]
@@ -106,7 +106,7 @@ def mapper(grid: Grid) -> Grid:
         
         # Remove the left object
         grid.remove_object(left_obj)
-        # plot_grids([left_obj, transformed_obj], f"left_obj_{left_obj.get_max_value()}.png",show=True)
+        # plot_grids([left_obj, transformed_obj], f"left_obj_{left_obj.get_max_color()}.png",show=True)
         # Place the transformed object at the left object's position
         for y in range(transformed_obj.height):
             for x in range(transformed_obj.width):
