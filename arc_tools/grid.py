@@ -608,12 +608,12 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
     return objects
     
     
-def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False) -> SubGrid:
+def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False, fill_color: Color | None = None) -> SubGrid:
     """
     Moves the object_to_move by (dx, dy) in the grid, extending the grid if necessary.
     """
-    logger.debug(f"Moving object {object_to_move} by {dx}, {dy} in grid of type {type(grid)}")
-    grid.remove_object(object_to_move)
+    logger.debug(f"Moving object {object_to_move} by {dx}, {dy}")
+    grid.remove_object(object_to_move, fill_color.value if fill_color else None)
     return copy_object(object_to_move, dx, dy, grid, extend_grid, silent=True)
 
 def place_object_on_new_grid(object_to_place: SubGrid, x: int, y: int, grid: Grid) -> SubGrid:
@@ -658,12 +658,13 @@ def copy_object(object_to_copy: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
         if min_row < 0 or min_col < 0:
             grid.extend_grid(-min_row, -min_col)
     # copy the object
-    dx, dy = object_to_copy.region.x1 + dx, object_to_copy.region.y1 + dy
+
+    dx1, dy1 = object_to_copy.region.x1 + dx, object_to_copy.region.y1 + dy
     for row in range(object_to_copy.height):
         for col in range(object_to_copy.width):
             value = object_to_copy[row][col]
-            row_index = row + dy
-            col_index = col + dx
+            row_index = row + dy1
+            col_index = col + dx1
             if value != grid.background_color:
                 if 0 <= row_index < len(grid) and 0 <= col_index < len(grid[0]):
                     if greedy or grid[row_index][col_index] == grid.background_color:
