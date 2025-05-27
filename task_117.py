@@ -1,11 +1,11 @@
 from typing import Sequence
+from arc_tools import logger
 from arc_tools.grid import Grid, SubGrid, GridRegion, GridPoint, detect_objects, rotate_object
 
 
 from datetime import datetime
 
 from arc_tools.plot import plot_grids
-from arc_tools.squash import squash_grid
 
 show_count = 0
 
@@ -180,7 +180,6 @@ def jigsaw_puzzle(grid: Grid) -> Grid:
     # find color map box
     output_grid_size = int(sum(grid.get_values_count().values())**0.5)
     objects = detect_objects(grid)
-    print(f"Found {len(objects)} objects")
     
     background_color = grid.background_color
     key_object = None
@@ -220,7 +219,8 @@ def jigsaw_puzzle(grid: Grid) -> Grid:
         if new_grid is not None:
             result = jigsaw_recursive(new_grid, objects)
             if result is not None:
-                for i, color in enumerate(squash_grid(result, background_color)):
+                corner_colors = result.get_corner_colors()
+                for i, color in enumerate(corner_colors):
                     result.replace_color(color, key_object_colors[i])
                 return result
     

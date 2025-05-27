@@ -8,7 +8,6 @@ import os
 import json
 from arc_tools.grid import Grid, GridPoint, GridRegion, detect_objects
 from arc_tools.plot import plot_grid, plot_grids, remove_pngs
-from arc_tools.squash import squash_grid
 
 from train_tasks import *
 from evaluation_tasks import *

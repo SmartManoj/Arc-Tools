@@ -127,6 +127,13 @@ class Grid(SafeList):
     def set(self, x: int, y: int, value: int):
         self[y][x] = value
     
+    def get_corner_colors(self):
+        top_left = self[0][0]
+        top_right = self[0][self.width - 1]
+        bottom_left = self[self.height - 1][0]
+        bottom_right = self[self.height - 1][self.width - 1]
+        return [top_left, top_right, bottom_left, bottom_right]
+    
     def compare(self, other):
         if len(self) != len(other):
             print(f"Row length mismatch: {len(self)} != {len(other)}")
