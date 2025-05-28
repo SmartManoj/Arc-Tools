@@ -53,7 +53,7 @@ def debug_output(grid, expected_output, output):
         for j in range(len(expected_output[0])):
             if expected_output[i][j] != output[i][j]:
                 print(f"Cell {i}, {j} is different")
-    plot_grids([grid, expected_output, output], show=1)
+    plot_grids([grid, expected_output, output], show=1, titles=["input", "expected", "actual"])
 
 def find_task(grids, expected_outputs, start_train_task_id=1):
     if len(grids[0][0]) == len(expected_outputs[0][0]):
@@ -72,7 +72,7 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
             output = task_fn(grid)
             plot_grid(output, name="actual_output.png")
             if not output.compare(expected_output):
-                # debug_output(grid, expected_output, output)
+                debug_output(grid, expected_output, output)
                 if actual_task_name:
                     logger.info(f'Train task {task_id} failed')
                 right_task = False

@@ -70,7 +70,10 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, sa
     # ax.tick_params(axis='both', which='major', length=0) # Hide major tick lines - Removed to show ticks
     # ax.tick_params(axis='both', which='minor', length=0) # Hide minor tick lines - Removed to show ticks
 
-    plt.title(title or name)
+    if ax is not None:
+        ax.set_title(title or name)
+    else:
+        plt.title(title or name)
     if save:
         name = f'{os.environ.get("initial_file", "main")}_{name}'
         plt.savefig(name, facecolor='black', edgecolor='white')
@@ -90,13 +93,14 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, sa
         plt.close()
 
 plot_grids_count = 0
-def plot_grids(grids, name="grids.png", show=False, save_all=False, title=None):
+def plot_grids(grids, name="grids.png", show=False, save_all=False, title=None, titles=None):
     global plot_grids_count
     # plot the grids in a single plot
     fig, axs = plt.subplots(1, len(grids), figsize=(10, 5 * len(grids)))
     for i, grid in enumerate(grids):
-        ax = plot_grid(grid, ax=axs[i] if len(grids) > 1 else axs, close=False, save=False, title=title)
-        # axs[i].imshow(grid)
+        current_title = titles[i] if titles and len(titles) > i else title
+        current_ax = axs[i] if len(grids) > 1 else axs
+        plot_grid(grid, ax=current_ax, close=False, save=False, title=current_title)
     plt.tight_layout()
     if show and not disable_show:
         plt.show(block=1)

@@ -1,10 +1,11 @@
 from collections import Counter, deque
+from arc_tools.constants import CARDINAL_DIRECTIONS, ORDINAL_DIRECTIONS
 from arc_tools.grid import Grid, detect_objects, Color, SubGrid, GridRegion, GridPoint
 from arc_tools.plot import plot_grid, plot_grids
 from arc_tools.logger import logger
 import logging
 import traceback
-
+# logger.setLevel(10)
 def get_outermost_corners(objects: list[SubGrid], input_grid: Grid, border_color: Color):
     """
     For each detected object in the grid, find its four outermost corners,
@@ -21,9 +22,8 @@ def get_outermost_corners(objects: list[SubGrid], input_grid: Grid, border_color
     
     parent_objects = []
     for obj in objects:
-        cardinals = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         empty_count = 0
-        for x, y in cardinals:
+        for x, y in CARDINAL_DIRECTIONS:
             nx, ny = obj.region.x1 + x, obj.region.y1 + y
             if 0 <= nx < input_grid.width and 0 <= ny < input_grid.height:
                 if input_grid[ny][nx] == bg:
@@ -37,8 +37,7 @@ def get_outermost_corners(objects: list[SubGrid], input_grid: Grid, border_color
 
     new_objects = parent_objects.copy()
     def get_children(obj: SubGrid, new_objects: list[SubGrid]):
-        ordinals = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
-        for x, y in ordinals:
+        for x, y in ORDINAL_DIRECTIONS:
             nx, ny = obj.region.x1 + x, obj.region.y1 + y
             if 0 <= nx < input_grid.width and 0 <= ny < input_grid.height:
                 if input_grid[ny][nx] not in [bg, border_color]:
@@ -62,10 +61,10 @@ def check_dots_with_color(dots_with_color: list[tuple[GridPoint, Color]], x: int
     return GridPoint(x, y) in (x[0] for x in dots_with_color)
 
 def walk_around(grid: Grid, obj_color: Color, initial_x: int, initial_y: int, dots_with_color: list[tuple[GridPoint, Color]]):
+    logger.debug(f"Walking around {initial_x}, {initial_y} with color {obj_color}")
     cur_x, cur_y = initial_x, initial_y
     initial_grid = grid.copy()
-    cardinals = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-    for k, (x, y) in enumerate(cardinals):
+    for k, (x, y) in enumerate(CARDINAL_DIRECTIONS):
         if initial_grid[initial_y + y][initial_x + x] == grid.background_color:
             direction = k
             break
@@ -74,6 +73,7 @@ def walk_around(grid: Grid, obj_color: Color, initial_x: int, initial_y: int, do
         # Place color at current position
         if ((initial_grid[cur_y][cur_x] == grid.background_color or check_dots_with_color(dots_with_color, cur_x, cur_y))):
             grid[cur_y][cur_x] = obj_color
+            logger.debug(f"Placing {obj_color} at {cur_x}, {cur_y}")
             # remove in dots_with_color
             gp = GridPoint(cur_x, cur_y)
             idx = next((i for i, x in enumerate(dots_with_color) if x[0] == gp), None)
@@ -114,6 +114,7 @@ def walk_around(grid: Grid, obj_color: Color, initial_x: int, initial_y: int, do
             
         # Stop if we've returned to initial position
         if next_x == initial_x and next_y == initial_y:
+            logger.debug(f"Returning to initial position at {initial_x}, {initial_y}")
             break
         started += 1
         
@@ -141,15 +142,16 @@ def borderize(grid: Grid) -> Grid:
     '''
     Draw the borders based on the corner dots.
     '''
+    grid = grid.copy()
     dots_with_color: list[tuple[GridPoint, Color]] = []
     border_color = grid.get_max_color()
-    objects = detect_objects(grid, ignore_color=border_color, go_diagonal=False)
+    objects = detect_objects(grid, ignore_color=Color(border_color), go_diagonal=False)
     objects = get_outermost_corners(objects, grid, border_color)
     for obj in objects:
-        dots_with_color.append((GridPoint(obj.region.x1, obj.region.y1), grid[obj.region.y1][obj.region.x1]))
+        dots_with_color.append((GridPoint(obj.region.x1, obj.region.y1), Color(grid[obj.region.y1][obj.region.x1])))
     # check all the corners of the object; if empty, prepend the correct corner with  -1 color to the dots_with_color
     for idx, obj in enumerate(objects):
-        for dir in ((1,1), (1,-1), (-1,1), (-1,-1)):
+        for dir in ORDINAL_DIRECTIONS:
             x, y = obj.region.x1 + dir[0], obj.region.y1 + dir[1]
             if grid[y][x] == grid.background_color:
                 # check up, down, left, right; if only two are empty, then it's a corner
@@ -162,17 +164,16 @@ def borderize(grid: Grid) -> Grid:
     while dots_with_color:
         dot, initial_obj_color = dots_with_color.pop(0)
         k += 1
-        if k > 10 and 0:
-            break
+        if k == 6 and 0:
+            plot_grid(grid, show=1, save_all=1)
         logger.debug(f"Processing dot {k} {dot}; Remaining: {len(dots_with_color)}")
         obj_color = grid[dot.y][dot.x]
-        if initial_obj_color != obj_color.value:
+        if initial_obj_color.value != obj_color:
+            logger.debug(f"Skipping dot {dot} because initial color {initial_obj_color} != {obj_color}")
             continue
         initial_x, initial_y = dot.x, dot.y
-        if k>=3 and 0:
-            plot_grid(grid, show=1, save_all=1)
         walk_around(grid, obj_color, initial_x, initial_y, dots_with_color)
-        for dir in ((1,1), (1,-1), (-1,1), (-1,-1)):
+        for dir in ORDINAL_DIRECTIONS:
             initial_x, initial_y = dot.x, dot.y
             overflow = False
             for j in range(1,10):
@@ -186,7 +187,7 @@ def borderize(grid: Grid) -> Grid:
             if not overflow and grid[initial_y][initial_x] == grid.background_color and initial_x != dot.x and initial_y != dot.y:
                 grid[initial_y][initial_x] = obj_color
                 logger.debug(f"Adding border at {initial_x}, {initial_y}, {obj_color}")
-                dots_with_color.append((GridPoint(initial_x, initial_y), obj_color))    
+                dots_with_color.append((GridPoint(initial_x, initial_y), Color(obj_color)))    
                 break
         if not dots_with_color:
             for y in range(grid.height):
@@ -212,7 +213,7 @@ def borderize(grid: Grid) -> Grid:
                             colors_order = colors_order[idx+1:] + colors_order[:idx]
                         for color in colors_order:
                             grid[y+k1][x+k1] = color
-                            dots_with_color.append((GridPoint(x+k1, y+k1), color))
+                            dots_with_color.append((GridPoint(x+k1, y+k1), Color(color)))
                             k1 += 1
                         found = True
                         break

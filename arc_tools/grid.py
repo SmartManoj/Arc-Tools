@@ -6,6 +6,7 @@ import logging
 from copy import deepcopy
 from typing import Optional
 
+from arc_tools.constants import EIGHT_DIRECTIONS
 from arc_tools.plot import plot_grids
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ class MyEnum(Enum):
         return f"{self.__class__.__name__}.{self.name}"
 
 class Color(MyEnum):
+    TEMP = -1
     BLACK = 0
     BLUE = 1
     RED = 2
@@ -167,14 +169,13 @@ class Grid(SafeList):
         # use bfs to fill the color
         queue = deque([point])
         old_color = self[point.y][point.x]
-        directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
         while queue:
             point = queue.popleft()
             if self[point.y][point.x] == new_color:
                 continue
             old_color = self[point.y][point.x]
             self[point.y][point.x] = new_color
-            for dx, dy in directions:
+            for dx, dy in EIGHT_DIRECTIONS:
                 new_col = point.x + dx
                 new_row = point.y + dy
                 if 0 <= new_col < self.width and 0 <= new_row < self.height:
