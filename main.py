@@ -49,11 +49,11 @@ jigsaw_task_fns = [
 
 def debug_output(grid, expected_output, output):
     # print which cells are different
-    for i in range(len(expected_output)):
-        for j in range(len(expected_output[0])):
-            if expected_output[i][j] != output[i][j]:
-                print(f"Cell {i}, {j} is different")
-    plot_grids([grid, expected_output, output], show=1, titles=["input", "expected", "actual"])
+    for row in range(len(expected_output)):
+        for col in range(len(expected_output[0])):
+            if expected_output[row][col] != output[row][col]:
+                logger.info(f"Cell at {row = }, {col = } is different")
+    plot_grids([grid, expected_output, output], show=1, titles=["Input", "Expected output", "Actual output"])
 
 def find_task(grids, expected_outputs, start_train_task_id=1):
     if len(grids[0][0]) == len(expected_outputs[0][0]):
@@ -69,7 +69,7 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
             expected_output = Grid(expected_output)
             plot_grid(expected_output, name="expected_output.png")
             plot_grid(grid, name="input.png")
-            output = task_fn(grid)
+            output = task_fn(grid.copy())
             plot_grid(output, name="actual_output.png")
             if not output.compare(expected_output):
                 debug_output(grid, expected_output, output)
@@ -91,7 +91,7 @@ def solve_task(data):
     start_test_task_id = 1
     actual_task_name = None
     start_train_task_id = 1
-    # start_test_task_id = 2
+    start_test_task_id = 1
     grids = []
     expected_outputs = []
     actual_outputs = []
@@ -115,13 +115,14 @@ def solve_task(data):
             expected_output = Grid(data['test'][task_idx].get('output'))
             plot_grid(expected_output, name="expected_output.png")
             
-            output = task_fn(grid)
+            output = task_fn(grid.copy())
             plot_grid(output, name="actual_output.png")
             if expected_output:
                 if output.compare(expected_output):
                     logger.info(f"Test task {task_idx + 1} passed")
                 else:
                     logger.info(f"Test task {task_idx + 1} failed")
+                    debug_output(grid, expected_output, output)
                     raise Exception(f"Incorrect task {task_idx + 1}: {task_fn.__name__}, Expected: {expected_output}, Actual: {output}")
             output = {"attempt_1": output, "attempt_2": output}
         else:
