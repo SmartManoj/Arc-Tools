@@ -25,6 +25,7 @@ from task_24 import ascend
 from task_25 import travel
 from task_26 import connect_the_dots
 from task_27 import water_flow
+from task_28 import unique_objects
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object

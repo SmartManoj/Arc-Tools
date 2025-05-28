@@ -342,7 +342,7 @@ class SubGrid(Grid):
         else:
             self.color = obj_color
 
-
+    
     def __hash__(self) -> int: # type: ignore
         return hash((self.region, self.parent_grid, self.background_color))
     
@@ -361,6 +361,18 @@ class SubGrid(Grid):
                 self.parent_grid == other.parent_grid and 
                 self.background_color == other.background_color and
                 super().__eq__(other))
+    
+    def compare(self, other):
+        if not isinstance(other, SubGrid):
+            return False
+        # if height and width are the same, then compare the points
+        if self.height == other.height and self.width == other.width:
+            for row in range(self.height):
+                for col in range(self.width):
+                    if self[row][col] != other[row][col]:
+                        return False
+            return True
+        return False
     
     def set_center_color(self):
         center_x = (self.region.x1 + self.region.x2) // 2
@@ -454,8 +466,6 @@ class SubGrid(Grid):
             for col in range(self.width):
                 grid[row + self.region.y1][col + self.region.x1] = self[row][col]
         return Grid(grid)
-    
-    
 
     def has_hollow_space(self):
         """
