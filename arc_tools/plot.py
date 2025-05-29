@@ -12,7 +12,7 @@ def remove_pngs():
 
 plot_grid_count = 0
 disable_show = 0
-def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, save=True, save_all=False, title=None):
+def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=True, save_all=False, title=None):
     global plot_grid_count
     if name == "grid.png" and save_all:
         plot_grid_count += 1
@@ -93,7 +93,10 @@ def plot_grid(grid: 'Grid', name="grid.png", show=False, close=True, ax=None, sa
         plt.close()
 
 plot_grids_count = 0
-def plot_grids(grids, name="grids.png", show=False, save_all=False, title=None, titles=None):
+def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titles=None):
+    if len(grids) == 0:
+        print("No grids to plot")
+        return
     global plot_grids_count
     # plot the grids in a single plot
     fig, axs = plt.subplots(1, len(grids), figsize=(10, 5 * len(grids)))

@@ -151,11 +151,18 @@ class Grid(SafeList):
                         return False
         return True
     
-    def replace_color(self, old_color, new_color):
-        for row in range(self.height):
-            for col in range(self.width):
-                if self[row][col] == old_color:
-                    self[row][col] = new_color
+    def replace_color(self, old_color, new_color, in_place: bool = False):
+        if in_place:
+            for row in range(self.region.y1, self.region.y2 + 1):
+                for col in range(self.region.x1, self.region.x2 + 1):
+                    if self.parent_grid[row][col] == old_color:
+                        self.parent_grid[row][col] = new_color
+            return self
+        else:
+            for row in range(self.height):
+                for col in range(self.width):
+                    if self[row][col] == old_color:
+                        self[row][col] = new_color
         return self
     
     def replace_all_color(self, new_color):
@@ -451,13 +458,14 @@ class SubGrid(Grid):
             points_and_sides.append((point, self.get_border_sides(point)))
         return points_and_sides
     
-    def get_subgrid(self, obj_color: int | None = None):
-        grid = SafeList([SafeList([self.parent_grid.background_color for _ in range(self.region.x2 - self.region.x1 + 1)]) for _ in range(self.region.y2 - self.region.y1 + 1)])
+    def get_subgrid(self, obj_color: int | None = None, safe: bool = True):
+        cls = SafeList if safe else list
+        grid = [cls([self.parent_grid.background_color for _ in range(self.region.x2 - self.region.x1 + 1)]) for _ in range(self.region.y2 - self.region.y1 + 1)]
         for row in range(self.region.y1, self.region.y2 + 1):
             for col in range(self.region.x1, self.region.x2 + 1):
                 if obj_color is None or self.parent_grid[row][col] == obj_color:
                     grid[row - self.region.y1][col - self.region.x1] = self.parent_grid[row][col]
-        return grid
+        return cls(grid)
     
     def get_full_grid(self) -> Grid:
         n_parent_rows, n_parent_cols = len(self.parent_grid), len(self.parent_grid[0])
@@ -557,7 +565,7 @@ class Square(Shape):
         
         
 
-def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None) -> list[SubGrid]:
+def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None, ignore_corners: bool = False) -> list[SubGrid]:
     grid_np = np.array(grid)
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
@@ -609,8 +617,12 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                     or p.y == max(p.y for p in current_object_points)
                 ]
                 if current_object_points:
+                    region = GridRegion(current_object_points)
+                    if ignore_corners:
+                        if region.x1 == 0 or region.y1 == 0 or region.x2 == grid.width - 1 or region.y2 == grid.height - 1:
+                            continue
                     obj_color = current_color if single_color_only else None
-                    obj = SubGrid(GridRegion(current_object_points), grid, obj_color)
+                    obj = SubGrid(region, grid, obj_color)
                     if isinstance(required_object, Square):
                         size = required_object.size
                         if obj.height == size and obj.width == size:
