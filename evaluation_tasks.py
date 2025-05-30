@@ -28,6 +28,7 @@ from task_27 import water_flow
 from task_28 import unique_objects
 from task_29 import fill_holes
 from task_30 import extend_the_nose
+from task_31 import shoot
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object

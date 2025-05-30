@@ -6,7 +6,7 @@ import logging
 from copy import deepcopy
 from typing import Optional
 
-from arc_tools.constants import EIGHT_DIRECTIONS
+from arc_tools.constants import CARDINAL_DIRECTIONS, EIGHT_DIRECTIONS
 from arc_tools.plot import plot_grids
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -256,8 +256,9 @@ class Grid(SafeList):
     def detect_background_color(self):
         # maximum value in the grid
         self.background_color = None
-        most_common_values = list(key for key, _ in self.get_values_count().most_common(2))
-        if Color.BLACK.value in most_common_values:
+        color_counts = self.get_values_count()
+        most_common_values = list(key for key, _ in color_counts.most_common(2))
+        if Color.BLACK.value in most_common_values and len(color_counts) > 2:
             return Color.BLACK.value
         return self.get_max_color()
 
@@ -565,7 +566,7 @@ class Square(Shape):
         
         
 
-def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None, ignore_corners: bool = False) -> list[SubGrid]:
+def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None, ignore_corners: bool = False, point: GridPoint | None = None) -> list[SubGrid]:
     grid_np = np.array(grid)
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
@@ -583,6 +584,8 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
     
     for r in range(rows):
         for c in range(cols):
+            if point:
+                r, c = point.y, point.x
             current_color = grid_np[r, c]
             if compare(current_color) and not visited[r, c]:
                 # Start BFS for a new object
@@ -594,10 +597,9 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                     row, col = q.popleft()
                     current_object_points.append(GridPoint(col, row)) # x=col, y=row
                     if go_diagonal:
-                        directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+                        directions = EIGHT_DIRECTIONS
                     else:
-                        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-                    # Check neighbors (8-connectivity: up, down, left, right, and diagonals)
+                        directions = CARDINAL_DIRECTIONS
                     for dr, dc in directions:
                         nr, nc = row + dr, col + dc
                         if 0 <= nr < rows and 0 <= nc < cols and \
@@ -634,6 +636,8 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                                 objects.append(new_obj)
                     else:
                         objects.append(obj)
+                    if point:
+                        break
     logger.debug(f"Found {len(objects)} objects")
     return objects
     
