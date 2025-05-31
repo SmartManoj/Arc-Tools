@@ -343,10 +343,7 @@ class SubGrid(Grid):
         self.width = self.region.x2 - self.region.x1 + 1
         self.background_color = self.parent_grid.background_color
         if obj_color is None:
-            if self.get_total_unique_dots() == 1:
-                self.color = self.get_max_color()
-            else:
-                self.color = None
+            self.color = self.get_max_color()
         else:
             self.color = obj_color
 
