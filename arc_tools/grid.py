@@ -343,10 +343,7 @@ class SubGrid(Grid):
         self.width = self.region.x2 - self.region.x1 + 1
         self.background_color = self.parent_grid.background_color
         if obj_color is None:
-            if self.get_total_unique_dots() == 1:
-                self.color = self.get_max_color()
-            else:
-                self.color = None
+            self.color = self.get_max_color()
         else:
             self.color = obj_color
 
@@ -656,7 +653,8 @@ def place_object_on_new_grid(object_to_place: SubGrid, x: int, y: int, grid: Gri
     """
     for row in range(object_to_place.height):
         for col in range(object_to_place.width):
-            grid[y+row][x+col] = object_to_place[row][col]
+            if object_to_place[row][col] != object_to_place.background_color:
+                grid[y+row][x+col] = object_to_place[row][col]
     return object_to_place
 
 def place_object(object_to_place: SubGrid, x: int, y: int, grid: Grid, remove_object: bool = True) -> SubGrid:
