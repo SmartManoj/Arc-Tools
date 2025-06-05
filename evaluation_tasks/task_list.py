@@ -7,7 +7,7 @@ from task_2 import connect_center
 from task_4 import shoot_light
 from task_5 import mapper
 from task_6 import cropped_reflection_symmetry
-# 7 135a2760 repeat_largest_pattern
+from task_7 import repeat_largest_pattern
 from task_8 import borderize
 from task_9 import highlight_plus
 from task_10 import just_walk
