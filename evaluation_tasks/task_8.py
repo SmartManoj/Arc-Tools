@@ -227,4 +227,5 @@ def borderize(grid: Grid) -> Grid:
     return grid
 if __name__ == "__main__":
     import os
-    os.system("main.py 13e47133 borderize")
+    os.environ['initial_file'] = os.path.splitext(os.path.basename(__file__))[0]
+    os.system("python main.py 13e47133 borderize")
