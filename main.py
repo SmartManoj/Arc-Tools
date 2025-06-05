@@ -10,7 +10,7 @@ from arc_tools.grid import Grid, GridPoint, GridRegion, detect_objects
 from arc_tools.plot import plot_grid, plot_grids, remove_pngs
 
 from train_tasks import *
-from evaluation_tasks import *
+from evaluation_tasks.task_list import *
 show_count = 0
 
 from collections import Counter, deque # Add deque import
