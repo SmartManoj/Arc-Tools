@@ -1,3 +1,6 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from task_1 import project_lines_with_gaps
 from task_2 import connect_center
 #3 16b78196 jigsaw variant
