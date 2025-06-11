@@ -11,7 +11,9 @@ def remove_pngs():
         os.remove(file)
 
 plot_grid_count = 0
-disable_show = os.environ.get("DISABLE_SHOW", "").lower() in ["true", "1"] or 0
+disable_show = os.environ.get("DISABLE_SHOW", "").lower() in ["true", "1"]
+is_agent_terminal = os.environ.get("IS_AGENT_TERMINAL", "").lower() in ["true", "1"]
+
 
 def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=True, save_all=False, title=None):
     global plot_grid_count
@@ -76,7 +78,7 @@ def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=T
     else:
         plt.title(title or name)
     if save:
-        name = f'{os.environ.get("initial_file", "main")}_{name}'
+        name = f'evaluation_tasks/{os.environ.get("initial_file", "main")}_{name}'
         plt.savefig(name, facecolor='black', edgecolor='white')
     def format_coord(x, y):
         if x >= -0.5 and y >= -0.5:
@@ -86,7 +88,7 @@ def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=T
         return ''
 
     ax.format_coord = format_coord
-    if show and not disable_show:
+    if show and not disable_show and not is_agent_terminal:
         # Function to format coordinates
         print(f'Showing interactive plot for {name}...')
         plt.show(block=1)
@@ -106,7 +108,7 @@ def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titl
         current_ax = axs[i] if len(grids) > 1 else axs
         plot_grid(grid, ax=current_ax, close=False, save=False, title=current_title)
     plt.tight_layout()
-    if show and not disable_show:
+    if show and not disable_show and not is_agent_terminal:
         plt.show(block=1)
     if name == "grids.png" and save_all:
         plot_grids_count += 1

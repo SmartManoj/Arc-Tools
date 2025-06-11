@@ -1,4 +1,14 @@
+Run programs like  
+python3 -u evaluation_tasks\task_3.py
+
+Then check task_3_actual_output.png, task_3_expected_output.png, and task_3_input.png in evaluation_tasks folder for visualization.
+
+Don't finish until you solve the task.
+---
+
 Don't hard code expected values.
 
 Don't run the following command.
 taskkill /f /im python.exe
+
+

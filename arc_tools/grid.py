@@ -253,7 +253,7 @@ class Grid(SafeList):
     def get_total_unique_dots(self) -> int:
         return len(self.get_unique_values())
 
-    def detect_background_color(self):
+    def detect_background_color(self) -> int:
         # maximum value in the grid
         self.background_color = None
         color_counts = self.get_values_count()
@@ -262,11 +262,11 @@ class Grid(SafeList):
             return Color.BLACK.value
         return self.get_max_color()
 
-    def get_min_color(self):
+    def get_min_color(self) -> int:
         min_key, _ = min(self.get_values_count().items(), key=lambda x: x[1], default=(None, 0))
         return min_key
     
-    def get_max_color(self):
+    def get_max_color(self) -> int:
         max_key, _ = max(self.get_values_count().items(), key=lambda x: x[1], default=(None, 0))
         return max_key
     
@@ -651,11 +651,12 @@ def place_object_on_new_grid(object_to_place: SubGrid, x: int, y: int, grid: Gri
     """
     Places the object_to_place at (x, y) in the grid, extending the grid if necessary.
     """
+    logger.debug(f"Placing object {object_to_place} at {x}, {y}")
     for row in range(object_to_place.height):
         for col in range(object_to_place.width):
             if object_to_place[row][col] != object_to_place.background_color:
                 grid[y+row][x+col] = object_to_place[row][col]
-    return object_to_place
+    return SubGrid(GridRegion([GridPoint(x, y), GridPoint(x + object_to_place.width - 1, y + object_to_place.height - 1)]), grid, object_to_place.color)
 
 def place_object(object_to_place: SubGrid, x: int, y: int, grid: Grid, remove_object: bool = True) -> SubGrid:
     """
