@@ -23,6 +23,24 @@ from arc_tools.grid import move_object
 
 
 remove_pngs()
+# Exception hook
+
+import sys
+import traceback
+from types import TracebackType
+
+
+def handle_exception(
+    type_: type[BaseException], value: BaseException, tb: TracebackType | None
+) -> None:
+    traceback.print_exception(type_, value, tb)
+    sys.exit(1)
+
+
+sys.excepthook = handle_exception
+
+
+#  =============
 
 if 0:
     normal_task_fns = [
@@ -133,10 +151,10 @@ def solve_task(data):
     return actual_outputs
 
 if __name__ == "__main__":
-    task_hash = 'abc82100'
+    task_hash = '16b78196'
     if sys.argv[1:]:
         task_hash = sys.argv[1]
-    actual_task_name = sys.argv[2] if sys.argv[2:] else None
+    actual_task_name = sys.argv[2] if sys.argv[2:] else 'optimize_the_grid'
     split = ['evaluation', 'training']
     for s in split:
         file = rf'../ARC-AGI-2/data/{s}/{task_hash}.json'
