@@ -3,7 +3,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from task_1 import project_lines_with_gaps
 from task_2 import connect_center
-#3 16b78196 jigsaw variant
+from task_3 import optimize_the_grid
 from task_4 import shoot_light
 from task_5 import mapper
 from task_6 import cropped_reflection_symmetry

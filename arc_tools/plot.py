@@ -76,7 +76,7 @@ def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=T
     else:
         plt.title(title or name)
     if save:
-        name = f'{os.environ.get("initial_file", "main")}_{name}'
+        name = f'evaluation_tasks/{os.environ.get("initial_file", "main")}_{name}'
         plt.savefig(name, facecolor='black', edgecolor='white')
     def format_coord(x, y):
         if x >= -0.5 and y >= -0.5:

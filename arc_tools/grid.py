@@ -253,7 +253,7 @@ class Grid(SafeList):
     def get_total_unique_dots(self) -> int:
         return len(self.get_unique_values())
 
-    def detect_background_color(self):
+    def detect_background_color(self) -> int:
         # maximum value in the grid
         self.background_color = None
         color_counts = self.get_values_count()
@@ -262,11 +262,11 @@ class Grid(SafeList):
             return Color.BLACK.value
         return self.get_max_color()
 
-    def get_min_color(self):
+    def get_min_color(self) -> int:
         min_key, _ = min(self.get_values_count().items(), key=lambda x: x[1], default=(None, 0))
         return min_key
     
-    def get_max_color(self):
+    def get_max_color(self) -> int:
         max_key, _ = max(self.get_values_count().items(), key=lambda x: x[1], default=(None, 0))
         return max_key
     
