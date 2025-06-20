@@ -5,7 +5,7 @@ Github: https://github.com/arcprize/ARC-AGI-2
 
 ---
 
-LLMs should code like this to verify it's solutions.
+LLMs should code like this to verify it's solutions. I am focusing on completing the 120 evaluation tasks first before creating a Kaggle solution, so that LLM labs can use this fully to train their next models.
 
 Setup instructions:
 `pip install -e .`
