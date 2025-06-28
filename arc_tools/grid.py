@@ -471,7 +471,7 @@ class SubGrid(Grid):
         for row in range(self.height):
             for col in range(self.width):
                 grid[row + self.region.y1][col + self.region.x1] = self[row][col]
-        return Grid(grid)
+        return Grid(grid, self.background_color)
 
     def has_hollow_space(self):
         """
