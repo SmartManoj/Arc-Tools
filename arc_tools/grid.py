@@ -59,6 +59,11 @@ class GridPoint:
             return self.x == other[0] and self.y == other[1]
         return False
 
+    def distance(self, other):
+        return (self.x - other.x), (self.y - other.y)
+    
+    def manhattan_distance(self, other):
+        return abs(self.x - other.x) + abs(self.y - other.y)
 
 class GridRegion:
     def __init__(self, points: list[GridPoint]):
@@ -77,6 +82,9 @@ class GridRegion:
     
     def __hash__(self):
         return hash((self.x1, self.x2, self.y1, self.y2))
+    
+    def contains(self, point: GridPoint):
+        return self.x1 <= point.x <= self.x2 and self.y1 <= point.y <= self.y2
 
 class CustomIndexError(IndexError):
     def __init__(self, message):
@@ -112,7 +120,6 @@ class Grid(SafeList):
         if type(grid) == Grid:
             raise ValueError(f"Wrong input type: {type(grid)}")
         if grid:
-            grid = deepcopy(grid)
             grid = [SafeList(row, allow_negative_index) for row in grid]
             super().__init__(grid, allow_negative_index)
             self.background_color = background_color or self.detect_background_color()
@@ -219,9 +226,8 @@ class Grid(SafeList):
         return self
 
     def copy(self):
-        c = deepcopy(self)
-        c.background_color = self.background_color
-        return c
+        new_grid_data = [list(row) for row in self]
+        return Grid(new_grid_data, self.background_color, self.allow_negative_index)
     
     def get_frame(self):
         # set all dots to background color
@@ -258,8 +264,8 @@ class Grid(SafeList):
         self.background_color = None
         color_counts = self.get_values_count()
         most_common_values = list(key for key, _ in color_counts.most_common(2))
-        if Color.BLACK.value in most_common_values and len(color_counts) > 2:
-            return Color.BLACK.value
+        # if Color.BLACK.value in most_common_values and len(color_counts) > 2:
+        #     return Color.BLACK.value
         return self.get_max_color()
 
     def get_min_color(self) -> int:
@@ -525,7 +531,7 @@ class SubGrid(Grid):
                     if max_count and count == max_count:
                         return count
 
-        return 0 
+        return count
     
 
 

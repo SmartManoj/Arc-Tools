@@ -1,8 +1,10 @@
+import os
 from pyperclip import paste
 from pymsgbox import prompt
 from arc_tools.plot import remove_pngs
 remove_pngs()
 task_id = paste()
+assert len(task_id) == 8, "Task ID must be 8 characters long"
 function_name = prompt("Enter the function name:").replace(" ", "_")
 code_snippet = f"""import os
 from collections import Counter
@@ -34,7 +36,8 @@ with open("C:\\Users\\smart\\Desktop\\GD\\ARC Tools\\evaluation_tasks\\tasks.py"
 with open(f"evaluation_tasks/task_{last_task_id+1}.py", "w") as f: 
     f.write(code_snippet)
 
-
+# open the file in vscode
+os.system(f"code {f.name}")
 
 
 
