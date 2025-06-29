@@ -1,7 +1,9 @@
 from pyperclip import paste
 from pymsgbox import prompt
+from arc_tools.plot import remove_pngs
+remove_pngs()
 task_id = paste()
-function_name = prompt("Enter the function name:")
+function_name = prompt("Enter the function name:").replace(" ", "_")
 code_snippet = f"""import os
 from collections import Counter
 from arc_tools.grid import Color, Grid, SubGrid, detect_objects, GridRegion, GridPoint, place_object_on_new_grid
