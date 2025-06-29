@@ -1,7 +1,9 @@
 Run programs like  
-python3 -u evaluation_tasks\task_3.py
+python3 -u evaluation_tasks\task_n.py
 
-Then check task_3_actual_output.png, task_3_expected_output.png, and task_3_input.png in evaluation_tasks folder for visualization.
+Then check task_n_actual_output.png, task_n_expected_output.png, and task_n_input.png in evaluation_tasks folder for visualization.
+
+Replace task_n with the current opened file name.
 
 Don't finish until you solve the task.
 ---
