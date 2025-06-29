@@ -7,7 +7,7 @@ from itertools import combinations
 import os
 import json
 from arc_tools.grid import Grid, GridPoint, GridRegion, detect_objects
-from arc_tools.plot import plot_grid, plot_grids, remove_pngs
+from arc_tools.plot import plot_grid, plot_grids
 
 from train_tasks import *
 from evaluation_tasks.tasks import *
@@ -22,7 +22,6 @@ from arc_tools.grid import Color
 from arc_tools.grid import move_object
 
 
-remove_pngs()
 # Exception hook
 
 import sys
@@ -73,7 +72,7 @@ def debug_output(grid, expected_output, output):
         for col in range(len(expected_output[0])):
             if (e := expected_output[row][col]) != (o := output[row][col]):
                 logger.info(f"Cell at {row = }, {col = } is different: {e} != {o}")
-    plot_grids([grid, expected_output, output], show=1, titles=["Input", "Expected output", "Actual output"])
+    plot_grids([grid, expected_output, output], show=1, titles=["Input", "Expected output", "Actual output"], name='result.png')
 
 def find_task(grids, expected_outputs, start_train_task_id=1):
     if len(grids[0][0]) == len(expected_outputs[0][0]):
@@ -87,10 +86,7 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
         right_task = True
         for task_id, (grid, expected_output) in enumerate(zip(grids, expected_outputs), start_train_task_id):
             expected_output = Grid(expected_output)
-            plot_grid(expected_output, name="expected_output.png")
-            plot_grid(grid, name="input.png")
             output = task_fn(grid.copy())
-            plot_grid(output, name="actual_output.png")
             if not output.compare(expected_output):
                 debug_output(grid, expected_output, output)
                 if actual_task_name:
@@ -131,12 +127,8 @@ def solve_task(data):
     for task_idx in range(start_test_task_id - 1, num_test_tasks):
         grid = Grid(data['test'][task_idx]['input'])
         if task_fn:
-            plot_grid(grid, name="input.png", show=0)
             expected_output = Grid(data['test'][task_idx].get('output'))
-            plot_grid(expected_output, name="expected_output.png")
-            
             output = task_fn(grid.copy())
-            plot_grid(output, name="actual_output.png")
             if expected_output:
                 if output.compare(expected_output):
                     logger.info(f"Test task {task_idx + 1} passed")

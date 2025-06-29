@@ -1,9 +1,12 @@
 from pyperclip import paste
+from pymsgbox import prompt
 task_id = paste()
-function_name = "build_a_box"
+function_name = prompt("Enter the function name:")
 code_snippet = f"""import os
 from collections import Counter
 from arc_tools.grid import Color, Grid, SubGrid, detect_objects, GridRegion, GridPoint, place_object_on_new_grid
+from arc_tools import logger
+from arc_tools.plot import plot_grids
 
 def {function_name}(grid: Grid):
     '''

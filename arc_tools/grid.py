@@ -334,9 +334,10 @@ class Grid(SafeList):
             print()
 
 class SubGrid(Grid):
-    def __init__(self, region: GridRegion, parent_grid: Grid, obj_color: int | None = None):
+    def __init__(self, region: GridRegion, parent_grid: Grid, obj_color: int | None = None, points: list[GridPoint] | None = None):
         self.parent_grid = parent_grid
         self.region = region
+        self.points = points
         super().__init__(self.get_subgrid(obj_color), allow_negative_index=True)
         self.region = region # reinitialize the region
         self.height = self.region.y2 - self.region.y1 + 1
@@ -608,20 +609,20 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                             visited[nr, nc] = True
                             q.append((nr, nc))
                 # filter only the corner points
-                current_object_points = [
-                    p for p in current_object_points 
-                    if p.x == min(p.x for p in current_object_points) 
-                    or p.x == max(p.x for p in current_object_points) 
-                    or p.y == min(p.y for p in current_object_points) 
+                current_object_corner_points = [
+                    p for p in current_object_points
+                    if p.x == min(p.x for p in current_object_points)
+                    or p.x == max(p.x for p in current_object_points)
+                    or p.y == min(p.y for p in current_object_points)
                     or p.y == max(p.y for p in current_object_points)
                 ]
-                if current_object_points:
+                if current_object_corner_points:
                     region = GridRegion(current_object_points)
                     if ignore_corners:
                         if region.x1 == 0 or region.y1 == 0 or region.x2 == grid.width - 1 or region.y2 == grid.height - 1:
                             continue
                     obj_color = current_color if single_color_only else None
-                    obj = SubGrid(region, grid, obj_color)
+                    obj = SubGrid(region, grid, obj_color, points=current_object_points)
                     if isinstance(required_object, Square):
                         size = required_object.size
                         if obj.height == size and obj.width == size:
