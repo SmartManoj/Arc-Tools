@@ -40,5 +40,5 @@ expected_2 = [
 
 
 
-assert (Grid([row[:] for row in a]).remove_corner_grid(grid_size=2) == Grid(expected))
-assert (Grid([row[:] for row in expanded_subgrid_by_2]).remove_corner_grid(grid_size=2, relative_to=subgrid) == Grid(expected_2))
+assert (Grid([row[:] for row in a]).clear_corners(grid_size=2) == Grid(expected))
+assert (Grid([row[:] for row in expanded_subgrid_by_2]).clear_corners(grid_size=2, relative_to=subgrid) == Grid(expected_2))

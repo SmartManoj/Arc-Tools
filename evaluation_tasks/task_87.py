@@ -12,7 +12,7 @@ def find_nearby_two_dots(sgrid: SubGrid, parent_grid: Grid) -> SubGrid:
     # expand the region by 2 * 2
     expanded_grid = sgrid.expand(2).get_full_grid()
     # fill background color on corners of the expanded grid
-    expanded_grid = expanded_grid.remove_corner_grid(grid_size=2, relative_to=sgrid)
+    expanded_grid = expanded_grid.clear_corners(grid_size=2, relative_to=sgrid)
     plot_grid(expanded_grid, show=0, save_all=True)
     objects = detect_objects(expanded_grid, ignore_color=Color.LIGHTBLUE)
     plot_grids(objects, show=0, save_all=True)

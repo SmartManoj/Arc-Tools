@@ -14,7 +14,7 @@ from arc_tools.plot import plot_grids
 
 def {function_name}(grid: Grid):
     '''
-    
+    add the function description first.
     '''
     return grid
 
@@ -36,6 +36,9 @@ with open("C:\\Users\\smart\\Desktop\\GD\\ARC Tools\\evaluation_tasks\\tasks.py"
 with open(f"evaluation_tasks/task_{last_task_id+1}.py", "w") as f: 
     f.write(code_snippet)
 
+from pyautogui import hotkey
+hotkey("ctrl", "w")
+hotkey("ctrl", "w")
 # open the file in vscode
 os.system(f"code {f.name}")
 

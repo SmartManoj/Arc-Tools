@@ -87,7 +87,7 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
         for task_id, (grid, expected_output) in enumerate(zip(grids, expected_outputs), start_train_task_id):
             expected_output = Grid(expected_output)
             output = task_fn(grid.copy())
-            if not output.compare(expected_output):
+            if not expected_output.compare(output):
                 debug_output(grid, expected_output, output)
                 if actual_task_name:
                     raise Exception(f'Train task {task_id} failed')
@@ -130,7 +130,7 @@ def solve_task(data):
             expected_output = Grid(data['test'][task_idx].get('output'))
             output = task_fn(grid.copy())
             if expected_output:
-                if output.compare(expected_output):
+                if expected_output.compare(output):
                     logger.info(f"Test task {task_idx + 1} passed")
                 else:
                     logger.info(f"Test task {task_idx + 1} failed")

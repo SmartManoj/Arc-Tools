@@ -37,6 +37,7 @@ from task_33 import build_a_box
 from task_34 import shoot_the_center
 from task_35 import close_the_lock
 from task_36 import cornerify
+from task_37 import replicate
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit

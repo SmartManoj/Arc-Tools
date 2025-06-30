@@ -83,8 +83,12 @@ class GridRegion:
     def __hash__(self):
         return hash((self.x1, self.x2, self.y1, self.y2))
     
-    def contains(self, point: GridPoint):
-        return self.x1 <= point.x <= self.x2 and self.y1 <= point.y <= self.y2
+    def contains(self, obj):
+        if isinstance(obj, GridPoint):
+            return self.x1 <= obj.x <= self.x2 and self.y1 <= obj.y <= self.y2
+        elif isinstance(obj, GridRegion):
+            return self.x1 <= obj.x1 <= self.x2 and self.y1 <= obj.y1 <= self.y2 and self.x1 <= obj.x2 <= self.x2 and self.y1 <= obj.y2 <= self.y2
+        return False
 
 class CustomIndexError(IndexError):
     def __init__(self, message):
@@ -136,6 +140,12 @@ class Grid(SafeList):
     def set(self, x: int, y: int, value: int):
         self[y][x] = value
     
+    def area(self):
+        return self.width * self.height
+    
+    def contains(self, other):
+        return self.region.contains(other.region)
+    
     def get_corner_colors(self):
         top_left = self[0][0]
         top_right = self[0][self.width - 1]
@@ -145,16 +155,16 @@ class Grid(SafeList):
     
     def compare(self, other):
         if len(self) != len(other):
-            print(f"Row length mismatch: {len(self)} != {len(other)}")
+            logger.info(f"Row length mismatch: Actual: {len(self)}, Expected: {len(other)}")
             return False
         for i in range(len(self)):
             if self[i] != other[i]:
                 if len(self[i]) != len(other[i]):
-                    print(f"Column length mismatch for row {i+1}: {len(self[i])} != {len(other[i])}")
+                    logger.info(f"Column length mismatch for row {i+1}: Actual: {len(self[i])}, Expected: {len(other[i])}")
                     return False
                 for j in range(len(self[i])):
                     if self[i][j] != other[i][j]:
-                        print(f"Mismatch at index {i}/{j}: {self[i][j]}, {other[i][j]}")
+                        logger.info(f"Mismatch at index {i}/{j}: Actual: {self[i][j]}, Expected: {other[i][j]}")
                         return False
         return True
     
@@ -242,7 +252,7 @@ class Grid(SafeList):
         values : Counter = Counter()
         for row in self:
             for col in row:
-                if col != self.background_color or all:
+                if col != getattr(self, "background_color", None) or all:
                     values[col] += 1
         return values
     
@@ -261,9 +271,8 @@ class Grid(SafeList):
 
     def detect_background_color(self) -> int:
         # maximum value in the grid
-        self.background_color = None
-        color_counts = self.get_values_count()
-        most_common_values = list(key for key, _ in color_counts.most_common(2))
+        # color_counts = self.get_values_count()
+        # most_common_values = list(key for key, _ in color_counts.most_common(2))
         # if Color.BLACK.value in most_common_values and len(color_counts) > 2:
         #     return Color.BLACK.value
         return self.get_max_color()
@@ -287,7 +296,7 @@ class Grid(SafeList):
         with open(name, 'w') as f:
             f.write(data)
 
-    def remove_corner_grid(self, grid_size: int = 1, relative_to: Optional['SubGrid'] = None):
+    def clear_corners(self, grid_size: int = 1, relative_to: Optional['SubGrid'] = None):
         top_left_corner = GridPoint(0, 0)
         top_right_corner = GridPoint(0, len(self[0])-1 - grid_size + 1)
         bottom_left_corner = GridPoint(len(self)-1 - grid_size + 1, 0)
@@ -303,7 +312,7 @@ class Grid(SafeList):
                 for x in range(corners.x, corners.x + grid_size):
                     if y < 0 or x < 0 or y >= len(self) or x >= len(self[0]):
                         continue
-                    self[y][x] = 0
+                    self[y][x] = self.background_color
         return self
     
     def extend_grid(self, new_height: int, new_width: int):
@@ -354,6 +363,10 @@ class SubGrid(Grid):
         else:
             self.color = obj_color
 
+    def remove_border(self, border: int = 1):
+        new_grid_region = GridRegion([GridPoint(self.region.x1 + border, self.region.y1 + border), GridPoint(self.region.x2 - border, self.region.y2 - border)])
+        # BUG? passing self.color floods the grid with the color
+        return SubGrid(new_grid_region, self.parent_grid, None)
     
     def __hash__(self) -> int: # type: ignore
         return hash((self.region, self.parent_grid, self.background_color))
