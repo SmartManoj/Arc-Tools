@@ -1,5 +1,4 @@
 from arc_tools.grid import Grid, detect_objects, Color, move_object, place_object_on_new_grid, GridRegion, GridPoint, SubGrid
-from arc_tools.plot import plot_grids
 
 def is_pluggable(list_1, list_2):
     '''
@@ -95,12 +94,6 @@ def get_docker_inner_holes(docker_obj: Grid):
                 holes.append(SubGrid(GridRegion(current_hole), docker_obj.parent_grid))
     return holes
 
-def list_strip(list, element):
-    while list and list[0] == element:
-        list.pop(0)
-    while list and list[-1] == element:
-        list.pop()
-    return list
 
 
 def is_pluggable_object_to_hole(obj, hole, is_vertical_docker, hole_side):

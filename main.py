@@ -100,14 +100,14 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
     return None
 
 def solve_task(data):
-    num_train_tasks = len(data['train'])
-    num_test_tasks = len(data['test'])
-    logger.info(f"Number of train tasks: {num_train_tasks}, Number of test tasks: {num_test_tasks}")
     start_train_task_id = 1
     start_test_task_id = 1
     actual_task_name = None
     start_train_task_id = 1
     start_test_task_id = 1
+    num_train_tasks = len(data['train'])
+    num_test_tasks = len(data['test'])
+    logger.info(f"Number of train tasks: {num_train_tasks}, Number of test tasks: {num_test_tasks}")
     grids = []
     expected_outputs = []
     actual_outputs = []
@@ -143,9 +143,11 @@ def solve_task(data):
     return actual_outputs
 
 if __name__ == "__main__":
-    task_hash = '16b78196'
     if sys.argv[1:]:
         task_hash = sys.argv[1]
+    else:
+        print('Usage: python main.py <task_hash> <task_name>')
+        exit()
     actual_task_name = sys.argv[2] if sys.argv[2:] else 'optimize_the_grid'
     split = ['evaluation', 'training']
     for s in split:
