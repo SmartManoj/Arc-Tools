@@ -39,6 +39,7 @@ from task_35 import close_the_lock
 from task_36 import cornerify
 from task_37 import replicate
 from task_38 import overlap
+from task_39 import laser_gun
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
