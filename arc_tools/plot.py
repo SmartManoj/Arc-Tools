@@ -12,7 +12,7 @@ def remove_pngs():
 
 plot_grid_count = 0
 disable_show = os.environ.get("DISABLE_SHOW", "0").lower() in ["true", "1"]
-is_agent_terminal = os.environ.get("IS_AGENT_TERMINAL", "0").lower() in ["true", "1"]
+is_agent_terminal = (os.environ.get("IS_AGENT_TERMINAL", '') or os.environ.get("COMPOSER_NO_INTERACTION ", '').lower() in ["true", "1"])
 
 
 def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=True, save_all=False, title=None):
@@ -48,6 +48,9 @@ def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=T
     # Plot
     if ax is None:
         fig, ax = plt.subplots()
+        # Set window title
+        window_title = title or name
+        fig.canvas.manager.set_window_title(window_title)
     ax.patch.set_facecolor('black')  # Set plot background to black
 
     ax.imshow(grid, cmap=cmap, norm=norm)
@@ -103,6 +106,11 @@ def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titl
     # plot the grids in a single plot
     fig, axs = plt.subplots(1, len(grids), figsize=(10, 5 * len(grids)))
     fig.patch.set_facecolor('black')  # Set figure background to black
+    
+    # Set window title
+    window_title = title or name
+    fig.canvas.manager.set_window_title(window_title)
+    
     if len(grids) == 1:
         axs = [axs]  # Make it iterable for single grid case
     for i, grid in enumerate(grids):
@@ -132,4 +140,4 @@ if __name__ == "__main__":
     data = [[1,2,3],[2,1,4],[3,4,1]]
     grid = Grid(data)
     # find square boxes
-    plot_grids([grid, grid], name="arc_tools/plot.png", show=1)
+    plot_grids([grid, grid], name="plot.png", show=1)

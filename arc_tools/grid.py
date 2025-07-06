@@ -126,7 +126,9 @@ class Grid(SafeList):
         if grid:
             grid = [SafeList(row, allow_negative_index) for row in grid]
             super().__init__(grid, allow_negative_index)
-            self.background_color = background_color or self.detect_background_color()
+            if background_color is None:
+                background_color = self.detect_background_color()
+            self.background_color = background_color
             self.height = len(self)
             self.width = len(self[0])
             self.region = GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)])
