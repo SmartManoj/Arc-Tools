@@ -42,6 +42,7 @@ from task_38 import overlap
 from task_39 import laser_gun
 from task_40 import race
 from task_41 import align_the_stars
+from task_42 import counter_box
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
