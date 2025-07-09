@@ -1,7 +1,9 @@
 import json
+from matplotlib.backend_bases import MouseButton
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
+import pyperclip
 from arc_tools.logger import logger
 from glob import glob
 import os
@@ -98,7 +100,7 @@ def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=T
         plt.close()
 
 plot_grids_count = 0
-def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titles=None):
+def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titles=None, window_title=None):
     if len(grids) == 0:
         print("No grids to plot")
         return
@@ -108,7 +110,7 @@ def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titl
     fig.patch.set_facecolor('black')  # Set figure background to black
     
     # Set window title
-    window_title = title or name
+    window_title = window_title or title or name
     fig.canvas.manager.set_window_title(window_title)
     
     if len(grids) == 1:
@@ -128,6 +130,14 @@ def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titl
     name = f'evaluation_tasks/{os.environ.get("initial_file", "main")}_{name}'
     plt.savefig(name, facecolor='black', edgecolor='white', dpi=150, bbox_inches='tight', pad_inches=0.2)
     
+    def on_click(event):
+        if event.button is MouseButton.LEFT:
+            if event.xdata >= -0.5 and event.ydata >= -0.5:
+                col = int(event.xdata + 0.5)
+                row = int(event.ydata + 0.5)
+            copy_msg = f'(row,col) = ({row},{col})'
+            pyperclip.copy(copy_msg)
+    plt.connect('button_press_event', on_click)
     if show and not disable_show and not is_agent_terminal:
         plt.show(block=1)
     plt.close()

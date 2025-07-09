@@ -22,8 +22,8 @@ if __name__ == "__main__":
     os.environ['initial_file'] = os.path.splitext(os.path.basename(__file__))[0]
     os.system("python main.py {task_id} {function_name}") 
 """
-# find previous before marker in C:\Users\smart\Desktop\GD\ARC Tools\evaluation_tasks\tasks.py
-with open("C:\\Users\\smart\\Desktop\\GD\\ARC Tools\\evaluation_tasks\\tasks.py", "r+") as f:
+# find previous before marker in evaluation_tasks/tasks.py
+with open("evaluation_tasks/tasks.py", "r+") as f:
     lines = f.readlines()
     for i, line in enumerate(lines):
         if "marker" in line:
@@ -42,5 +42,5 @@ hotkey("ctrl", "w")
 # open the file in vscode
 os.system(f"code {f.name}")
 
-cmd = f"git commit -m '{last_task_id+1}'"
+cmd = f"git add . && git commit -m '{last_task_id+1}'"
 os.system(cmd)

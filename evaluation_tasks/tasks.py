@@ -44,6 +44,7 @@ from task_40 import race
 from task_41 import align_the_stars
 from task_42 import counter_box
 from task_43 import seal_the_box
+from task_44 import canals
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit

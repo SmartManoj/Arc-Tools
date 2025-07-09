@@ -64,7 +64,7 @@ jigsaw_task_fns = [
 
 
 DEBUG_OUTPUT = 1
-def debug_output(grid, expected_output, output):
+def debug_output(grid, expected_output, output, window_title='result'):
     if not DEBUG_OUTPUT:
         return
     # print which cells are different
@@ -72,7 +72,7 @@ def debug_output(grid, expected_output, output):
         for col in range(len(expected_output[0])):
             if (e := expected_output[row][col]) != (o := output[row][col]):
                 logger.info(f"Cell at {row = }, {col = } is different: {e} != {o}")
-    plot_grids([grid, expected_output, output], show=1, titles=["Input", "Expected output", "Actual output"], name='result.png')
+    plot_grids([grid, expected_output, output], show=1, titles=["Input", "Expected output", "Actual output"], window_title=window_title)
 
 def find_task(grids, expected_outputs, start_train_task_id=1):
     if len(grids[0][0]) == len(expected_outputs[0][0]):
@@ -88,7 +88,7 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
             expected_output = Grid(expected_output)
             output = task_fn(grid.copy())
             if not expected_output.compare(output):
-                debug_output(grid, expected_output, output)
+                debug_output(grid, expected_output, output, f'train_{task_id+1}_result')
                 if actual_task_name:
                     raise Exception(f'Train task {task_id} failed')
                 right_task = False

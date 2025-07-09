@@ -84,6 +84,8 @@ class GridRegion:
         return hash((self.x1, self.x2, self.y1, self.y2))
     
     def contains(self, obj):
+        if isinstance(obj, Grid):
+            return self.contains(obj.region)
         if isinstance(obj, GridPoint):
             return self.x1 <= obj.x <= self.x2 and self.y1 <= obj.y <= self.y2
         elif isinstance(obj, GridRegion):
@@ -141,12 +143,24 @@ class Grid(SafeList):
     
     def set(self, x: int, y: int, value: int):
         self[y][x] = value
+
+    def get_top_side(self):
+        return [self[0][i] for i in range(self.width)]
+    
+    def get_bottom_side(self):
+        return [self[self.height - 1][i] for i in range(self.width)]
+    
+    def get_left_side(self):
+        return [self[i][0] for i in range(self.height)]
+    
+    def get_right_side(self):
+        return [self[i][self.width - 1] for i in range(self.height)]
     
     def area(self):
         return self.width * self.height
     
     def contains(self, other):
-        return self.region.contains(other.region)
+        return self.region.contains(other)
     
     def get_corner_colors(self):
         top_left = self[0][0]
@@ -170,18 +184,18 @@ class Grid(SafeList):
                         return False
         return True
     
-    def replace_color(self, old_color, new_color, in_place: bool = False):
-        if in_place:
+    def replace_color(self, old_color: Color, new_color: Color, replace_in_grid: bool = True):
+        if replace_in_grid:
             for row in range(self.region.y1, self.region.y2 + 1):
                 for col in range(self.region.x1, self.region.x2 + 1):
-                    if self.parent_grid[row][col] == old_color:
-                        self.parent_grid[row][col] = new_color
+                    if self.parent_grid[row][col] == old_color.value:
+                        self.parent_grid[row][col] = new_color.value
             return self
         else:
             for row in range(self.height):
                 for col in range(self.width):
-                    if self[row][col] == old_color:
-                        self[row][col] = new_color
+                    if self[row][col] == old_color.value:
+                        self[row][col] = new_color.value
         return self
     
     def replace_all_color(self, new_color):
