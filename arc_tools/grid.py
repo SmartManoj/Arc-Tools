@@ -669,7 +669,7 @@ def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
     grid.remove_object(object_to_move, fill_color.value if fill_color else None)
     return copy_object(object_to_move, dx, dy, grid, extend_grid, silent=True)
 
-def place_object_on_new_grid(object_to_place: SubGrid, x: int, y: int, grid: Grid) -> SubGrid:
+def place_object_on_new_grid(object_to_place: SubGrid, x: int, y: int, grid: Grid, fill_color: int | None = None) -> SubGrid:
     """
     Places the object_to_place at (x, y) in the grid, extending the grid if necessary.
     """
@@ -677,7 +677,10 @@ def place_object_on_new_grid(object_to_place: SubGrid, x: int, y: int, grid: Gri
     for row in range(object_to_place.height):
         for col in range(object_to_place.width):
             if object_to_place[row][col] != object_to_place.background_color:
-                grid[y+row][x+col] = object_to_place[row][col]
+                if fill_color:
+                    grid[y+row][x+col] = fill_color
+                else:
+                    grid[y+row][x+col] = object_to_place[row][col]
     return SubGrid(GridRegion([GridPoint(x, y), GridPoint(x + object_to_place.width - 1, y + object_to_place.height - 1)]), grid, object_to_place.color)
 
 def place_object(object_to_place: SubGrid, x: int, y: int, grid: Grid, remove_object: bool = True) -> SubGrid:
