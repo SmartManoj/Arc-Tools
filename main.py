@@ -88,7 +88,7 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
             expected_output = Grid(expected_output)
             output = task_fn(grid.copy())
             if not expected_output.compare(output):
-                debug_output(grid, expected_output, output, f'train_{task_id+1}_result')
+                debug_output(grid, expected_output, output, f'train_{task_id}_result')
                 if actual_task_name:
                     raise Exception(f'Train task {task_id} failed')
                 right_task = False
@@ -118,10 +118,11 @@ def solve_task(data):
             grids.append(Grid(data['train'][task_idx]['input']))
             expected_outputs.append(data['train'][task_idx]['output'])
         task_fn = find_task(grids, expected_outputs, start_train_task_id)
-        if task_fn:
-            logger.info(f"Found task: {task_fn.__name__}")
-        else:
-            logger.info(f"Task not found")
+        if 0:
+            if task_fn:
+                logger.info(f"Found task: {task_fn.__name__}")
+            else:
+                logger.info(f"Task not found")
     else:
         task_fn = globals()[actual_task_name]
     for task_idx in range(start_test_task_id - 1, num_test_tasks):
@@ -134,7 +135,7 @@ def solve_task(data):
                     logger.info(f"Test task {task_idx + 1} passed")
                 else:
                     logger.info(f"Test task {task_idx + 1} failed")
-                    debug_output(grid, expected_output, output)
+                    debug_output(grid, expected_output, output, f'test_{task_idx + 1}_result')
                     raise Exception(f"Incorrect task {task_idx + 1}: {task_fn.__name__}, Expected: {expected_output}, Actual: {output}")
             output = {"attempt_1": output, "attempt_2": output}
         else:
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     else:
         print('Usage: python main.py <task_hash> <task_name>')
         exit()
-    actual_task_name = sys.argv[2] if sys.argv[2:] else 'optimize_the_grid'
+    actual_task_name = sys.argv[2] if sys.argv[2:] else None
     split = ['evaluation', 'training']
     for s in split:
         file = rf'../ARC-AGI-2/data/{s}/{task_hash}.json'

@@ -42,5 +42,5 @@ hotkey("ctrl", "w")
 # open the file in vscode
 os.system(f"code {f.name}")
 
-cmd = f"git add . && git commit -m '{last_task_id+1}'"
+cmd = f"git add . && git commit -m {last_task_id+1}"
 os.system(cmd)
