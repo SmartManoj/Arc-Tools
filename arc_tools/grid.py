@@ -2,13 +2,11 @@ from collections import Counter, deque
 from enum import Enum
 import json
 import numpy as np
-import logging
 from copy import deepcopy
 from typing import Optional
 
 from arc_tools.constants import CARDINAL_DIRECTIONS, EIGHT_DIRECTIONS
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from arc_tools.logger import logger
 
 class MyEnum(Enum):
     def __repr__(self):
@@ -124,15 +122,14 @@ class Grid(SafeList):
     def __init__(self, grid: list[list[int]], background_color: int | None = None, allow_negative_index: bool = False):
         if type(grid) == Grid:
             raise ValueError(f"Wrong input type: {type(grid)}")
-        if grid:
-            grid = [SafeList(row, allow_negative_index) for row in grid]
-            super().__init__(grid, allow_negative_index)
-            if background_color is None:
-                background_color = self.detect_background_color()
-            self.background_color = background_color
-            self.height = len(self)
-            self.width = len(self[0])
-            self.region = GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)])
+        grid = [SafeList(row, allow_negative_index) for row in grid]
+        super().__init__(grid, allow_negative_index)
+        if background_color is None:
+            background_color = self.detect_background_color()
+        self.background_color = background_color
+        self.height = len(self)
+        self.width = len(self[0])
+        self.region = GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)])
     
     def __hash__(self) -> int: # type: ignore
         return hash((tuple(tuple(row) for row in self), self.background_color))
@@ -160,6 +157,26 @@ class Grid(SafeList):
             return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid, self.background_color), self.color)
         else:
             return Grid(new_grid, self.background_color)
+    
+    def flip_horizontally(self) -> 'Grid':
+        rows = self.height
+        cols = self.width
+        new_grid = [self[rows-1-j] for j in range(rows)]
+        if type(self) == SubGrid:
+            logger.info(f'{self.background_color = }')
+            g = Grid(new_grid, self.background_color)
+            return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(cols-1, rows-1)]), g, self.color)
+        else:
+            return Grid(new_grid, self.background_color)
+
+    def flip_vertically(self) -> 'Grid':
+        rows = self.height
+        cols = self.width
+        new_grid = [[self[j][cols-1-i] for i in range(cols)] for j in range(rows)]
+        if type(self) == SubGrid:
+            return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(cols-1, rows-1)]), Grid(new_grid, self.background_color), self.color)
+        else:
+            return Grid(new_grid, self.background_color)
 
     def get(self, x: int, y: int) -> int:
         return self[y][x]
@@ -179,6 +196,7 @@ class Grid(SafeList):
     def get_right_side(self):
         return [self[i][self.width - 1] for i in range(self.height)]
     
+    @property
     def area(self):
         return self.width * self.height
     
@@ -392,15 +410,12 @@ class SubGrid(Grid):
         self.parent_grid = parent_grid
         self.region = region
         self.points = points
-        super().__init__(self.get_subgrid(obj_color), allow_negative_index=True)
+        self.background_color = self.parent_grid.background_color
+        super().__init__(self.get_subgrid(obj_color), self.background_color, allow_negative_index=True)
         self.region = region # reinitialize the region
         self.height = self.region.y2 - self.region.y1 + 1
         self.width = self.region.x2 - self.region.x1 + 1
-        self.background_color = self.parent_grid.background_color
-        if obj_color is None:
-            self.color = self.get_max_color()
-        else:
-            self.color = obj_color
+        self.color = obj_color
 
     def remove_border(self, border: int = 1):
         new_grid_region = GridRegion([GridPoint(self.region.x1 + border, self.region.y1 + border), GridPoint(self.region.x2 - border, self.region.y2 - border)])
@@ -426,7 +441,7 @@ class SubGrid(Grid):
                 self.background_color == other.background_color and
                 super().__eq__(other))
     
-    def compare(self, other):
+    def is_resemble(self, other):
         if not isinstance(other, SubGrid):
             return False
         # if height and width are the same, then compare the points
@@ -772,32 +787,28 @@ def copy_object(object_to_copy: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
     copied_obj.region.y2 = min(copied_obj.region.y2 + dy, grid.height - 1)
     return copied_obj
 
+
 def flip_horizontally(object: Grid) -> Grid:
-    rows = object.height
-    cols = object.width
-    new_grid = [[object[rows-1-j][i] for i in range(cols)] for j in range(rows)]
-    return Grid(new_grid)
+    pass
 
 def flip_vertically(object: Grid) -> Grid:
-    rows = object.height
-    cols = object.width
-    new_grid = [[object[j][cols-1-i] for i in range(cols)] for j in range(rows)]
-    return Grid(new_grid)
-
+    pass
 
 
 if __name__ == "__main__":
     # Create a test grid
     test_grid = Grid([
-        [0, 0, 0, 0],
-        [0, 1, 1, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0]
-    ])
-    
+        [1, 2],
+        [3, 4],
+    ], background_color=0)
+    sub_grid = SubGrid(GridRegion([GridPoint(1, 1), GridPoint(2, 2)]), test_grid)
+    test_grid2 = test_grid.flip_horizontally()
+    test_grid.display()
+    print('-' * 10)
+    test_grid2.display()
+    exit()
+    # exit()
     # Create a SubGrid from the colored region
     region = GridRegion([GridPoint(1, 1), GridPoint(2, 2)])
     test_object = SubGrid(region, test_grid)
     
-    print("Original grid:")
-    test_grid.display()

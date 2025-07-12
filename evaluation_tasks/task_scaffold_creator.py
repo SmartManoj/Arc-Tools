@@ -7,8 +7,7 @@ task_id = paste()
 assert len(task_id) == 8, "Task ID must be 8 characters long"
 function_name = prompt("Enter the function name:").replace(" ", "_")
 code_snippet = f"""import os
-from collections import Counter
-from arc_tools.grid import Color, Grid, SubGrid, detect_objects, GridRegion, GridPoint, place_object_on_new_grid
+from arc_tools.grid import Grid, detect_objects
 from arc_tools import logger
 from arc_tools.plot import plot_grids
 
@@ -16,6 +15,8 @@ def {function_name}(grid: Grid):
     '''
     add the function description first.
     '''
+    objects = detect_objects(grid)
+
     return grid
 
 if __name__ == "__main__":

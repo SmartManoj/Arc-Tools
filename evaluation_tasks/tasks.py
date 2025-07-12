@@ -48,6 +48,7 @@ from task_43 import seal_the_box
 from task_44 import canals
 from task_45 import relocate_objects
 from task_46 import gravity
+from task_47 import parallel_universe
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
