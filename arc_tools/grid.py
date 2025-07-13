@@ -141,6 +141,40 @@ class Grid(SafeList):
     def __hash__(self) -> int: # type: ignore
         return hash((tuple(tuple(row) for row in self), self.background_color))
     
+    def as_sub_grid(self):
+        return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)]), self)
+
+    def is_similar(self, other, ignore_color = False):
+        if self.height > self.width:
+            self = self.rotate()
+        if other.height > other.width:
+            other = other.rotate()
+        if not isinstance(other, Grid):
+            return False
+        # if height and width are the same, then compare the points
+        if self.height == other.height and self.width == other.width:
+            def check(self, other):
+                for row in range(self.height):
+                    for col in range(self.width):
+                        if ignore_color:
+                            c1 = self[row][col] == self.background_color
+                            c2 = other[row][col] == other.background_color
+                            if c1 != c2:
+                                return False
+                        else:
+                            if self[row][col] != other[row][col]:
+                                return False
+                return True
+            
+            # check all rotatations
+            for _ in range(4):
+                for _ in range(4):
+                    if check(self, other):
+                        return True
+                    other = other.rotate()
+                self = self.rotate()
+        return False
+    
     def rotate(self) -> 'Grid':
         """
         Rotates 90 degrees clockwise.
@@ -453,17 +487,7 @@ class SubGrid(Grid):
                 self.background_color == other.background_color and
                 super().__eq__(other))
     
-    def is_resemble(self, other):
-        if not isinstance(other, SubGrid):
-            return False
-        # if height and width are the same, then compare the points
-        if self.height == other.height and self.width == other.width:
-            for row in range(self.height):
-                for col in range(self.width):
-                    if self[row][col] != other[row][col]:
-                        return False
-            return True
-        return False
+    
     
     def set_center_color(self):
         center_x = (self.region.x1 + self.region.x2) // 2

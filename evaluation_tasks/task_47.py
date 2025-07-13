@@ -119,7 +119,7 @@ def parallel_universe(grid: Grid):
             
             for rotation_count in range(4):
                 # Check if universes match after rotation
-                if test_universe.is_resemble(matched_parallel_universe):
+                if test_universe.is_similar(matched_parallel_universe):
                     # Calculate corresponding point in this universe
                     
                     new_offset = get_rotated_point(meeting_point_offset[0], meeting_point_offset[1], rotation_count, test_universe)
@@ -141,7 +141,7 @@ def parallel_universe(grid: Grid):
                     
                 # Try with vertical flip
                 flipped_universe = test_universe.flip_vertically()
-                if flipped_universe.is_resemble(matched_parallel_universe):
+                if flipped_universe.is_similar(matched_parallel_universe):
                     # Calculate corresponding point in flipped universe
                     new_offset = get_rotated_point(flipped_meeting_point_offset[0], flipped_meeting_point_offset[1], rotation_count, flipped_universe)
                     

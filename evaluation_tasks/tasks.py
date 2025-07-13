@@ -50,6 +50,7 @@ from task_45 import relocate_objects
 from task_46 import gravity
 from task_47 import parallel_universe
 from task_48 import role_model
+from task_49 import majority
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
