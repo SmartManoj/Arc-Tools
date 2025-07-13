@@ -1,7 +1,7 @@
 # optimize
 import os
 from collections import Counter
-from arc_tools.grid import Color, Grid, SubGrid, detect_objects, GridRegion, GridPoint, place_object_on_new_grid, move_object, rotate_object, rotate_object_counter_clockwise
+from arc_tools.grid import Color, Grid, SubGrid, detect_objects, GridRegion, GridPoint, place_object_on_new_grid, move_object
 from arc_tools import logger
 from arc_tools.plot import plot_grids
 
@@ -457,7 +457,7 @@ def race(grid: Grid):
     # plot_grids([car, output_grid])
 
     for _ in range(number_of_turns):
-        car = rotate_object(car)
+        car = car.rotate()
         
     
     # Adjust position coordinates based on number of rotations

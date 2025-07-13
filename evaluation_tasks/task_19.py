@@ -1,6 +1,6 @@
 import json
 from arc_tools import logger
-from arc_tools.grid import Color, Grid, SubGrid, detect_objects, place_object_on_new_grid, rotate_object, GridRegion, GridPoint, rotate_object_counter_clockwise
+from arc_tools.grid import Color, Grid, SubGrid, detect_objects, place_object_on_new_grid, GridRegion, GridPoint
 from arc_tools.plot import plot_grid, plot_grids
 # logger.setLevel(10)
 
@@ -15,16 +15,16 @@ def rotate_and_stack(grid: Grid) -> Grid:
         if grid[y][x] == Color.BLACK.value:
             if k == 0:
                 if grid[0][x+1] != Color.BLUE.value:
-                    grid = rotate_object_counter_clockwise(grid)
+                    grid = grid.anti_rotate()
             elif k == 1:
                 if grid[0][x-1] != Color.BLUE.value:
-                    grid = rotate_object_counter_clockwise(grid)
+                    grid = grid.anti_rotate()
             elif k == 2:
                 if grid[y-1][0] != Color.BLUE.value:
-                    grid = rotate_object_counter_clockwise(grid)
+                    grid = grid.anti_rotate()
             elif k == 3:
                 if grid[y-1][x-1] != Color.BLUE.value:
-                    grid =  rotate_object_counter_clockwise(grid)
+                    grid =  grid.anti_rotate()
             blue_at_the_top = grid[0][1] == Color.BLUE.value
             red_at_the_left = grid[1][0] == Color.RED.value
             # crop the knowledge border

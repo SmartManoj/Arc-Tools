@@ -4,7 +4,7 @@ import os
 from collections import deque
 from arc_tools import logger
 from arc_tools.constants import EIGHT_DIRECTIONS
-from arc_tools.grid import Color, Grid, SubGrid, copy_object, detect_objects, rotate_object, GridRegion, GridPoint, flip_horizontally, move_object, place_object, rotate_object_counter_clockwise
+from arc_tools.grid import Color, Grid, SubGrid, copy_object, detect_objects, GridRegion, GridPoint, flip_horizontally, move_object, place_object
 from arc_tools.plot import plot_grid, plot_grids
 
 # logger.setLevel(10)

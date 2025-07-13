@@ -1,6 +1,6 @@
 import json
 from arc_tools import logger
-from arc_tools.grid import Color, Grid, SubGrid, detect_objects, rotate_object, GridRegion, GridPoint, flip_horizontally, move_object
+from arc_tools.grid import Color, Grid, SubGrid, detect_objects, GridRegion, GridPoint, flip_horizontally, move_object
 from arc_tools.plot import plot_grids
 # logger.setLevel(10)
 

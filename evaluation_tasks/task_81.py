@@ -1,5 +1,5 @@
 from arc_tools import grid
-from arc_tools.grid import Grid, copy_object, detect_objects, Color, SubGrid, GridRegion, GridPoint, move_object, rotate_object
+from arc_tools.grid import Grid, copy_object, detect_objects, Color, SubGrid, GridRegion, GridPoint, move_object
 from arc_tools.plot import plot_grid, plot_grids
 from itertools import combinations
 from arc_tools.logger import logger
@@ -182,7 +182,7 @@ def fit_or_swap_fit(grid):
                 fit_valid, new_grid = move_and_check(grid, movable_obj, fixed_obj, move_point, fixed_obj_color)
                 if fit_valid:
                     break
-                movable_obj = rotate_object(movable_obj)
+                movable_obj = movable_obj.rotate()
         if not fit_valid:
             # Try swapping colors
             new_grid = initial_grid.copy()
@@ -202,7 +202,7 @@ def fit_or_swap_fit(grid):
                 fit_valid, new_grid = move_and_check(new_grid, movable_obj, fixed_obj, move_point, fixed_obj_color)
                 if fit_valid:
                     break
-                movable_obj = rotate_object(movable_obj)
+                movable_obj = movable_obj.rotate()
             # plot_grids([grid, new_grid], show=1, save_all=True)      
         initial_grid = new_grid.copy()
         # plot_grids([grid, movable_obj, fixed_obj, new_grid], show=1, save_all=True)

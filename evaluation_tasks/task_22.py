@@ -1,7 +1,7 @@
 import json
 import os
 from arc_tools import logger
-from arc_tools.grid import Color, Grid, SubGrid, copy_object, detect_objects, rotate_object, GridRegion, GridPoint, flip_horizontally, move_object, place_object, rotate_object_counter_clockwise
+from arc_tools.grid import Color, Grid, SubGrid, copy_object, detect_objects, GridRegion, GridPoint, flip_horizontally, move_object, place_object
 from arc_tools.plot import plot_grid, plot_grids
 import numpy as np
 # logger.setLevel(10)
@@ -44,23 +44,23 @@ def clean_the_room(grid: Grid):
         if shelf[0][1] == obj.color:  # Top side
             # Rotate to have only 2 dots on bottom
             while not cmp(obj, 'bottom'):
-                obj = rotate_object(obj)
+                obj = obj.rotate()
             vx = next(i for i, dot in enumerate(obj[-1]) if dot != grid.background_color) - 1
             place_object(obj, shelf.region.x1 - vx, shelf.region.y1 - obj.height, grid)
         elif shelf[1][-1] == obj.color:  # Right side
             # Rotate to have only 2 dots on left
             while not cmp(obj, 'left'):
-                obj = rotate_object(obj)
+                obj = obj.rotate()
             place_object(obj, shelf.region.x2 + 1, shelf.region.y1, grid, remove_object=False)
         elif shelf[1][0] == obj.color:  # Left side
             # Rotate to have only 2 dots on right
             while not cmp(obj, 'right'):
-                obj = rotate_object(obj)
+                obj = obj.rotate()
             place_object(obj, shelf.region.x1 - obj.width, shelf.region.y1, grid, remove_object=False)
         elif shelf[-1][1] == obj.color:  # Bottom side
             # Rotate to have only 2 dots on top
             while not cmp(obj, 'top'):
-                obj = rotate_object(obj)
+                obj = obj.rotate()
             vx = next(i for i, dot in enumerate(obj[0]) if dot != grid.background_color) - 1
             place_object(obj, shelf.region.x1 - vx, shelf.region.y2 + 1, grid)
     

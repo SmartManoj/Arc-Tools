@@ -1,5 +1,5 @@
 import json
-from arc_tools.grid import Grid, rotate_object, GridRegion, GridPoint, flip_horizontally
+from arc_tools.grid import Grid, GridRegion, GridPoint, flip_horizontally
 
 def check_subgrid(grid: Grid, full_grid: Grid) -> bool:
     for big_row in range(full_grid.height - grid.height + 1):
@@ -25,7 +25,7 @@ def extrapolation(grid: Grid) -> Grid:
     for _ in range(8):
         if check_subgrid(grid, full_grid):
             return full_grid
-        full_grid = rotate_object(full_grid)
+        full_grid = full_grid.rotate()
         if _ == 3:
             full_grid = flip_horizontally(full_grid)
         

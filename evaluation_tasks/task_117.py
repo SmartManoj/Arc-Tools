@@ -1,6 +1,6 @@
 from typing import Sequence
 from arc_tools import logger
-from arc_tools.grid import Grid, SubGrid, GridRegion, GridPoint, detect_objects, rotate_object
+from arc_tools.grid import Grid, SubGrid, GridRegion, GridPoint, detect_objects
 
 
 from datetime import datetime
@@ -162,7 +162,7 @@ def jigsaw_recursive(grid: Grid, pieces: list[SubGrid]) -> Grid | None:
                 result = jigsaw_recursive(new_grid, remaining_pieces)
                 if result is not None:
                     return result
-            piece = rotate_object(piece)
+            piece = piece.rotate()
 
     return None
 

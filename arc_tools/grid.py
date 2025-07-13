@@ -138,6 +138,30 @@ class Grid(SafeList):
     def __hash__(self) -> int: # type: ignore
         return hash((tuple(tuple(row) for row in self), self.background_color))
     
+    def rotate(self) -> 'Grid':
+        """
+        Rotates 90 degrees clockwise.
+        """
+        rows = self.height
+        cols = self.width
+        new_grid = [[self[rows-1-j][i] for j in range(rows)] for i in range(cols)]
+        if type(self) == SubGrid:
+            return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid, self.background_color), self.color)
+        else:
+            return Grid(new_grid, self.background_color)
+
+    def anti_rotate(self) -> 'Grid':
+        """
+        Rotate 90 degrees counter-clockwise.
+        """
+        rows = self.height
+        cols = self.width
+        new_grid = [[self[j][cols-1-i] for j in range(rows)] for i in range(cols)]
+        if type(self) == SubGrid:
+            return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid, self.background_color), self.color)
+        else:
+            return Grid(new_grid, self.background_color)
+
     def get(self, x: int, y: int) -> int:
         return self[y][x]
     
@@ -761,35 +785,7 @@ def flip_vertically(object: Grid) -> Grid:
     new_grid = [[object[j][cols-1-i] for i in range(cols)] for j in range(rows)]
     return Grid(new_grid)
 
-def rotate_object(object: Grid) -> Grid:
-    """
-    Rotate a object 90 degrees clockwise.
-    
-    Args:
-        object: The object to rotate
-        
-    Returns:
-        SubGrid: The rotated object
-    """
-    rows = object.height
-    cols = object.width
-    new_grid = [[object[rows-1-j][i] for j in range(rows)] for i in range(cols)]
-    if type(object) == SubGrid:
-        return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid, object.background_color), object.color)
-    else:
-        return Grid(new_grid, object.background_color)
 
-def rotate_object_counter_clockwise(object: Grid) -> Grid:
-    """
-    Rotate a object 90 degrees counter-clockwise.
-    """
-    rows = object.height
-    cols = object.width
-    new_grid = [[object[j][cols-1-i] for j in range(rows)] for i in range(cols)]
-    if type(object) == SubGrid:
-        return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(rows-1, cols-1)]), Grid(new_grid))
-    else:
-        return Grid(new_grid)
 
 if __name__ == "__main__":
     # Create a test grid
