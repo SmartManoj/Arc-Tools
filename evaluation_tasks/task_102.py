@@ -1,6 +1,4 @@
-from arc_tools import logger
-from arc_tools.grid import Grid, detect_objects, Color, move_object, place_object_on_new_grid, GridRegion, GridPoint, SubGrid
-from arc_tools.plot import plot_grids
+from arc_tools.grid import Grid, detect_objects, Color, GridRegion, GridPoint, SubGrid
 
 def compare_boxes(key_box, find_box):
     if key_box.region.x1 == find_box.region.x1 and key_box.region.y1 == find_box.region.y1:

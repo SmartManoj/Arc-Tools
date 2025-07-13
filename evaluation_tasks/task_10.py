@@ -1,8 +1,4 @@
-from collections import Counter
-from arc_tools import grid
-from arc_tools.grid import Grid, detect_objects, Color, SubGrid, GridRegion, GridPoint, move_object, Square
-from arc_tools.plot import plot_grid, plot_grids
-from arc_tools.logger import logger
+from arc_tools.grid import Grid, detect_objects, Square
 
 def just_walk(grid: Grid) -> Grid:
     '''

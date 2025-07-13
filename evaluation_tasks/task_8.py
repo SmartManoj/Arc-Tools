@@ -1,10 +1,7 @@
-from collections import Counter, deque
 from arc_tools.constants import CARDINAL_DIRECTIONS, ORDINAL_DIRECTIONS
-from arc_tools.grid import Grid, detect_objects, Color, SubGrid, GridRegion, GridPoint
-from arc_tools.plot import plot_grid, plot_grids
+from arc_tools.grid import Grid, detect_objects, Color, SubGrid, GridPoint
+from arc_tools.plot import plot_grid
 from arc_tools.logger import logger
-import logging
-import traceback
 # logger.setLevel(10)
 def get_outermost_corners(objects: list[SubGrid], input_grid: Grid, border_color: Color):
     """

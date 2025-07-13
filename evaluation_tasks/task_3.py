@@ -1,4 +1,4 @@
-from arc_tools.grid import Grid, detect_objects, Color, move_object, place_object_on_new_grid, GridRegion, GridPoint, SubGrid
+from arc_tools.grid import Grid, detect_objects, Color, place_object_on_new_grid, GridRegion, GridPoint, SubGrid
 
 def is_pluggable(list_1, list_2):
     '''

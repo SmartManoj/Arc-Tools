@@ -1,5 +1,5 @@
-from arc_tools.grid import Grid, Color
-from arc_tools.plot import plot_grid, plot_grids
+from arc_tools.grid import Grid
+from arc_tools.plot import plot_grid
 from task_4 import shoot_light
 
 def test_shoot_light():

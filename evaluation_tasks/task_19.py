@@ -1,7 +1,4 @@
-import json
-from arc_tools import logger
-from arc_tools.grid import Color, Grid, SubGrid, detect_objects, place_object_on_new_grid, GridRegion, GridPoint
-from arc_tools.plot import plot_grid, plot_grids
+from arc_tools.grid import Color, Grid, detect_objects, place_object_on_new_grid, GridRegion, GridPoint
 # logger.setLevel(10)
 
 

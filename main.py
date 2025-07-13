@@ -1,13 +1,9 @@
-from datetime import datetime
 import sys
-from arc_tools import grid
 from arc_tools.logger import logger
-from copy import deepcopy
-from itertools import combinations
 import os
 import json
-from arc_tools.grid import Grid, GridPoint, GridRegion, detect_objects
-from arc_tools.plot import plot_grid, plot_grids
+from arc_tools.grid import Grid
+from arc_tools.plot import plot_grids
 
 from train_tasks import *
 from evaluation_tasks.tasks import *
@@ -18,8 +14,6 @@ from arc_tools.grid import SubGrid # Add SubGrid import
 
 from typing import Sequence # Add typing imports
 
-from arc_tools.grid import Color
-from arc_tools.grid import move_object
 
 
 # Exception hook

@@ -1,6 +1,4 @@
-from collections import Counter
-from arc_tools.grid import Grid, copy_object, detect_objects, Color, SubGrid, GridRegion, GridPoint, move_object
-from arc_tools.plot import plot_grid, plot_grids
+from arc_tools.grid import Grid, copy_object, detect_objects, Color, SubGrid, GridRegion, GridPoint
 from arc_tools.logger import logger
 import math
 from sympy import symbols

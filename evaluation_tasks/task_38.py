@@ -1,10 +1,7 @@
 # optimize
 import os
-from collections import Counter
-from typing import Optional, Tuple, List
-from arc_tools.grid import Color, Grid, SubGrid, detect_objects, GridRegion, GridPoint, place_object_on_new_grid
-from arc_tools import logger
-from arc_tools.plot import plot_grids
+from typing import Optional, Tuple
+from arc_tools.grid import Grid, SubGrid, detect_objects, GridRegion, GridPoint, place_object_on_new_grid
 from arc_tools.utils import list_strip
 
 def find_matching_point(obj1: SubGrid, obj2: SubGrid, side: str, perfect_match: bool = True) -> Optional[Tuple[int, int]]:

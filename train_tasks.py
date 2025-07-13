@@ -1,6 +1,5 @@
 from arc_tools.grid import Color, copy_object
-from arc_tools.grid import Grid, GridPoint, GridRegion, SubGrid, detect_objects, move_object
-from arc_tools.plot import plot_grid
+from arc_tools.grid import Grid, GridPoint, GridRegion, SubGrid, detect_objects
 
 # 1 00576224 repeat_reverse_grid
 # 6 017c7c7b repeat_and_swap_color

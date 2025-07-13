@@ -1,7 +1,4 @@
-from collections import Counter
-from arc_tools import grid
-from arc_tools.grid import Grid, detect_objects, Color, SubGrid, GridRegion, GridPoint
-from arc_tools.plot import plot_grid, plot_grids
+from arc_tools.grid import Grid, detect_objects, Color
 from arc_tools.logger import logger
 
 

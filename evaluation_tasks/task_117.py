@@ -1,6 +1,5 @@
 from typing import Sequence
-from arc_tools import logger
-from arc_tools.grid import Grid, SubGrid, GridRegion, GridPoint, detect_objects
+from arc_tools.grid import Grid, SubGrid, detect_objects
 
 
 from datetime import datetime

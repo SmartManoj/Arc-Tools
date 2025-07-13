@@ -1,8 +1,4 @@
-import json
-from arc_tools import logger
-from arc_tools.grid import Color, Grid, SubGrid, copy_object, detect_objects, GridRegion, GridPoint, flip_horizontally, move_object, place_object
-from arc_tools.plot import plot_grid, plot_grids
-import numpy as np
+from arc_tools.grid import Color, Grid
 # logger.setLevel(10)
 
 def is_movable_down(grid: Grid, x: int, y: int):

@@ -1,7 +1,4 @@
-from arc_tools import grid
-from arc_tools.grid import Grid, copy_object, detect_objects, Color, SubGrid, GridRegion, GridPoint, move_object
-from arc_tools.plot import plot_grid, plot_grids
-from itertools import combinations
+from arc_tools.grid import copy_object, detect_objects, SubGrid, GridRegion, GridPoint
 from arc_tools.logger import logger
 def merge_objects(objects: list[SubGrid]):
     new_objects = []

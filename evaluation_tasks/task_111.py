@@ -1,5 +1,4 @@
 from collections import deque, defaultdict
-import json
 from arc_tools.extract_knowledge import extract_knowledge
 from arc_tools.grid import Grid
 

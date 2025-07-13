@@ -1,7 +1,6 @@
 from itertools import combinations
 from arc_tools.logger import logger
 from arc_tools.grid import Grid, GridPoint, detect_objects, SubGrid, copy_object
-from arc_tools.plot import plot_grids
 
 def calculate_offset(A1: GridPoint, A2: GridPoint): 
     # calculate offset between A1 and A2

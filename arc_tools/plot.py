@@ -1,4 +1,3 @@
-import json
 from matplotlib.backend_bases import MouseButton
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors

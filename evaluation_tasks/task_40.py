@@ -1,9 +1,6 @@
 # optimize
 import os
-from collections import Counter
-from arc_tools.grid import Color, Grid, SubGrid, detect_objects, GridRegion, GridPoint, place_object_on_new_grid, move_object
-from arc_tools import logger
-from arc_tools.plot import plot_grids
+from arc_tools.grid import Grid, detect_objects, GridPoint, place_object_on_new_grid
 
 def race(grid: Grid):
     '''

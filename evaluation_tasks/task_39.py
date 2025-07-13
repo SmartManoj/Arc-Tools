@@ -1,8 +1,5 @@
 import os
-from collections import Counter
-from arc_tools.grid import Color, Grid, SubGrid, detect_objects, GridRegion, GridPoint, place_object_on_new_grid
-from arc_tools import logger
-from arc_tools.plot import plot_grids
+from arc_tools.grid import Color, Grid, detect_objects
 
 def laser_gun(grid: Grid):
     '''

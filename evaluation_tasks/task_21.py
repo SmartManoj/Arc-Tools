@@ -1,9 +1,5 @@
-import json
 import os
-from arc_tools import logger
-from arc_tools.grid import Color, Grid, SubGrid, detect_objects, place_object_on_new_grid
-from arc_tools.plot import plot_grid, plot_grids
-import numpy as np
+from arc_tools.grid import Grid, SubGrid, detect_objects, place_object_on_new_grid
 # logger.setLevel(10)
 
 def is_hollow(obj: SubGrid) -> bool:

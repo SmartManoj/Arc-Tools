@@ -1,6 +1,5 @@
 
 from arc_tools.grid import Grid, GridPoint, GridRegion, SubGrid
-from arc_tools.plot import plot_grid, plot_grids
 
 def row_col_color_data(grid: Grid) -> Grid:
     """

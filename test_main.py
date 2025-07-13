@@ -3,8 +3,7 @@ import json
 
 d = [[0, 0, 0, 0, 0, 0, 0], [0, 8, 8, 8, 8, 8, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 6, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 6, 6, 6, 6, 6, 0], [0, 0, 0, 0, 0, 0, 0]]
 d = json.load(open("grid1.json"))
-from arc_tools.grid import Grid, detect_objects, GridRegion, GridPoint
-from arc_tools.plot import plot_grids
+from arc_tools.grid import Grid, detect_objects
 from main import merge_nearby_objects_as_square 
 d = Grid(d)
 for i in range(0,22):

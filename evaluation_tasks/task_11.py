@@ -1,8 +1,4 @@
-from collections import Counter
-from arc_tools import grid
-from arc_tools.grid import Grid, detect_objects, Color, SubGrid, GridRegion, GridPoint, move_object
-from arc_tools.plot import plot_grid, plot_grids
-from arc_tools.logger import logger
+from arc_tools.grid import Grid, detect_objects, Color, move_object
 
 def glue_it(grid: Grid) -> Grid:
     '''

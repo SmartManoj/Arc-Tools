@@ -1,8 +1,5 @@
 import os
-from collections import Counter
-from arc_tools.grid import Color, Grid, SubGrid, detect_objects, GridRegion, GridPoint, copy_object
-from arc_tools import logger
-from arc_tools.plot import plot_grids
+from arc_tools.grid import Grid, detect_objects, copy_object
 
 def align_the_stars(grid: Grid):
     '''

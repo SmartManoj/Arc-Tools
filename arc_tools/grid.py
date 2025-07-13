@@ -7,7 +7,6 @@ from copy import deepcopy
 from typing import Optional
 
 from arc_tools.constants import CARDINAL_DIRECTIONS, EIGHT_DIRECTIONS
-from arc_tools.plot import plot_grids
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,4 @@
 from arc_tools.grid import Grid, GridPoint, GridRegion, SubGrid
-from arc_tools.plot import plot_grid
 
 a = [
     [1, 2, 3, 4, 5],

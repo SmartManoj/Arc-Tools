@@ -1,8 +1,5 @@
-from arc_tools import grid
 from arc_tools.grid import Grid, detect_objects, Color, SubGrid, GridRegion, GridPoint
 from arc_tools.plot import plot_grid, plot_grids
-from itertools import combinations
-from arc_tools.logger import logger
 
 def find_nearby_two_dots(sgrid: SubGrid, parent_grid: Grid) -> SubGrid:
     """
