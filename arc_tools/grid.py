@@ -141,6 +141,21 @@ class Grid(SafeList):
     def __hash__(self) -> int: # type: ignore
         return hash((tuple(tuple(row) for row in self), self.background_color))
     
+    def is_hole(self, region: GridRegion):
+        logger.info(f"Checking if {region} is a hole")
+        for row in range(region.y1 - 1, region.y2 + 2):
+            for col in range(region.x1 - 1, region.x2 + 2):
+                # if edge not background color, then it is not a hole
+                if row == region.y1 - 1 or row == region.y2 + 1 or col == region.x1 - 1 or col == region.x2 + 1:
+                    if self[row][col] == self.background_color:
+                        logger.info(f"Edge {row},{col} is background color")
+                        return False
+                else:
+                    if self[row][col] != self.background_color:
+                        logger.info(f"Internal {row},{col} is not background color")
+                        return False
+        return True
+    
     def as_sub_grid(self):
         return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)]), self)
 
@@ -753,6 +768,8 @@ def move_object(object_to_move: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
     """
     Moves the object_to_move by (dx, dy) in the grid, extending the grid if necessary.
     """
+    if dx == 0 and dy == 0:
+        return object_to_move
     logger.debug(f"Moving object {object_to_move} by {dx}, {dy}")
     grid.remove_object(object_to_move, fill_color.value if fill_color else None)
     return copy_object(object_to_move, dx, dy, grid, extend_grid, silent=True)
@@ -837,7 +854,7 @@ if __name__ == "__main__":
         [1, 2],
         [3, 4],
     ], background_color=0)
-    sub_grid = SubGrid(GridRegion([GridPoint(1, 1), GridPoint(2, 2)]), test_grid)
+    sub_grid = SubGrid(GridRegion([GridPoint(0, 0), GridPoint(1, 1)]), test_grid)
     test_grid2 = test_grid.flip_horizontally()
     test_grid.display()
     print('-' * 10)

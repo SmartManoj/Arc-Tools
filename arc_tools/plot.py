@@ -131,11 +131,11 @@ def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titl
     
     def on_click(event):
         if event.button is MouseButton.LEFT:
-            if event.xdata >= -0.5 and event.ydata >= -0.5:
+            if hasattr(event, 'xdata') and hasattr(event, 'ydata') and event.xdata >= -0.5 and event.ydata >= -0.5:
                 col = int(event.xdata + 0.5)
                 row = int(event.ydata + 0.5)
-            copy_msg = f'(row,col) = ({row},{col})'
-            pyperclip.copy(copy_msg)
+                copy_msg = f'(row,col) = ({row},{col})'
+                pyperclip.copy(copy_msg)
     plt.connect('button_press_event', on_click)
     if show and not disable_show and not is_agent_terminal:
         plt.show(block=1)
