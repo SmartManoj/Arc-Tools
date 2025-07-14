@@ -131,7 +131,7 @@ def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titl
     
     def on_click(event):
         if event.button is MouseButton.LEFT:
-            if hasattr(event, 'xdata') and hasattr(event, 'ydata') and event.xdata >= -0.5 and event.ydata >= -0.5:
+            if event.xdata and event.xdata >= -0.5 and event.ydata and event.ydata >= -0.5:
                 col = int(event.xdata + 0.5)
                 row = int(event.ydata + 0.5)
                 copy_msg = f'(row,col) = ({row},{col})'

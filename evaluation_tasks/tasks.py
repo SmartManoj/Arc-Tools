@@ -52,6 +52,7 @@ from task_47 import parallel_universe
 from task_48 import role_model
 from task_49 import majority
 from task_50 import magnetic_current
+from task_51 import land_the_ship
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit

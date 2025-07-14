@@ -64,8 +64,8 @@ def debug_output(grid, expected_output, output, window_title='result'):
     # print which cells are different
     for row in range(len(expected_output)):
         for col in range(len(expected_output[0])):
-            if (e := expected_output[row][col]) != (o := output[row][col]):
-                logger.info(f"Cell at {row = }, {col = } is different: {e} != {o}")
+            if (expected_value := expected_output[row][col]) != (actual_value := output[row][col]):
+                logger.info(f"At {row =}, {col = }, {expected_value = } != {actual_value = }")
     plot_grids([grid, expected_output, output], show=1, titles=["Input", "Expected output", "Actual output"], window_title=window_title)
 
 def find_task(grids, expected_outputs, start_train_task_id=1):
@@ -97,8 +97,8 @@ def solve_task(data):
     start_train_task_id = 1
     start_test_task_id = 1
     actual_task_name = None
-    start_train_task_id = 1
-    start_test_task_id = 1
+    # start_train_task_id = 2
+    # start_test_task_id = 1
     num_train_tasks = len(data['train'])
     num_test_tasks = len(data['test'])
     logger.info(f"Number of train tasks: {num_train_tasks}, Number of test tasks: {num_test_tasks}")

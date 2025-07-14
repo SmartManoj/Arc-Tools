@@ -7,6 +7,7 @@ from typing import Optional
 
 from arc_tools.constants import CARDINAL_DIRECTIONS, EIGHT_DIRECTIONS
 from arc_tools.logger import logger
+from arc_tools.plot import plot_grids
 
 class MyEnum(Enum):
     def __repr__(self):
@@ -26,10 +27,10 @@ class Color(MyEnum):
     MAROON = 9
 
 class BorderSide(MyEnum):
-    LEFT = 0
-    RIGHT = 1
-    TOP = 2
-    BOTTOM = 3
+    LEFT = 'left'
+    RIGHT = 'right'
+    TOP = 'top'
+    BOTTOM = 'bottom'
 
 class GridPoint:
     def __init__(self, x, y):
@@ -219,7 +220,6 @@ class Grid(SafeList):
         cols = self.width
         new_grid = [self[rows-1-j] for j in range(rows)]
         if type(self) == SubGrid:
-            logger.info(f'{self.background_color = }')
             g = Grid(new_grid, self.background_color)
             return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(cols-1, rows-1)]), g, self.color)
         else:
@@ -252,6 +252,16 @@ class Grid(SafeList):
     def get_right_side(self):
         return [self[i][self.width - 1] for i in range(self.height)]
     
+    def get_side_data(self, side: BorderSide):
+        if side == BorderSide.TOP:
+            return self.get_top_side()
+        elif side == BorderSide.BOTTOM:
+            return self.get_bottom_side()
+        elif side == BorderSide.LEFT:
+            return self.get_left_side()
+        elif side == BorderSide.RIGHT:
+            return self.get_right_side()
+
     @property
     def area(self):
         return self.width * self.height
@@ -277,7 +287,7 @@ class Grid(SafeList):
                     return False
                 for j in range(len(self[i])):
                     if self[i][j] != other[i][j]:
-                        logger.info(f"Mismatch at index {i}/{j}: Actual: {self[i][j]}, Expected: {other[i][j]}")
+                        logger.info(f"Mismatch at index row {i}, col {j}: Actual: {self[i][j]}, Expected: {other[i][j]}")
                         return False
         return True
     
@@ -693,7 +703,11 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
     objects = []
-    
+    is_subgrid = type(grid) == SubGrid
+    x_offset = grid.region.x1 if is_subgrid else 0
+    y_offset = grid.region.y1 if is_subgrid else 0
+    if is_subgrid:
+        grid = grid.parent_grid
     def compare(a):
         val = a != grid.background_color
         if ignore_color:
@@ -732,6 +746,11 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                                 break
                             visited[nr, nc] = True
                             q.append((nr, nc))
+                
+                if is_subgrid:
+                    # add x1 and y1 to current_object_points
+                    current_object_points = [GridPoint(p.x + x_offset, p.y + y_offset) for p in current_object_points]
+                    
                 # filter only the corner points
                 current_object_corner_points = [
                     p for p in current_object_points

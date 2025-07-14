@@ -124,7 +124,6 @@ def check_fit(grid: Grid) -> Grid:
     objects.remove(centre_object)
     
     
-    logger.info("New count of objects: %d", len(objects))
     # Initial call to the recursive function with an empty list for locked_dots
     output, is_fitted = check_fit_recursive(output, objects, [], dot_value)
     if is_fitted:
