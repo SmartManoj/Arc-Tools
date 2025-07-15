@@ -139,6 +139,35 @@ class Grid(SafeList):
         self.width = len(self[0])
         self.region = GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)])
     
+    def shrink(self):
+        # remove all empty rows and columns
+        starting_row_point = 0
+        for row_idx in range(self.height):
+            if all(cell == self.background_color for cell in self[row_idx]):
+                starting_row_point += 1
+            else:
+                break
+        ending_row_point = self.height - 1
+        for row_idx in reversed(range(self.height)):
+            if all(cell == self.background_color for cell in self[row_idx]):
+                ending_row_point -= 1
+            else:
+                break
+        starting_col_point = 0
+        for col_idx in range(self.width):
+            if all(row[col_idx] == self.background_color for row in self):
+                starting_col_point += 1 
+            else:
+                break
+        ending_col_point = self.width - 1
+        for col_idx in reversed(range(self.width)):
+            if all(row[col_idx] == self.background_color for row in self):
+                ending_col_point -= 1
+            else:
+                break
+        data = [row[starting_col_point:ending_col_point + 1] for row in self[starting_row_point:ending_row_point + 1]]
+        return Grid(data, self.background_color)
+    
     def __hash__(self) -> int: # type: ignore
         return hash((tuple(tuple(row) for row in self), self.background_color))
     
@@ -278,16 +307,16 @@ class Grid(SafeList):
     
     def compare(self, other):
         if len(self) != len(other):
-            logger.info(f"Row length mismatch: Actual: {len(self)}, Expected: {len(other)}")
+            logger.info(f"Row length mismatch: Expected: {len(self)}, Actual: {len(other)}")
             return False
         for i in range(len(self)):
             if self[i] != other[i]:
                 if len(self[i]) != len(other[i]):
-                    logger.info(f"Column length mismatch for row {i+1}: Actual: {len(self[i])}, Expected: {len(other[i])}")
+                    logger.info(f"Column length mismatch for row {i+1}: Expected: {len(self[i])}, Actual: {len(other[i])}")
                     return False
                 for j in range(len(self[i])):
                     if self[i][j] != other[i][j]:
-                        logger.info(f"Mismatch at index row {i}, col {j}: Actual: {self[i][j]}, Expected: {other[i][j]}")
+                        logger.info(f"Mismatch at index row {i}, col {j}: Expected: {self[i][j]}, Actual: {other[i][j]}")
                         return False
         return True
     
@@ -519,11 +548,33 @@ class SubGrid(Grid):
         center_y = (self.region.y1 + self.region.y2) // 2
         self.center_color = self.parent_grid[center_y][center_x]
         
-    def expand(self, n: int):
+    def expand(self, n: int = None):
+        if n:
+            x1 = x2 = y1 = y2 = n
+        else:
+            x1 = x2 = y1 = y2 = 0
+            # check for x1
+            for col in reversed(range(self.region.x1)):
+                if any(self.parent_grid[row][col] != self.background_color for row in range(self.region.y1, self.region.y2 + 1)):
+                    x1 = self.region.x1 - col - 1
+                    break
+            for col in range(self.region.x2 + 1, self.parent_grid.width):
+                if any(self.parent_grid[row][col] != self.background_color for row in range(self.region.y1, self.region.y2 + 1)):
+                    x2 = col - self.region.x2 - 1
+                    break
+            for row in reversed(range(self.region.y1)):
+                if any(self.parent_grid[row][col] != self.background_color for col in range(self.region.x1, self.region.x2 + 1)):
+                    y1 = self.region.y1 - row - 1
+                    break   
+            for row in range(self.region.y2 + 1, self.parent_grid.height):
+                if any(self.parent_grid[row][col] != self.background_color for col in range(self.region.x1, self.region.x2 + 1)):
+                    y2 = row - self.region.y2 - 1
+                    break
+            
         return SubGrid(GridRegion([
-            GridPoint(max(self.region.x1 - n, 0), max(self.region.y1 - n, 0)),
-            GridPoint(min(self.region.x2 + n, self.parent_grid.width - 1), min(self.region.y2 + n, self.parent_grid.height - 1))
-        ]), self.parent_grid)
+            GridPoint(max(self.region.x1 - x1, 0), max(self.region.y1 - y1, 0)),
+            GridPoint(min(self.region.x2 + x2, self.parent_grid.width - 1), min(self.region.y2 + y2, self.parent_grid.height - 1))
+        ]), self.parent_grid, self.color)
     
     def get_border_sides(self, point: GridPoint):
         sides = []
@@ -693,7 +744,7 @@ class Shape:
     pass
 
 class Square(Shape):
-    def __init__(self, size: int):
+    def __init__(self, size: int | None = None):
         self.size = size
         
         
@@ -722,7 +773,7 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
         for c in range(cols):
             if point:
                 r, c = point.y, point.x
-            current_color = grid_np[r, c]
+            current_color = grid[r][c]
             if compare(current_color) and not visited[r, c]:
                 # Start BFS for a new object
                 current_object_points = []
