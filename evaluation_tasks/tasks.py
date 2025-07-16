@@ -55,6 +55,7 @@ from task_50 import magnetic_current
 from task_51 import land_the_ship
 from task_52 import smart_rotate
 from task_53 import army
+from task_54 import map_merge
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
