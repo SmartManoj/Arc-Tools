@@ -83,7 +83,6 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
             if not expected_output.compare(output):
                 if grid.compare(output):
                     logger.info(f"Output is still the same as the input - No changes, idiot.")
-                    exit()
                 debug_output(grid, expected_output, output, f'train_{task_id}_result')
                 if actual_task_name:
                     raise Exception(f'Train task {task_id} failed')
