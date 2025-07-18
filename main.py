@@ -37,7 +37,6 @@ sys.excepthook = handle_exception
 
 if 0:
     normal_task_fns = [
-            count_hollows_task,
             check_fit,
             move_object_without_collision,
             repeat_reverse_grid,

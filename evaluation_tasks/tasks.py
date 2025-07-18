@@ -63,7 +63,7 @@ from task_87 import dot_to_object
 from task_90 import move_object_without_collision
 from task_99 import check_fit
 from task_102 import highlight_the_box
-from task_111 import count_hollows_task
+from task_111 import hole_color
 from task_117 import jigsaw_puzzle
 from task_118 import row_col_color_data
 
