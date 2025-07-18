@@ -7,7 +7,8 @@ Visualize after every change.
 Replace task_n with the current opened file name.
 Don't finish until you solve the task ("Test task passed" should be printerd).
 ---
-
+Data Path: "../ARC-AGI-2/data/evaluation/{task_hash}.json"
+---
 Don't hard code expected values.
 
 Don't run the following command.

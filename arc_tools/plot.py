@@ -99,7 +99,7 @@ def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=T
         plt.close()
 
 plot_grids_count = 0
-def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titles=None, window_title=None):
+def plot_grids(grids, name=None, show=1, save_all=False, titles=None):
     if len(grids) == 0:
         print("No grids to plot")
         return
@@ -108,14 +108,11 @@ def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titl
     fig, axs = plt.subplots(1, len(grids), figsize=(10, 5 * len(grids)))
     fig.patch.set_facecolor('black')  # Set figure background to black
     
-    # Set window title
-    window_title = window_title or title or name
-    fig.canvas.manager.set_window_title(window_title)
     
     if len(grids) == 1:
         axs = [axs]  # Make it iterable for single grid case
     for i, grid in enumerate(grids):
-        current_title = titles[i] if titles and len(titles) > i else title
+        current_title = titles[i] if titles and len(titles) > i else f'plot_{i+1}'
         current_ax = axs[i]
         plot_grid(grid, ax=current_ax, close=False, save=False, title=current_title)
     
@@ -123,11 +120,17 @@ def plot_grids(grids, name="grids.png", show=1, save_all=False, title=None, titl
     plt.tight_layout(pad=2.0)
     
     # Save before showing
+    if not name:
+        name = "grids.png"
     if name == "grids.png" and save_all:
         plot_grids_count += 1
         name = f"grids_{plot_grids_count}.png"
-    name = f'evaluation_tasks/{os.environ.get("initial_file", "main")}_{name}'
-    plt.savefig(name, facecolor='black', edgecolor='white', dpi=150, bbox_inches='tight', pad_inches=0.2)
+    prefix = os.environ.get("initial_file", "main")
+    name = f'{prefix}_{name}'
+    # Set window title
+    fig.canvas.manager.set_window_title(name)
+    
+    plt.savefig(f'evaluation_tasks/{name}', facecolor='black', edgecolor='white', dpi=150, bbox_inches='tight', pad_inches=0.2)
     
     def on_click(event):
         if event.button is MouseButton.LEFT:
