@@ -23,7 +23,7 @@ class Color(MyEnum):
     LIGHT_GRAY = 5
     MAGENTA = 6
     ORANGE = 7
-    LIGHTBLUE = 8
+    LIGHT_BLUE = 8
     MAROON = 9
 
 class BorderSide(MyEnum):

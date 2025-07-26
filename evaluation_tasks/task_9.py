@@ -16,9 +16,9 @@ def highlight_plus(grid: Grid) -> Grid:
         for x in range(grid.width):
             if grid[y][x] == Color.YELLOW.value:
                 if is_plus(x,y,grid):
-                    grid[y][x] = Color.LIGHTBLUE.value
+                    grid[y][x] = Color.LIGHT_BLUE.value
                     for dx,dy in plus_pos:
-                        grid[y+dy][x+dx] = Color.LIGHTBLUE.value
+                        grid[y+dy][x+dx] = Color.LIGHT_BLUE.value
     return grid
 
 if __name__ == "__main__":

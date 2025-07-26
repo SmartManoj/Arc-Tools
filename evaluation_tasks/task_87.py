@@ -11,7 +11,7 @@ def find_nearby_two_dots(sgrid: SubGrid, parent_grid: Grid) -> SubGrid:
     # fill background color on corners of the expanded grid
     expanded_grid = expanded_grid.clear_corners(grid_size=2, relative_to=sgrid)
     plot_grid(expanded_grid, show=0, save_all=True)
-    objects = detect_objects(expanded_grid, ignore_color=Color.LIGHTBLUE)
+    objects = detect_objects(expanded_grid, ignore_color=Color.LIGHT_BLUE)
     plot_grids(objects, show=0, save_all=True)
     return [obj for obj in objects if obj.get_total_dots() == 2][0]
     
@@ -26,7 +26,7 @@ def dot_to_object(grid: Grid) -> Grid:
     replace dots with the object using the color replacement map (don't replace already replaced dots).
     remove the key object and the color replacement map from the grid.
     """
-    objects = detect_objects(grid, required_color=Color.LIGHTBLUE)
+    objects = detect_objects(grid, required_color=Color.LIGHT_BLUE)
     for obj in objects[::-1]:
         if len(obj.get_unique_values()) != 1:
             # split the object vertically if height > width
@@ -36,9 +36,9 @@ def dot_to_object(grid: Grid) -> Grid:
                 center_y = obj.region.y2
                 region1 = GridRegion([GridPoint(obj.region.x1, obj.region.y1), GridPoint(center_x, obj.region.y2)])
                 region2 = GridRegion([GridPoint(center_x + 1, obj.region.y1), GridPoint(obj.region.x2, obj.region.y2)])
-                obj1 = detect_objects(SubGrid(region1, grid).get_full_grid(), required_color=Color.LIGHTBLUE)[0]
+                obj1 = detect_objects(SubGrid(region1, grid).get_full_grid(), required_color=Color.LIGHT_BLUE)[0]
                 obj1 = SubGrid(obj1.region, grid)
-                obj2 = detect_objects(SubGrid(region2, grid).get_full_grid(), required_color=Color.LIGHTBLUE)[0]
+                obj2 = detect_objects(SubGrid(region2, grid).get_full_grid(), required_color=Color.LIGHT_BLUE)[0]
                 obj2 = SubGrid(obj2.region, grid)
                 objects.append(obj1)
                 objects.append(obj2)
@@ -49,9 +49,9 @@ def dot_to_object(grid: Grid) -> Grid:
                 center_y = obj.region.height // 2 - 1
                 region1 = GridRegion([GridPoint(obj.region.x1, obj.region.y1), GridPoint(obj.region.x2, center_y)])
                 region2 = GridRegion([GridPoint(obj.region.x1, center_y + 1), GridPoint(obj.region.x2, obj.region.y2)])
-                obj1 = detect_objects(SubGrid(region1, grid).get_full_grid(), required_color=Color.LIGHTBLUE)[0]
+                obj1 = detect_objects(SubGrid(region1, grid).get_full_grid(), required_color=Color.LIGHT_BLUE)[0]
                 obj1 = SubGrid(obj1.region, grid)
-                obj2 = detect_objects(SubGrid(region2, grid).get_full_grid(), required_color=Color.LIGHTBLUE)[0]
+                obj2 = detect_objects(SubGrid(region2, grid).get_full_grid(), required_color=Color.LIGHT_BLUE)[0]
                 obj2 = SubGrid(obj2.region, grid)
                 objects.append(obj1)
                 objects.append(obj2)
@@ -70,7 +70,7 @@ def dot_to_object(grid: Grid) -> Grid:
             dot_color, object_color = first_value, second_value
         else:
             dot_color, object_color = second_value, first_value
-        obj = obj.replace_color(Color.LIGHTBLUE.value, object_color)
+        obj = obj.replace_color(Color.LIGHT_BLUE.value, object_color)
         dx, dy = obj.region.x1 - color_replacement_map.region.x1  , obj.region.y1 - color_replacement_map.region.y1
         # move one step forward towards the object
         # if obj is above, move up

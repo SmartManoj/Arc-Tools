@@ -5,7 +5,7 @@ def cropped_reflection_symmetry(grid: Grid) -> Grid:
     Fill the largest blue object with the equivalent symmetry region.
     This operates on a 30x30 grid (cropped from 32x32).
     '''
-    blue_objects = detect_objects(grid, required_color=Color.LIGHTBLUE)
+    blue_objects = detect_objects(grid, required_color=Color.LIGHT_BLUE)
     blue_objects.sort(key=lambda x: x.width * x.height, reverse=True)
     blue_object_region = blue_objects[0].region
 
@@ -20,7 +20,7 @@ def cropped_reflection_symmetry(grid: Grid) -> Grid:
                 (31 - y, x), 
                 (31 - y, 31 - x), 
             ]:
-                if 0 <= new_x < grid.width and 0 <= new_y < grid.height and grid[new_y][new_x] != Color.LIGHTBLUE.value:
+                if 0 <= new_x < grid.width and 0 <= new_y < grid.height and grid[new_y][new_x] != Color.LIGHT_BLUE.value:
                     grid[y][x] = grid[new_y][new_x]
                     break
     return SubGrid(blue_object_region, grid)

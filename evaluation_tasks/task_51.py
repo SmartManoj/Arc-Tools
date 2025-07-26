@@ -6,10 +6,10 @@ from arc_tools.plot import plot_grids
 def land_the_ship(grid: Grid):
     '''
     maroon object is the docker.
-    lightblue object is the ship.
+    LIGHT_BLUE object is the ship.
     '''
     # Create a copy to work with
-    ship_color = Color.LIGHTBLUE.value
+    ship_color = Color.LIGHT_BLUE.value
     objects = detect_objects(grid)
     dockers = []
     walls = []

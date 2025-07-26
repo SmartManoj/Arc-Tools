@@ -9,7 +9,7 @@ def move_object_without_collision(grid: Grid) -> Grid:
     '''
     global show_count
     objects = detect_objects(grid, required_object = Square(5))
-    blue_objects = [obj for obj in objects if obj[0][0]==Color.LIGHTBLUE.value]
+    blue_objects = [obj for obj in objects if obj[0][0]==Color.LIGHT_BLUE.value]
     blue_objects.sort(key=lambda x: x.region.x1)
     red_objects = [obj for obj in objects if obj[0][0]==Color.RED.value]
     red_objects.sort(key=lambda x: x.region.x1, reverse=True)
