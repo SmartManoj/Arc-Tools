@@ -25,26 +25,12 @@ def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=T
         logger.debug(f"Grid is empty")
         return
     # Define colors
-    colors = {
-    0: 'black',
-    1: 'blue',
-    2: 'red',
-    3: 'green',
-    4: 'yellow',
-    5: 'lightgray',
-    6: 'magenta',
-    7: 'orange',
-    8: 'lightblue',
-    9: 'maroon',
-
-    }
+    colors = ['#000000', '#0074D9','#FF4136','#2ECC40','#FFDC00',
+     '#AAAAAA', '#F012BE', '#FF851B', '#7FDBFF', '#870C25']
     norm = mcolors.BoundaryNorm(boundaries=range(len(colors)+1), ncolors=len(colors))
 
     # Create a colormap
-    cmap = mcolors.ListedColormap([colors[i] for i in sorted(colors.keys())])
-    cmap = mcolors.ListedColormap(
-    ['#000000', '#0074D9','#FF4136','#2ECC40','#FFDC00',
-     '#AAAAAA', '#F012BE', '#FF851B', '#7FDBFF', '#870C25'])
+    cmap = mcolors.ListedColormap(colors)
 
     # Plot
     if ax is None:
