@@ -20,7 +20,7 @@ class Color(MyEnum):
     RED = 2
     GREEN = 3
     YELLOW = 4
-    LIGHTGRAY = 5
+    LIGHT_GRAY = 5
     MAGENTA = 6
     ORANGE = 7
     LIGHTBLUE = 8

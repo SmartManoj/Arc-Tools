@@ -57,7 +57,7 @@ def grow_and_crop(grid: Grid) -> Grid:
     then crop the grid to the size of the L shapes.
     '''
     # Detect objects in the grid
-    l_shapes = detect_objects(grid, required_color=Color.LIGHTGRAY)
+    l_shapes = detect_objects(grid, required_color=Color.LIGHT_GRAY)
     cropped_region = GridRegion([
         GridPoint(l_shapes[0].region.x1, l_shapes[0].region.y1),
         GridPoint(l_shapes[1].region.x2, l_shapes[1].region.y2)

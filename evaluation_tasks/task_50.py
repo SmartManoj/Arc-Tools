@@ -17,10 +17,10 @@ def magnetic_current(grid: Grid):
         Modified grid with objects moved and magnetic field effects applied
     '''
     # result = grid.copy()
-    objects = detect_objects(grid, ignore_color=Color.LIGHTGRAY)
+    objects = detect_objects(grid, ignore_color=Color.LIGHT_GRAY)
     # find gray vertical divider line
     for c in range(grid.width):
-        if all(grid[r][c] == Color.LIGHTGRAY.value for r in range(grid.height)):
+        if all(grid[r][c] == Color.LIGHT_GRAY.value for r in range(grid.height)):
             divider_col = c
             break
     # move all objects to the left of the divider line
