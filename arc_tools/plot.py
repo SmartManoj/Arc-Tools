@@ -67,7 +67,9 @@ def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=T
     else:
         plt.title(title or name, color='white', fontsize=12, pad=10)
     if save:
-        name = f'evaluation_tasks/{os.environ.get("initial_file", "main")}_{name}'
+        initial_file = os.environ.get("initial_file")
+        if initial_file:
+            name = f'evaluation_tasks/{initial_file}_{name}'
         plt.savefig(name, facecolor='black', edgecolor='white', dpi=150, bbox_inches='tight', pad_inches=0.2)
     def format_coord(x, y):
         if x >= -0.5 and y >= -0.5:
@@ -116,7 +118,10 @@ def plot_grids(grids, name=None, show=1, save_all=False, titles=None):
     # Set window title
     fig.canvas.manager.set_window_title(name)
     
-    plt.savefig(f'evaluation_tasks/{name}', facecolor='black', edgecolor='white', dpi=150, bbox_inches='tight', pad_inches=0.2)
+    initial_file = os.environ.get("initial_file")
+    if initial_file:
+        name = f'evaluation_tasks/{name}'
+    plt.savefig(name, facecolor='black', edgecolor='white', dpi=150, bbox_inches='tight', pad_inches=0.2)
     
     def on_click(event):
         if event.button is MouseButton.LEFT:
