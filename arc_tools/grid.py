@@ -501,9 +501,10 @@ class Grid(SafeList):
         return self 
     
     def display(self):
+        max_digits = len(str(max(self.get_unique_values())))
         for row in self:
             for col in row:
-                print(col, end=" ")
+                print(f"{col:>{max_digits}}", end=" ")
             print()
 
 class SubGrid(Grid):
