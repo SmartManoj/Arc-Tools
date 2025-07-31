@@ -14,7 +14,7 @@ def remove_pngs():
 plot_grid_count = 0
 disable_show = os.environ.get("DISABLE_SHOW", "0").lower() in ["true", "1"]
 is_agent_terminal = (os.environ.get("IS_AGENT_TERMINAL", '') or os.environ.get("COMPOSER_NO_INTERACTION", '').lower() in ["true", "1"])
-
+IS_ARC_AGI_3 = True
 
 def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=True, save_all=False, title=None):
     global plot_grid_count
@@ -25,8 +25,10 @@ def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=T
         logger.debug(f"Grid is empty")
         return
     # Define colors
-    colors = ['#000000', '#0074D9','#FF4136','#2ECC40','#FFDC00',
-     '#AAAAAA', '#F012BE', '#FF851B', '#7FDBFF', '#870C25']
+    if IS_ARC_AGI_3:
+        colors = ['#FFFFFF', '#CCCCCC', '#999999', '#666666', '#333333', '#000000', '#E53AA3', '#FF7BCC', '#F93C31', '#1E93FF', '#88D8F1', '#FFDC00', '#FF851B', '#921231', '#4FCC30', '#A356D6']
+    else:
+        colors = ['#000000', '#0074D9','#FF4136','#2ECC40','#FFDC00', '#AAAAAA', '#F012BE', '#FF851B', '#7FDBFF', '#870C25']
     norm = mcolors.BoundaryNorm(boundaries=range(len(colors)+1), ncolors=len(colors))
 
     # Create a colormap

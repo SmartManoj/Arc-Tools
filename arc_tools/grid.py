@@ -585,7 +585,7 @@ class Grid(SafeList):
         return self 
     
     def display(self):
-        max_digits = len(str(max(self.get_unique_values())))
+        max_digits = len(str(max(self.get_unique_values(), default=0)))
         for row in self:
             for col in row:
                 print(f"{col:>{max_digits}}", end=" ")
