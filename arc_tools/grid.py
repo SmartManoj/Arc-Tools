@@ -145,7 +145,7 @@ class Grid(SafeList):
         surrounding_cells = [self[row + dy][col + dx] for dx, dy in EIGHT_DIRECTIONS]
         return (sum(cell in [current_color, []] for cell in surrounding_cells) <= 3 and sum(cell in [current_color, []] for cell in cardinal_cells) <= 1) or all(cell != current_color for cell in surrounding_cells)
 
-    def shrink(self):
+    def strip(self):
         # remove all empty rows and columns
         starting_row_point = 0
         for row_idx in range(self.height):

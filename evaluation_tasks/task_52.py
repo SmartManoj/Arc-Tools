@@ -59,7 +59,7 @@ def smart_rotate(grid: Grid):
     # remove it
     for obj in rotation_map_objects:
         grid.remove_object(obj)
-    grid = grid.shrink()
+    grid = grid.strip()
     objects = extract_frames(grid)
     rotation_map = {obj.color: obj.get_total_dots() for obj in  rotation_map_objects}
     for obj in objects:
@@ -73,7 +73,7 @@ def smart_rotate(grid: Grid):
         place_object_on_new_grid(obj, x1, y1, grid)
         # plot_grids([grid, obj])
         
-    return grid.shrink()
+    return grid.strip()
 
 if __name__ == "__main__":
     os.environ['initial_file'] = os.path.splitext(os.path.basename(__file__))[0]
