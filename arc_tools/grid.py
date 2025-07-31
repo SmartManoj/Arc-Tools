@@ -186,6 +186,10 @@ class Grid(SafeList):
         
         return Grid(shrunk, self.background_color)
 
+    
+    def flatten_list(self):
+        return [self[i][j] for i in range(self.height) for j in range(self.width)]
+    
     def shrink(self, factor = None):
         """Find the maximum factor that can be used to shrink the grid by detecting pattern boundaries."""
         if factor:
