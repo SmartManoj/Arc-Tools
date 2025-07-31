@@ -26,6 +26,26 @@ class Color(MyEnum):
     LIGHT_BLUE = 8
     MAROON = 9
 
+
+class FrameColor(MyEnum):
+    WHITE = 0
+    LIGHT_GRAY = 1
+    GRAY = 2
+    DARK_GRAY = 3
+    CHARCOAL = 4
+    BLACK = 5
+    MAGENTA = 6
+    PINK = 7
+    RED = 8
+    BLUE = 9
+    SKY_BLUE = 10
+    YELLOW = 11
+    ORANGE = 12
+    MAROON = 13
+    GREEN = 14
+    PURPLE = 15
+
+
 class BorderSide(MyEnum):
     LEFT = 'left'
     RIGHT = 'right'
