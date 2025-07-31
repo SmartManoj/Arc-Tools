@@ -930,13 +930,16 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                     obj = SubGrid(region, grid, obj_color, points=current_object_points)
                     if isinstance(required_object, Square):
                         size = required_object.size
+                        if not size:
+                            size = obj.height
                         if obj.height == size and obj.width == size:
                             objects.append(obj)
                         else:
                             new_objects = split_into_square_boxes(obj.get_full_grid(), size, obj_color)
                             logger.debug(f"Found {len(new_objects)} square boxes")
                             for new_obj in new_objects:
-                                objects.append(new_obj)
+                                if new_obj.height == size and new_obj.width == size:
+                                    objects.append(new_obj)
                     else:
                         objects.append(obj)
                     if point:
