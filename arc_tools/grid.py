@@ -827,7 +827,7 @@ def split_into_square_boxes(grid: Grid, size: int, obj_color: int | None = None)
                 regions.append(GridRegion([start_point, end_point]))
                 for dr in range(size):
                     for dc in range(size):
-                        grid[r + dr][c + dc] = 0
+                        grid[r + dr][c + dc] = grid.background_color
 
     return [SubGrid(region, grid, obj_color) for region in regions]
 
