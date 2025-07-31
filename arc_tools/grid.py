@@ -144,6 +144,86 @@ class Grid(SafeList):
         cardinal_cells = [self[row + dy][col + dx] for dx, dy in CARDINAL_DIRECTIONS]
         surrounding_cells = [self[row + dy][col + dx] for dx, dy in EIGHT_DIRECTIONS]
         return (sum(cell in [current_color, []] for cell in surrounding_cells) <= 3 and sum(cell in [current_color, []] for cell in cardinal_cells) <= 1) or all(cell != current_color for cell in surrounding_cells)
+    
+    def _shrink(self, factor):
+        """Shrink a grid by the given factor while maintaining pattern structure."""
+        if factor <= 1:
+            return self
+        
+        rows = len(self)
+        cols = len(self[0]) if self else 0
+        
+        new_rows = rows // factor
+        new_cols = cols // factor
+        
+        shrunk = []
+        for i in range(new_rows):
+            row = []
+            for j in range(new_cols):
+                # Take the most common value in the factor x factor block
+                values = []
+                block = []
+                start_row = i * factor
+                start_col = j * factor
+                for di in range(factor):
+                    block_row = []
+                    for dj in range(factor):
+                        if start_row + di < rows and start_col + dj < cols:
+                            value = self[start_row + di][start_col + dj]
+                            values.append(value)
+                            block_row.append(value)
+                    if block_row:
+                        block.append(block_row)
+                
+                # Check if all values in the block are the same
+                if values:
+                    if len(set(values)) != 1:
+                        raise ValueError(f"Region ({start_col},{start_row}) to ({start_col+factor-1},{start_row+factor-1}) has different values:\n{block}")
+                    row.append(values[0])
+                else:
+                    row.append(0)
+            shrunk.append(row)
+        
+        return Grid(shrunk, self.background_color)
+
+    def shrink(self, factor = None):
+        """Find the maximum factor that can be used to shrink the grid by detecting pattern boundaries."""
+        if factor:
+            return self._shrink(factor)
+
+        rows = len(self)
+        cols = len(self[0]) if self else 0
+        
+        # Find the smallest repeating pattern size
+        def find_pattern_size():
+            # Check first row for pattern repetition
+            first_row = self[0]
+            first_element = first_row[0]
+            
+            # Count how many times the first element repeats
+            repetition_count = 0
+            for i in range(len(first_row)):
+                if first_row[i] == first_element:
+                    repetition_count += 1
+                else:
+                    break
+            
+            return repetition_count
+        
+        pattern_size = find_pattern_size()
+        
+        # Use the pattern size as the factor, but ensure it divides the grid dimensions
+        max_factor = min(pattern_size, rows, cols)
+        
+        # Find the largest factor that divides both rows and cols
+        for factor in range(max_factor, 0, -1):
+            if rows % factor == 0 and cols % factor == 0:
+                try:
+                    return self._shrink(factor)
+                except ValueError:
+                    continue
+        
+        return self
 
     def strip(self):
         # remove all empty rows and columns
