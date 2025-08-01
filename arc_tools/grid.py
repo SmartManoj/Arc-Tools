@@ -147,7 +147,7 @@ class SafeList(list):
     
 
 class Grid(SafeList):
-    def __init__(self, grid: list[list[int]], background_color: int | None = None, allow_negative_index: bool = False):
+    def __init__(self, grid: list[list[int]], background_color: int | None = None, allow_negative_index: bool = False, region: GridRegion | None = None):
         if type(grid) == Grid:
             raise ValueError(f"Wrong input type: {type(grid)}")
         grid = [SafeList(row, allow_negative_index) for row in grid]
@@ -157,7 +157,9 @@ class Grid(SafeList):
         self.background_color = background_color
         self.height = len(self)
         self.width = len(self[0])
-        self.region = GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)])
+        self.region = region or GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)])
+        self.cx = self.region.x1 + self.region.width // 2
+        self.cy = self.region.y1 + self.region.height // 2
     
     def is_solo(self, row: int, col: int):
         current_color = self[row][col]
@@ -617,8 +619,7 @@ class SubGrid(Grid):
         self.region = region
         self.points = points
         self.background_color = self.parent_grid.background_color
-        super().__init__(self.get_subgrid(obj_color), self.background_color, allow_negative_index=True)
-        self.region = region # reinitialize the region
+        super().__init__(self.get_subgrid(obj_color), self.background_color, allow_negative_index=True, region=region)
         self.height = self.region.y2 - self.region.y1 + 1
         self.width = self.region.x2 - self.region.x1 + 1
         self.color = obj_color
@@ -655,9 +656,7 @@ class SubGrid(Grid):
     
     
     def set_center_color(self):
-        center_x = (self.region.x1 + self.region.x2) // 2
-        center_y = (self.region.y1 + self.region.y2) // 2
-        self.center_color = self.parent_grid[center_y][center_x]
+        self.center_color = self.parent_grid[self.cy][self.cx]
         
     def expand(self, n: int = None):
         if n:
@@ -1035,16 +1034,13 @@ def flip_vertically(object: Grid) -> Grid:
 if __name__ == "__main__":
     # Create a test grid
     test_grid = Grid([
-        [1, 2],
-        [3, 4],
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
     ], background_color=0)
-    sub_grid = SubGrid(GridRegion([GridPoint(0, 0), GridPoint(1, 1)]), test_grid)
-    test_grid2 = test_grid.flip_horizontally()
-    test_grid.display()
-    print('-' * 10)
-    test_grid2.display()
+    sub_grid = SubGrid(GridRegion([GridPoint(1, 1), GridPoint(2, 2)]), test_grid)
+    print(sub_grid.cx)
     exit()
-    # exit()
     # Create a SubGrid from the colored region
     region = GridRegion([GridPoint(1, 1), GridPoint(2, 2)])
     test_object = SubGrid(region, test_grid)
