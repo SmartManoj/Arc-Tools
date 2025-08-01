@@ -58,7 +58,7 @@ def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=T
     ax.set_yticklabels(np.arange(0, height, 1), color='white')
 
      # Add grid lines
-    ax.grid(which='minor', color='#555555', linestyle='-', linewidth=1,  )
+    ax.grid(which='minor', color='#4b4b4b', linestyle='-', linewidth=0.1)
     
     # Customize tick parameters
     # ax.tick_params(axis='both', which='major', length=0) # Hide major tick lines - Removed to show ticks
