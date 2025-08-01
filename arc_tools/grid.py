@@ -868,7 +868,7 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
     x_offset = grid.region.x1 if is_subgrid else 0
     y_offset = grid.region.y1 if is_subgrid else 0
     if is_subgrid:
-        grid = grid.parent_grid
+        grid = Grid(grid, grid.background_color)
     def compare(a):
         val = a != grid.background_color
         if ignore_color:
