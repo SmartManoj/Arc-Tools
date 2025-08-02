@@ -432,7 +432,9 @@ class Grid(SafeList):
                         return False
         return True
     
-    def replace_color(self, old_color: Color, new_color: Color, replace_in_parent_grid: bool = True):
+    def replace_color(self, old_color: Color, new_color: Color, replace_in_parent_grid: Optional[bool] = None):
+        if replace_in_parent_grid is None:
+            replace_in_parent_grid = type(self) == SubGrid
         if replace_in_parent_grid:
             for row in range(self.region.y1, self.region.y2 + 1):
                 for col in range(self.region.x1, self.region.x2 + 1):
