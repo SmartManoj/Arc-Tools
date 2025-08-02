@@ -16,7 +16,7 @@ disable_show = os.environ.get("DISABLE_SHOW", "0").lower() in ["true", "1"]
 is_agent_terminal = (os.environ.get("IS_AGENT_TERMINAL", '') or os.environ.get("COMPOSER_NO_INTERACTION", '').lower() in ["true", "1"])
 IS_ARC_AGI_3 = True
 
-def plot_grid(grid: 'Grid', name="grid.png", show=0, close=True, ax=None, save=True, save_all=False, title=None):
+def plot_grid(grid: 'Grid', name="grid.png", show=1, close=True, ax=None, save=True, save_all=False, title=None):
     global plot_grid_count
     if name == "grid.png" and save_all:
         plot_grid_count += 1
@@ -104,7 +104,7 @@ def plot_grids(grids, name=None, show=1, save_all=False, titles=None):
     for i, grid in enumerate(grids):
         current_title = titles[i] if titles and len(titles) > i else f'plot_{i+1}'
         current_ax = axs[i]
-        plot_grid(grid, ax=current_ax, close=False, save=False, title=current_title)
+        plot_grid(grid, ax=current_ax, close=False, save=False, title=current_title, show=0)
     
     # Ensure proper layout with titles and axes
     plt.tight_layout(pad=2.0)
