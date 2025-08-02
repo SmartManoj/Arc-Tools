@@ -623,11 +623,10 @@ class SubGrid(Grid):
         self.height = self.region.y2 - self.region.y1 + 1
         self.width = self.region.x2 - self.region.x1 + 1
         self.color = obj_color
+        self.colors = self.get_unique_values()
         if self.color is None:
-            # unique dots is 1, set the color to the unique dot
-            unique_dots = self.get_unique_values()
-            if len(unique_dots) == 1:
-                self.color = unique_dots[0]
+            if len(self.colors) == 1:
+                self.color = self.colors[0]
 
     def remove_border(self, border: int = 1):
         new_grid_region = GridRegion([GridPoint(self.region.x1 + border, self.region.y1 + border), GridPoint(self.region.x2 - border, self.region.y2 - border)])
