@@ -33,7 +33,7 @@ def majority(grid: Grid):
     for frame_object in frame_objects:
         for object in counter_list:
             if frame_object.is_similar(object, ignore_color=True):
-                frame_object.replace_color(Color(frame_object.color), Color(object.color), replace_in_grid=True)
+                frame_object.replace_color(Color(frame_object.color), Color(object.color), replace_in_parent_grid=True)
                 break
         else:
             logger.info(f"No similar object found for {frame_object}")
