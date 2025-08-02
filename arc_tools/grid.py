@@ -97,7 +97,9 @@ class GridRegion:
         self.y1 = min(p.y for p in points)
         self.y2 = max(p.y for p in points)
         self.width = self.x2 - self.x1 + 1
-        self.height = self.y2 - self.y1 + 1 
+        self.height = self.y2 - self.y1 + 1
+        self.start = GridPoint(self.x1, self.y1)
+        self.end = GridPoint(self.x2, self.y2)
     
     def __eq__(self, other):
         return self.x1 == other.x1 and self.x2 == other.x2 and self.y1 == other.y1 and self.y2 == other.y2
@@ -440,12 +442,12 @@ class Grid(SafeList):
                 for col in range(self.region.x1, self.region.x2 + 1):
                     if self.parent_grid[row][col] == old_color.value:
                         self.parent_grid[row][col] = new_color.value
-            return self
         else:
             for row in range(self.height):
                 for col in range(self.width):
                     if self[row][col] == old_color.value:
                         self[row][col] = new_color.value
+        self.colors = self.get_unique_values()
         return self
     
     def replace_all_color(self, new_color):
@@ -526,7 +528,7 @@ class Grid(SafeList):
         return Color.YELLOW.value in self.get_unique_values()
     
     def get_unique_values(self):
-        return list(self.get_values_count().keys())
+        return sorted(list(self.get_values_count().keys()))
     
 
     def get_total_dots(self) -> int:
