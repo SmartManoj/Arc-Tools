@@ -1,7 +1,7 @@
 from typing import List, Tuple, Optional
 from collections import deque
 
-from .grid import Grid, SubGrid
+from arc_tools.grid import FrameColor, Grid, SubGrid
 
 
 def scale_to_9x9(grid: Grid):
@@ -123,7 +123,7 @@ def compress_grid(grid: Grid, start_pos: Tuple[int, int], end_pos: Tuple[int, in
     return compressed_grid
 
 
-def group_by_similarity(objects: list[SubGrid]):
+def group_by_similarity(objects: list[SubGrid]) -> Tuple[list[list[SubGrid]], str]:
     """Count objects by similarity, grouping similar objects together"""
     if not objects:
         return {}
@@ -146,5 +146,14 @@ def group_by_similarity(objects: list[SubGrid]):
                 used.add(j)
         
         groups.append(group)
-    
-    return groups
+
+    summary = "Similarity groups:\n"
+    for i, group in enumerate(groups):
+        obj = group[0]
+        if obj.color:
+            color_clause = f'{FrameColor(obj.color).name} color'
+        else:
+            color_clause = f'{len(obj.colors)} colors'
+        size = f'{obj.width}x{obj.height}'
+        summary += f"Object {i+1} ({size}) with {color_clause} has {len(group)} similar objects\n"
+    return groups, summary
