@@ -6,6 +6,7 @@ import pyperclip
 from arc_tools.logger import logger
 from glob import glob
 import os
+import math
 
 def remove_pngs():
     for file in glob('evaluation_tasks/*.png'):
@@ -37,9 +38,11 @@ def plot_grid(grid: 'Grid', name="grid.png", show=1, close=True, ax=None, save=T
     # Plot
     if ax is None:
         fig, ax = plt.subplots()
-        # Set window title
+        # Set window title (safe on environments without GUI manager)
         window_title = title or name
-        fig.canvas.manager.set_window_title(window_title)
+        manager = getattr(getattr(fig.canvas, 'manager', None), 'set_window_title', None)
+        if callable(manager):
+            manager(window_title)
     ax.patch.set_facecolor('black')  # Set plot background to black
 
     ax.imshow(grid, cmap=cmap, norm=norm)
@@ -51,11 +54,21 @@ def plot_grid(grid: 'Grid', name="grid.png", show=1, close=True, ax=None, save=T
     ax.set_xticks(np.arange(-.5, width, 1), minor=True)
     ax.set_yticks(np.arange(-.5, height, 1), minor=True)
 
-    # Set ticks and labels for numbering
-    ax.set_xticks(np.arange(0, width, 1))
-    ax.set_yticks(np.arange(0, height, 1))
-    ax.set_xticklabels(np.arange(0, width, 1), color='white')
-    ax.set_yticklabels(np.arange(0, height, 1), color='white')
+    # Set ticks and labels for numbering with dynamic thinning to avoid collisions
+    def _step(n: int, max_labels: int = 24) -> int:
+        return max(1, int(math.ceil(n / max_labels)))
+
+    x_step = _step(width)
+    y_step = _step(height)
+
+    x_ticks = np.arange(0, width, x_step)
+    y_ticks = np.arange(0, height, y_step)
+
+    ax.set_xticks(x_ticks)
+    ax.set_yticks(y_ticks)
+    ax.set_xticklabels([str(i) for i in x_ticks], color='white')
+    ax.set_yticklabels([str(i) for i in y_ticks], color='white')
+    ax.tick_params(axis='both', labelsize=8, top=False, right=False, labeltop=False)
 
      # Add grid lines
     ax.grid(which='minor', color='#4b4b4b', linestyle='-', linewidth=0.1)
@@ -117,8 +130,10 @@ def plot_grids(grids, name=None, show=1, save_all=False, titles=None):
         name = f"grids_{plot_grids_count}.png"
     prefix = os.environ.get("initial_file", "main")
     name = f'{prefix}_{name}'
-    # Set window title
-    fig.canvas.manager.set_window_title(name)
+    # Set window title (safe on environments without GUI manager)
+    manager = getattr(getattr(fig.canvas, 'manager', None), 'set_window_title', None)
+    if callable(manager):
+        manager(name)
     
     initial_file = os.environ.get("initial_file")
     if initial_file:
