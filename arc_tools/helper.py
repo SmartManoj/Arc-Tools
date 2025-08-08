@@ -121,3 +121,30 @@ def compress_grid(grid: Grid, start_pos: Tuple[int, int], end_pos: Tuple[int, in
         compressed_grid.append(row)
     
     return compressed_grid
+
+
+def group_by_similarity(objects: list[SubGrid]):
+    """Count objects by similarity, grouping similar objects together"""
+    if not objects:
+        return {}
+    
+    groups = []
+    used = set()
+    
+    for i, obj in enumerate(objects):
+        if i in used:
+            continue
+            
+        group = [obj]
+        used.add(i)
+        
+        for j, other_obj in enumerate(objects):
+            if j in used:
+                continue
+            if obj.is_similar(other_obj):
+                group.append(other_obj)
+                used.add(j)
+        
+        groups.append(group)
+    
+    return groups
