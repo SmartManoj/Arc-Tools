@@ -2,113 +2,227 @@ import os
 from collections import Counter
 from arc_tools.grid import Grid, GridPoint, Color
 
-def join_the_pipes(grid: Grid):
+def split_pieces(grid_data, magenta_points):
+    """
+    Step 1: Split the grid into pieces based on magenta separators
+    Returns: pieces (list of grid sections)
+    """
+    h, w = len(grid_data), len(grid_data[0])
+    
+    # Check if magenta forms horizontal or vertical separators
+    magenta_rows = set(p.y for p in magenta_points)
+    magenta_cols = set(p.x for p in magenta_points)
+    
+    # If magenta spans full width in certain rows, it's horizontal separation
+    horizontal_separators = []
+    for row in magenta_rows:
+        row_magenta_cols = [p.x for p in magenta_points if p.y == row]
+        if len(row_magenta_cols) == w:  # Full width
+            horizontal_separators.append(row)
+    
+    # If magenta spans full height in certain columns, it's vertical separation  
+    vertical_separators = []
+    for col in magenta_cols:
+        col_magenta_rows = [p.y for p in magenta_points if p.x == col]
+        if len(col_magenta_rows) == h:  # Full height
+            vertical_separators.append(col)
+    
+    # Split based on separator patterns
+    quads_dict = None
+    final_pieces = None
+    
+    if horizontal_separators and vertical_separators:
+        # Both separators exist - create quad dictionary
+        center_y = horizontal_separators[0]
+        center_x = vertical_separators[0]
+        
+        quads_dict = {
+            'tl': [row[0:center_x] for row in grid_data[0:center_y]],
+            'tr': [row[center_x+1:w] for row in grid_data[0:center_y]],
+            'bl': [row[0:center_x] for row in grid_data[center_y+1:h]],
+            'br': [row[center_x+1:w] for row in grid_data[center_y+1:h]],
+        }
+    elif vertical_separators:
+        # Vertical separators only
+        vertical_separators.sort()
+        sections = []
+        
+        start_col = 0
+        for sep_col in vertical_separators:
+            if sep_col > start_col:
+                sections.append([row[start_col:sep_col] for row in grid_data])
+            start_col = sep_col + 1
+        
+        if start_col < w:
+            sections.append([row[start_col:w] for row in grid_data])
+        
+        final_pieces = sections
+        
+    elif horizontal_separators:
+        # Horizontal separators only
+        horizontal_separators.sort()
+        sections = []
+        
+        start_row = 0
+        for sep_row in horizontal_separators:
+            if sep_row > start_row:
+                sections.append([row[:] for row in grid_data[start_row:sep_row]])
+            start_row = sep_row + 1
+        
+        if start_row < h:
+            sections.append([row[:] for row in grid_data[start_row:h]])
+        
+        final_pieces = sections
+    
+    # Return either quad pieces or section pieces
+    if quads_dict is not None:
+        return [quads_dict['tl'], quads_dict['tr'], quads_dict['bl'], quads_dict['br']]
+    else:
+        return final_pieces
 
-    def rotate_90_cw(m):
-        if not m or not m[0]: return []
-        return [list(i) for i in zip(*m[::-1])]
-
-    def rotate_180(m):
-        if not m or not m[0]: return []
-        return [row[::-1] for row in m[::-1]]
-
-    def rotate_90_ccw(m):
-        if not m or not m[0]: return []
-        return [list(i) for i in zip(*m)][::-1]
-
-    def shrink_to_content(quad, bg_color):
-        if not quad or not any(quad): return []
-        min_r, max_r, min_c, max_c = -1, -1, float('inf'), -1
-        for r, row in enumerate(quad):
-            for c, val in enumerate(row):
-                if val != bg_color:
-                    if min_r == -1: min_r = r
-                    max_r = r
-                    min_c = min(min_c, c)
-                    max_c = max(max_c, c)
-        if min_r == -1: return []
-        return [quad[r][min_c:max_c+1] for r in range(min_r, max_r+1)]
-
-    def is_open_pipe(quad, bg_color):
-        if not quad or not quad[0]: return False
-        h, w = len(quad), len(quad[0])
-        for r in range(h):
-            if quad[r][0] != bg_color or quad[r][w-1] != bg_color:
-                return True
-        for c in range(w):
-            if quad[0][c] != bg_color or quad[h-1][c] != bg_color:
-                return True
-        return False
-
-    def get_alignment(sh, sw, name, is_pipe, canvas_dim=5):
-        if is_pipe:
-            start_r = (canvas_dim - sh) // 2
-            if name == 'br':
-                start_c = (canvas_dim - sw) // 2
-            elif name in ['tl', 'bl']:
-                start_c = 0
-            else: # tr
-                start_c = canvas_dim - sw
+def arrange_the_pieces(pieces, bg_color):
+    """
+    Step 2: Determine the order and orientation for joining pieces  
+    Returns: (final_pieces_ordered, join_horizontally)
+    """
+    # Check if all pieces have clean left and right borders
+    def has_clean_left_right_borders(piece, bg_color):
+        if not piece or not piece[0]:
+            return True
+        
+        # Check left border (first column)
+        left_clean = all(row[0] == bg_color for row in piece if row)
+        # Check right border (last column)  
+        right_clean = all(row[-1] == bg_color for row in piece if row)
+        
+        return left_clean and right_clean
+    
+    # Determine join direction
+    all_pieces_clean_lr = all(has_clean_left_right_borders(piece, bg_color) for piece in pieces)
+    
+    if all_pieces_clean_lr:
+        join_horizontally = False  # Vertical join (stack vertically)
+    else:
+        join_horizontally = True   # Horizontal join (place side by side)
+    
+    # Find optimal order by matching structures based on join direction
+    def get_top_row_structure(piece, bg_color):
+        """Get the structure pattern of the top row"""
+        if not piece or not piece[0]:
+            return []
+        return [1 if cell != bg_color else 0 for cell in piece[0]]
+    
+    def get_bottom_row_structure(piece, bg_color):
+        """Get the structure pattern of the bottom row"""
+        if not piece:
+            return []
+        return [1 if cell != bg_color else 0 for cell in piece[-1]]
+    
+    def get_left_edge_structure(piece, bg_color):
+        """Get the structure pattern of the left edge"""
+        if not piece:
+            return []
+        return [1 if row[0] != bg_color else 0 for row in piece if row]
+    
+    def get_right_edge_structure(piece, bg_color):
+        """Get the structure pattern of the right edge"""
+        if not piece:
+            return []
+        return [1 if row[-1] != bg_color else 0 for row in piece if row]
+    
+    # Find the starting piece: top and left edges should be clean
+    def has_clean_top_edge(piece, bg_color):
+        if not piece or not piece[0]:
+            return True
+        return all(cell == bg_color for cell in piece[0])
+    
+    def has_clean_left_edge(piece, bg_color):
+        if not piece:
+            return True
+        return all(row[0] == bg_color for row in piece if row)
+    
+    # Find valid starting piece (clean top and left edges)
+    for i, piece in enumerate(pieces):
+        if has_clean_top_edge(piece, bg_color) and has_clean_left_edge(piece, bg_color):
+            start_idx = i
+            break
+    
+    # Build the sequence greedily
+    ordered_indices = [start_idx]
+    remaining_indices = [i for i in range(len(pieces)) if i != start_idx]
+    
+    # Greedily add the best matching piece at each step
+    while remaining_indices:
+        current_piece = pieces[ordered_indices[-1]]
+        
+        if join_horizontally:
+            current_edge = get_right_edge_structure(current_piece, bg_color)
         else:
-            start_r = (canvas_dim - sh) // 2
-            start_c = (canvas_dim - sw) // 2
-        return start_r, start_c
-
-    def normalize_to_5x5(quad, bg_color, name, is_pipe):
-        shrunk = shrink_to_content(quad, bg_color)
-        canvas = [[bg_color] * 5 for _ in range(5)]
-        if not shrunk or not shrunk[0]: return canvas
+            current_edge = get_bottom_row_structure(current_piece, bg_color)
         
-        sh, sw = len(shrunk), len(shrunk[0])
-        start_r, start_c = get_alignment(sh, sw, name, is_pipe)
+        for idx in remaining_indices:
+            candidate_piece = pieces[idx]
+            
+            if join_horizontally:
+                candidate_edge = get_left_edge_structure(candidate_piece, bg_color)
+            else:
+                candidate_edge = get_top_row_structure(candidate_piece, bg_color)
+            
+            if current_edge == candidate_edge:
+                ordered_indices.append(idx)
+                remaining_indices.remove(idx)
+                break
         
-        for r in range(sh):
-            for c in range(sw):
-                if 0 <= start_r + r < 5 and 0 <= start_c + c < 5:
-                    canvas[start_r + r][start_c + c] = shrunk[r][c]
-        return canvas
+    final_pieces_ordered = [pieces[i] for i in ordered_indices]
+    
+    return final_pieces_ordered, join_horizontally
 
+def join_the_pipes(grid: Grid):
+    """
+    Joins separated grid sections into a continuous grid.
+    
+    Step 1: Split pieces based on magenta separators
+    Step 2: Determine join direction - if all pieces have clean left/right borders, join vertically
+    Step 3: Find starting piece with clean top and left edges
+    Step 4: Greedily connect pieces by matching edge structures
+    Step 5: Join pieces horizontally or vertically as determined
+
+    Notes:
+    - Each section is a 5x5 grid.
+    """
+    
     grid_data = [list(row) for row in grid]
-    
-    non_magenta_colors = [c for row in grid_data for c in row if c != Color.MAGENTA.value]
-    bg_color = Counter(c for c in non_magenta_colors if c != 0).most_common(1)[0][0] if any(c != 0 for c in non_magenta_colors) else Color.BLACK.value
-
+    bg_color = grid.background_color
     magenta_points = [GridPoint(c, r) for r, row in enumerate(grid_data) for c, val in enumerate(row) if val == Color.MAGENTA.value]
-    if not magenta_points: return grid
     
-    center_y = Counter(p.y for p in magenta_points).most_common(1)[0][0]
-    center_x = Counter(p.x for p in magenta_points).most_common(1)[0][0]
-
-    h, w = len(grid_data), (len(grid_data[0]) if len(grid_data) > 0 else 0)
-
-    quads = {
-        'tl': [row[0:center_x] for row in grid_data[0:center_y]],
-        'tr': [row[center_x+1:w] for row in grid_data[0:center_y]],
-        'bl': [row[0:center_x] for row in grid_data[center_y+1:h]],
-        'br': [row[center_x+1:w] for row in grid_data[center_y+1:h]],
-    }
-
-    stack_order = ['tl', 'br', 'tr', 'bl']
+    # Step 1: Split the pieces
+    pieces = split_pieces(grid_data, magenta_points)
     
-    final_pieces = []
-    for name in stack_order:
-        quad = quads[name]
-        is_pipe = is_open_pipe(quad, bg_color)
+    # Step 2: Arrange the pieces - determine order and orientation
+    final_pieces_ordered, join_horizontally = arrange_the_pieces( pieces, bg_color)
+    
+    # Step 3: Join the pieces
+    if join_horizontally:
+        # Horizontal join - place pieces side by side
+        max_height = len(final_pieces_ordered[0])
         
-        transformed_quad = quad
-        if is_pipe:
-            if name == 'tl': transformed_quad = rotate_90_cw(quad)
-            elif name == 'tr': transformed_quad = rotate_90_ccw(quad)
-            elif name == 'bl': transformed_quad = rotate_180(quad)
+        output_grid_data = []
+        for row_idx in range(max_height):
+            output_row = []
+            for i, piece in enumerate(final_pieces_ordered):
+                output_row.extend(piece[row_idx])
+                if i < len(final_pieces_ordered) - 1:
+                    output_row.append(Color.MAGENTA.value)
+            output_grid_data.append(output_row)
+    else:
+        # Vertical join - place pieces vertically
+        max_width = len(final_pieces_ordered[0])
         
-        normalized = normalize_to_5x5(transformed_quad, bg_color, name, is_pipe)
-        final_pieces.append(normalized)
-
-    output_grid_data = []
-    for i, piece in enumerate(final_pieces):
-        output_grid_data.extend(piece)
-        if i < len(final_pieces) - 1:
-            output_grid_data.append([Color.MAGENTA.value] * 5)
+        output_grid_data = []
+        for i, piece in enumerate(final_pieces_ordered):
+            output_grid_data.extend(piece)
+            if i < len(final_pieces_ordered) - 1:
+                output_grid_data.append([Color.MAGENTA.value] * max_width)
 
     return Grid(output_grid_data, background_color=bg_color)
 
