@@ -41,7 +41,7 @@ from pyautogui import hotkey
 hotkey("ctrl", "w")
 hotkey("ctrl", "w")
 # open the file in vscode
-os.system(f"code {f.name}")
+os.system(f"cursor {f.name}")
 
 cmd = f"git add . && git commit -m {last_task_id+1}"
 os.system(cmd)

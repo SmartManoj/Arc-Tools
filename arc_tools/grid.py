@@ -118,6 +118,22 @@ class GridRegion:
         elif isinstance(obj, GridRegion):
             return self.x1 <= obj.x1 <= self.x2 and self.y1 <= obj.y1 <= self.y2 and self.x1 <= obj.x2 <= self.x2 and self.y1 <= obj.y2 <= self.y2
         return False
+    
+    def get_surrounding_points(self):
+        new_x1 = self.x1 - 1
+        new_y1 = self.y1 - 1
+        new_x2 = self.x2 + 1
+        new_y2 = self.y2 + 1
+        new_region = GridRegion([GridPoint(new_x1, new_y1), GridPoint(new_x2, new_y2)])
+        return new_region.get_border_points()
+
+    def get_border_points(self):
+        points = []
+        for row in range(self.y1, self.y2 + 1):
+            for col in range(self.x1, self.x2 + 1):
+                if row == self.y1 or row == self.y2 or col == self.x1 or col == self.x2:
+                    points.append(GridPoint(col, row))
+        return points
 
 class CustomIndexError(IndexError):
     def __init__(self, message):
@@ -157,8 +173,8 @@ class Grid(SafeList):
         if background_color is None:
             background_color = self.detect_background_color()
         self.background_color = background_color
-        self.height = len(self)
-        self.width = len(self[0])
+        self.height = self.h = len(self)
+        self.width = self.w = len(self[0])
         self.region = region or GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)])
         self.cx = self.region.x1 + self.region.width // 2
         self.cy = self.region.y1 + self.region.height // 2
@@ -624,8 +640,8 @@ class SubGrid(Grid):
         self.points = points
         self.background_color = self.parent_grid.background_color
         super().__init__(self.get_subgrid(obj_color), self.background_color, allow_negative_index=True, region=region)
-        self.height = self.region.y2 - self.region.y1 + 1
-        self.width = self.region.x2 - self.region.x1 + 1
+        self.height = self.h = self.region.y2 - self.region.y1 + 1
+        self.width = self.w = self.region.x2 - self.region.x1 + 1
         self.color = obj_color
         self.colors = self.get_unique_values()
         if self.color is None:
@@ -934,7 +950,7 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                         size = required_object.size
                         if not size:
                             size = obj.height
-                        if obj.height == size and obj.width == size:
+                        if obj.height == size and obj.width == size and list(obj.get_values_count().values())[0] == obj.area:
                             objects.append(obj)
                         else:
                             new_objects = split_into_square_boxes(obj.get_full_grid(), size, obj_color)
