@@ -61,6 +61,7 @@ from task_56 import join_the_pipes
 from task_57 import route_finder
 from task_58 import jigsaw_v1
 from task_59 import straight_snake
+from task_60 import broken_rope
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
