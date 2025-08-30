@@ -1,5 +1,5 @@
 from typing import Sequence
-from arc_tools.grid import Grid, SubGrid, detect_objects
+from arc_tools.grid import Color, Grid, SubGrid, detect_objects
 
 
 from datetime import datetime
@@ -161,7 +161,7 @@ def jigsaw_recursive(grid: Grid, pieces: list[SubGrid]) -> Grid | None:
 
     return None
 
-def jigsaw_puzzle(grid: Grid) -> Grid:
+def jigsaw_v1(grid: Grid) -> Grid:
     """
     find output grid size by counting the number of objects in the input grid
     1. find color map box
@@ -180,27 +180,16 @@ def jigsaw_puzzle(grid: Grid) -> Grid:
     key_object = None
     first_object = None
     for obj in objects:
-        colors = list(obj.get_values_count().keys())
-        if len(colors) != 1:
-            key_object = obj.copy()
+        if obj.color is None:
             objects.remove(obj)
-            first_object = obj
-            # plot_grid(key_object, name="key_object.png", show=True)
-            object_color = colors[0]
-            key_object.replace_color(object_color, background_color)
-            key_object = detect_objects(key_object.get_full_grid())[0]
-            
-            for row in range(key_object.region.y1, key_object.region.y2 + 1):
-                for col in range(key_object.region.x1, key_object.region.x2 + 1):
-                    obj[row-obj.region.y1][col-obj.region.x1] = object_color
+            for _ in range(4):
+                if obj[0][0] == Color.LIGHT_GRAY.value:
+                    first_object = obj
+                    break
+                obj = obj.rotate()
             break
     
-    if key_object is None:
-        print("No key object found")
-        return grid
     
-    key_object_colors = [key_object[row][col] for row in range(key_object.height) for col in range(key_object.width)]
-    key_object_colors = [i for i in key_object_colors if i != background_color]
     
     # Create list of puzzle pieces
     # Create empty grid with output_grid_size
@@ -214,17 +203,12 @@ def jigsaw_puzzle(grid: Grid) -> Grid:
         if new_grid is not None:
             result = jigsaw_recursive(new_grid, objects)
             if result is not None:
-                corner_colors = result.get_corner_colors()
-                for i, color in enumerate(corner_colors):
-                    result.replace_color(color, key_object_colors[i])
                 return result
     
-    print("No solution found")
-    print(f"Time taken: {datetime.now() - start_time}")
     return grid
 
 if __name__ == "__main__":
     import os
-    os.system("main.py f560132c jigsaw_puzzle")
+    os.system("main.py 7b3084d4 jigsaw_v1")
 
 
