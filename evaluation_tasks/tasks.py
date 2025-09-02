@@ -62,6 +62,7 @@ from task_57 import route_finder
 from task_58 import jigsaw_v1
 from task_59 import straight_snake
 from task_60 import broken_rope
+from task_61 import magnetic_nets
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit

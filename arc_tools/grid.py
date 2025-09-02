@@ -450,19 +450,23 @@ class Grid(SafeList):
                         return False
         return True
     
-    def replace_color(self, old_color: Color, new_color: Color, replace_in_parent_grid: Optional[bool] = None):
+    def replace_color(self, old_color: Color|int, new_color: Color|int, replace_in_parent_grid: Optional[bool] = None):
+        if isinstance(old_color, Color):
+            old_color = old_color.value
+        if isinstance(new_color, Color):
+            new_color = new_color.value
         if replace_in_parent_grid is None:
             replace_in_parent_grid = type(self) == SubGrid
         if replace_in_parent_grid:
             for row in range(self.region.y1, self.region.y2 + 1):
                 for col in range(self.region.x1, self.region.x2 + 1):
-                    if self.parent_grid[row][col] == old_color.value:
-                        self.parent_grid[row][col] = new_color.value
+                    if self.parent_grid[row][col] == old_color:
+                        self.parent_grid[row][col] = new_color
         else:
             for row in range(self.height):
                 for col in range(self.width):
-                    if self[row][col] == old_color.value:
-                        self[row][col] = new_color.value
+                    if self[row][col] == old_color:
+                        self[row][col] = new_color
         self.colors = self.get_unique_values()
         return self
     
@@ -536,7 +540,7 @@ class Grid(SafeList):
         values : Counter = Counter()
         for row in self:
             for col in row:
-                if col != getattr(self, "background_color", None) or all:
+                if (col != getattr(self, "background_color", None) or all) and isinstance(col, int):
                     values[col] += 1
         return values
     
@@ -629,9 +633,10 @@ class Grid(SafeList):
     def display(self):
         max_digits = len(str(max(self.get_unique_values(), default=0)))
         for row in self:
+            line = ""
             for col in row:
-                print(f"{col:>{max_digits}}", end=" ")
-            print()
+                line += f"{col:>{max_digits}} "
+            logger.info(line)
 
 class SubGrid(Grid):
     def __init__(self, region: GridRegion, parent_grid: Grid, obj_color: int | None = None, points: list[GridPoint] | None = None):
@@ -879,15 +884,15 @@ class Square(Shape):
         
 
 def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None, ignore_corners: bool = False, point: GridPoint | None = None) -> list[SubGrid]:
+    is_subgrid = type(grid) == SubGrid
+    if is_subgrid:
+        grid = grid.get_full_grid()
     grid_np = np.array(grid)
     rows, cols = grid_np.shape
     visited = np.zeros_like(grid_np, dtype=bool)
     objects = []
-    is_subgrid = type(grid) == SubGrid
     x_offset = grid.region.x1 if is_subgrid else 0
     y_offset = grid.region.y1 if is_subgrid else 0
-    if is_subgrid:
-        grid = Grid(grid, grid.background_color)
     def compare(a):
         val = a != grid.background_color
         if ignore_color:
@@ -939,29 +944,28 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                     or p.y == min(p.y for p in current_object_points)
                     or p.y == max(p.y for p in current_object_points)
                 ]
-                if current_object_corner_points:
-                    region = GridRegion(current_object_points)
-                    if ignore_corners:
-                        if region.x1 == 0 or region.y1 == 0 or region.x2 == grid.width - 1 or region.y2 == grid.height - 1:
-                            continue
-                    obj_color = current_color if single_color_only else None
-                    obj = SubGrid(region, grid, obj_color, points=current_object_points)
-                    if isinstance(required_object, Square):
-                        size = required_object.size
-                        if not size:
-                            size = obj.height
-                        if obj.height == size and obj.width == size and list(obj.get_values_count().values())[0] == obj.area:
-                            objects.append(obj)
-                        else:
-                            new_objects = split_into_square_boxes(obj.get_full_grid(), size, obj_color)
-                            logger.debug(f"Found {len(new_objects)} square boxes")
-                            for new_obj in new_objects:
-                                if new_obj.height == size and new_obj.width == size:
-                                    objects.append(new_obj)
-                    else:
+                region = GridRegion(current_object_points)
+                if ignore_corners:
+                    if region.x1 == 0 or region.y1 == 0 or region.x2 == grid.width - 1 or region.y2 == grid.height - 1:
+                        continue
+                obj_color = current_color if single_color_only else None
+                obj = SubGrid(region, grid, obj_color, points=current_object_points)
+                if isinstance(required_object, Square):
+                    size = required_object.size
+                    if not size:
+                        size = obj.height
+                    if obj.height == size and obj.width == size and list(obj.get_values_count().values())[0] == obj.area:
                         objects.append(obj)
-                    if point:
-                        break
+                    else:
+                        new_objects = split_into_square_boxes(obj.get_full_grid(), size, obj_color)
+                        logger.debug(f"Found {len(new_objects)} square boxes")
+                        for new_obj in new_objects:
+                            if new_obj.height == size and new_obj.width == size:
+                                objects.append(new_obj)
+                else:
+                    objects.append(obj)
+                if point:
+                    break
     logger.debug(f"Found {len(objects)} objects")
     return objects
     
