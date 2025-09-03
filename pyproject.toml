@@ -5,11 +5,19 @@ version = "0.1.0"
 description = "Tools for the ARC dataset"
 authors = ["மனோஜ்குமார் பழனிச்சாமி"]
 packages = [
-  { include = "arc_tools/**/*" },
+  { include = "arc_tools" },
 ]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.setuptools.packages.find]
+include = ["arc_tools*"]
+exclude = ["evaluation_tasks*", "tests*"]
 
 [tool.mypy]
 disable_error_code = "import"

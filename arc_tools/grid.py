@@ -548,7 +548,10 @@ class Grid(SafeList):
         return Color.YELLOW.value in self.get_unique_values()
     
     def get_unique_values(self):
-        return sorted(list(self.get_values_count().keys()))
+        # sort by count
+        values_count = self.get_values_count()
+        values_count = sorted(values_count.items(), key=lambda x: x[1], reverse=True)
+        return [value for value, _ in values_count]
     
 
     def get_total_dots(self) -> int:
@@ -640,11 +643,13 @@ class Grid(SafeList):
 
 class SubGrid(Grid):
     def __init__(self, region: GridRegion, parent_grid: Grid, obj_color: int | None = None, points: list[GridPoint] | None = None):
+        logger.debug(f"Creating SubGrid from region {region}  and obj_color {obj_color}")
         self.parent_grid = parent_grid
         self.region = region
         self.points = points
         self.background_color = self.parent_grid.background_color
-        super().__init__(self.get_subgrid(obj_color), self.background_color, allow_negative_index=True, region=region)
+        subgrid_data = self.get_subgrid(obj_color)
+        super().__init__(subgrid_data, self.background_color, allow_negative_index=True, region=region)
         self.height = self.h = self.region.y2 - self.region.y1 + 1
         self.width = self.w = self.region.x2 - self.region.x1 + 1
         self.color = obj_color
@@ -848,18 +853,21 @@ class SubGrid(Grid):
     
 
 
-def split_into_square_boxes(grid: Grid, size: int, obj_color: int | None = None) -> list[SubGrid]:
-    grid = deepcopy(grid)
+def split_into_square_boxes(original_grid: Grid, size: int, obj_color: int | None = None, required_color: int | None = None) -> list[SubGrid]:
+    grid = deepcopy(original_grid)
     rows = len(grid)
     cols = len(grid[0])
     regions = []
-
     for r in range(rows - size + 1):
         for c in range(cols - size + 1):
             is_box = True
             for dr in range(size):
                 for dc in range(size):
-                    if grid[r + dr][c + dc] == grid.background_color:
+                    if required_color:
+                        cond = grid[r + dr][c + dc] != required_color
+                    else:
+                        cond = grid[r + dr][c + dc] == grid.background_color
+                    if cond:
                         is_box = False
                         break
                 if not is_box:
@@ -872,7 +880,9 @@ def split_into_square_boxes(grid: Grid, size: int, obj_color: int | None = None)
                     for dc in range(size):
                         grid[r + dr][c + dc] = grid.background_color
 
-    return [SubGrid(region, grid, obj_color) for region in regions]
+    if not obj_color:
+        obj_color = required_color
+    return [SubGrid(region, original_grid, obj_color) for region in regions]
 
 class Shape:
     pass
@@ -883,7 +893,11 @@ class Square(Shape):
         
         
 
-def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color | None = None, ignore_color: Color | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None, ignore_corners: bool = False, point: GridPoint | None = None) -> list[SubGrid]:
+def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color| int | None = None, ignore_color: Color| int | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None, ignore_corners: bool = False, point: GridPoint | None = None) -> list[SubGrid]:
+    if isinstance(required_color, Color):
+        required_color = required_color.value
+    if isinstance(ignore_color, Color):
+        ignore_color = ignore_color.value
     is_subgrid = type(grid) == SubGrid
     if is_subgrid:
         grid = grid.get_full_grid()
@@ -896,9 +910,9 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
     def compare(a):
         val = a != grid.background_color
         if ignore_color:
-            val = val and a != ignore_color.value
+            val = val and a != ignore_color
         if required_color:
-            val = val and a == required_color.value
+            val = val and a == required_color
         if invert:
             return not val
         return val
@@ -957,7 +971,7 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                     if obj.height == size and obj.width == size and list(obj.get_values_count().values())[0] == obj.area:
                         objects.append(obj)
                     else:
-                        new_objects = split_into_square_boxes(obj.get_full_grid(), size, obj_color)
+                        new_objects = split_into_square_boxes(obj.get_full_grid(), size, obj_color, required_color)
                         logger.debug(f"Found {len(new_objects)} square boxes")
                         for new_obj in new_objects:
                             if new_obj.height == size and new_obj.width == size:
@@ -1062,10 +1076,11 @@ if __name__ == "__main__":
         [4, 5, 6],
         [7, 8, 9],
     ], background_color=0)
-    sub_grid = SubGrid(GridRegion([GridPoint(1, 1), GridPoint(2, 2)]), test_grid)
-    print(sub_grid.cx)
-    exit()
-    # Create a SubGrid from the colored region
-    region = GridRegion([GridPoint(1, 1), GridPoint(2, 2)])
-    test_object = SubGrid(region, test_grid)
-    
+    # load from json
+    with open('grid.json', 'r') as f:
+        test_grid = Grid(json.load(f))
+    objects = detect_objects(test_grid, required_color=8, required_object=Square(3))
+    logger.info(f"Found {len(objects)} objects")
+    # log first object
+    logger.info(f"First object: {objects[0]}")
+    plot_grids([test_grid]+objects)
