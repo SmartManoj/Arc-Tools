@@ -411,7 +411,7 @@ class Grid(SafeList):
     def get_right_side(self):
         return [self[i][self.width - 1] for i in range(self.height)]
     
-    def get_side_data(self, side: BorderSide):
+    def get_edge_data(self, side: BorderSide):
         if side == BorderSide.TOP:
             return self.get_top_side()
         elif side == BorderSide.BOTTOM:
@@ -994,6 +994,7 @@ def place_object_on_new_grid(object_to_place: SubGrid, x: int, y: int, grid: Gri
                     grid[y+row][x+col] = object_to_place[row][col]
     return SubGrid(GridRegion([GridPoint(x, y), GridPoint(x + object_to_place.width - 1, y + object_to_place.height - 1)]), grid, object_to_place.color)
 
+
 def place_object(object_to_place: SubGrid, x: int, y: int, grid: Grid, remove_object: bool = True) -> SubGrid:
     """
     Places the object_to_place at (x, y) in the grid, extending the grid if necessary.
@@ -1002,7 +1003,7 @@ def place_object(object_to_place: SubGrid, x: int, y: int, grid: Grid, remove_ob
     dy = y - object_to_place.region.y1
     if remove_object:
         grid.remove_object(object_to_place)
-    return move_object(object_to_place, dx, dy, grid)
+    return copy_object(object_to_place, dx, dy, grid)
 
 
 def copy_object(object_to_copy: SubGrid, dx: int, dy: int, grid: Grid, extend_grid: bool = False, greedy: bool = True, silent: bool = False) -> SubGrid:

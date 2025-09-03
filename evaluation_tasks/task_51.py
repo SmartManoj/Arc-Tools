@@ -71,12 +71,12 @@ def land_the_ship(grid: Grid):
                             last_wall_side = 'right'
                             break
                 for _ in range(4):
-                    side_data_1 = list(set(i for i in ship.get_side_data(BorderSide(first_wall_side)) if i not in [grid.background_color, Color.MAROON.value]))
+                    side_data_1 = list(set(i for i in ship.get_edge_data(BorderSide(first_wall_side)) if i not in [grid.background_color, Color.MAROON.value]))
                     if len(side_data_1) == 1:
                         side_color_1 = side_data_1[0]
                     else:
                         side_color_1 = None
-                    side_data_2 = list(set(i for i in ship.get_side_data(BorderSide(last_wall_side)) if i not in [grid.background_color, Color.MAROON.value]))
+                    side_data_2 = list(set(i for i in ship.get_edge_data(BorderSide(last_wall_side)) if i not in [grid.background_color, Color.MAROON.value]))
                     if len(side_data_2) == 1:
                         side_color_2 = side_data_2[0]
                     else:
@@ -84,7 +84,7 @@ def land_the_ship(grid: Grid):
                     if side_color_1 == first_wall_color or side_color_2 == last_wall_color:
                         if first_wall_side == 'top':
                             # check left and right side 
-                            left_side_data = list(set(i for i in ship.get_side_data(BorderSide.LEFT) if i not in [grid.background_color, Color.MAROON.value]))
+                            left_side_data = list(set(i for i in ship.get_edge_data(BorderSide.LEFT) if i not in [grid.background_color, Color.MAROON.value]))
                             flipped = False
                             left_wall_color = None
                             if len(left_side_data) == 1:
@@ -97,7 +97,7 @@ def land_the_ship(grid: Grid):
                                     ship = ship.flip_vertically()
                                     flipped = True
                             if not flipped:
-                                right_side_data = list(set(i for i in ship.get_side_data(BorderSide.RIGHT) if i not in [grid.background_color, Color.MAROON.value]))
+                                right_side_data = list(set(i for i in ship.get_edge_data(BorderSide.RIGHT) if i not in [grid.background_color, Color.MAROON.value]))
                                 right_wall_color = None
                                 if len(right_side_data) == 1:
                                     right_side_color = right_side_data[0]
@@ -110,7 +110,7 @@ def land_the_ship(grid: Grid):
                                         flipped = True
                             if not flipped:
                                 # check top and bottom side
-                                top_side_data = list(set(i for i in ship.get_side_data(BorderSide.TOP) if i not in [grid.background_color, Color.MAROON.value]))
+                                top_side_data = list(set(i for i in ship.get_edge_data(BorderSide.TOP) if i not in [grid.background_color, Color.MAROON.value]))
                                 top_wall_color = None
                                 if len(top_side_data) == 1:
                                     top_side_color = top_side_data[0]
@@ -123,7 +123,7 @@ def land_the_ship(grid: Grid):
                                         flipped = True
                             if not flipped:
                                 # check bottom and top side
-                                bottom_side_data = list(set(i for i in ship.get_side_data(BorderSide.BOTTOM) if i not in [grid.background_color, Color.MAROON.value]))
+                                bottom_side_data = list(set(i for i in ship.get_edge_data(BorderSide.BOTTOM) if i not in [grid.background_color, Color.MAROON.value]))
                                 bottom_wall_color = None
                                 if len(bottom_side_data) == 1:
                                     bottom_side_color = bottom_side_data[0]
