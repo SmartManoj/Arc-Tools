@@ -53,9 +53,10 @@ class BorderSide(MyEnum):
     BOTTOM = 'bottom'
 
 class GridPoint:
-    def __init__(self, x, y):
+    def __init__(self, x, y, value = None):
         self.x = x
         self.y = y
+        self.value = value
     
     # iterable
     def __iter__(self):
@@ -65,7 +66,7 @@ class GridPoint:
         return next(self.x, self.y)
     
     def __repr__(self):
-        return f"({self.x}, {self.y})"
+        return f"({self.x}, {self.y}, {self.value})"
     
     def __eq__(self, other):
         if isinstance(other, GridPoint):
@@ -75,7 +76,7 @@ class GridPoint:
         return False
     
     def __hash__(self):
-        return hash((self.x, self.y))
+        return hash((self.x, self.y, self.value))
     
     def __contains__(self, other):
         if isinstance(other, GridPoint):
@@ -400,16 +401,16 @@ class Grid(SafeList):
         self[y][x] = value
 
     def get_top_side(self):
-        return [self[0][i] for i in range(self.width)]
+        return [GridPoint(self.region.x1 + i, self.region.y1, self[0][i]) for i in range(self.width)]
     
     def get_bottom_side(self):
-        return [self[self.height - 1][i] for i in range(self.width)]
+        return [GridPoint(self.region.x1 + i, self.region.y2, self[self.height - 1][i]) for i in range(self.width)]
     
     def get_left_side(self):
-        return [self[i][0] for i in range(self.height)]
+        return [GridPoint(self.region.x1, self.region.y1 + i, self[i][0]) for i in range(self.height)]
     
     def get_right_side(self):
-        return [self[i][self.width - 1] for i in range(self.height)]
+        return [GridPoint(self.region.x2, self.region.y1 + i, self[i][self.width - 1]) for i in range(self.height)]
     
     def get_edge_data(self, side: BorderSide):
         if side == BorderSide.TOP:

@@ -58,6 +58,9 @@ jigsaw_task_fns = [
 
 DEBUG_OUTPUT = 1
 def debug_output(grid, expected_output, output, window_title='result'):
+    if grid.compare(output):
+        logger.info(f"Output is still the same as the input - No changes, idiot.")
+        exit(1)
     if not DEBUG_OUTPUT:
         return
     # print which cells are different
@@ -81,9 +84,6 @@ def find_task(grids, expected_outputs, start_train_task_id=1):
             expected_output = Grid(expected_output)
             output = task_fn(grid.copy())
             if not expected_output.compare(output):
-                if grid.compare(output):
-                    logger.info(f"Output is still the same as the input - No changes, idiot.")
-                    exit(1)
                 debug_output(grid, expected_output, output, f'train_{task_id}_result')
                 if actual_task_name:
                     raise Exception(f'Train task {task_id} failed')
