@@ -809,8 +809,11 @@ class SubGrid(Grid):
         return self.get_holes_count(max_count=1)
     
     def get_holes_count(self, max_count: int | None = None) -> int:
+        """Count the number of distinct hole regions (connected components of background color)."""
         rows, cols = len(self), len(self[0])
         visited = [[False for _ in range(cols)] for _ in range(rows)]
+        
+        # First, mark all background cells connected to the border as visited (not holes)
         q : deque[tuple[int, int]] = deque()
 
         for r in range(rows):
@@ -833,6 +836,7 @@ class SubGrid(Grid):
                 q.append((rows - 1, c))
                 visited[rows - 1][c] = True
 
+        # Flood fill from border background cells
         while q:
             r, c = q.popleft()
             for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
@@ -842,15 +846,30 @@ class SubGrid(Grid):
                     visited[nr][nc] = True
                     q.append((nr, nc))
 
-        count = 0
+        # Now count distinct hole regions (unvisited background cells)
+        hole_regions = 0
         for r in range(rows):
             for c in range(cols):
                 if self[r][c] == self.background_color and not visited[r][c]:
-                    count += 1
-                    if max_count and count == max_count:
-                        return count
+                    # Found a new hole region, flood fill it
+                    hole_regions += 1
+                    if max_count and hole_regions == max_count:
+                        return hole_regions
+                    
+                    # Mark all cells in this hole region as visited
+                    region_q = deque([(r, c)])
+                    visited[r][c] = True
+                    
+                    while region_q:
+                        cr, cc = region_q.popleft()
+                        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                            nr, nc = cr + dr, cc + dc
+                            if 0 <= nr < rows and 0 <= nc < cols and \
+                            self[nr][nc] == self.background_color and not visited[nr][nc]:
+                                visited[nr][nc] = True
+                                region_q.append((nr, nc))
 
-        return count
+        return hole_regions
     
 
 
@@ -1003,10 +1022,7 @@ def place_object_on_new_grid(object_to_place: SubGrid, x: int, y: int, grid: Gri
     for row in range(object_to_place.height):
         for col in range(object_to_place.width):
             if object_to_place[row][col] != object_to_place.background_color:
-                if fill_color:
-                    grid[y+row][x+col] = fill_color
-                else:
-                    grid[y+row][x+col] = object_to_place[row][col]
+                grid[y+row][x+col] = fill_color or object_to_place[row][col]
     return SubGrid(GridRegion([GridPoint(x, y), GridPoint(x + object_to_place.width - 1, y + object_to_place.height - 1)]), grid, object_to_place.color)
 
 

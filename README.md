@@ -1,6 +1,7 @@
 ARC PRIZE 2025
 
-Website: https://www.arcprize.org/
+Website: https://www.arcprize.org
+
 Github: https://github.com/arcprize/ARC-AGI-2
 
 ---

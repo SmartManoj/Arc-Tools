@@ -66,6 +66,7 @@ from task_61 import magnetic_nets
 from task_62 import mirror_it
 from task_63 import water_tanks
 from task_64 import pathways
+from task_65 import move_the_frames
 # marker
 from task_66 import rope_stretch
 from task_81 import fit_or_swap_fit
