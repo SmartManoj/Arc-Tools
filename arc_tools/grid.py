@@ -179,12 +179,24 @@ class Grid(SafeList):
         self.region = region or GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)])
         self.cx = self.region.x1 + self.region.width // 2
         self.cy = self.region.y1 + self.region.height // 2
+        self.colors = self.get_unique_values()
+        if getattr(self, 'color', None) is None:
+            if len(self.colors) == 1:
+                self.color = self.colors[0]
+            else:
+                self.color = None
     
     def is_solo(self, row: int, col: int):
         current_color = self[row][col]
         cardinal_cells = [self[row + dy][col + dx] for dx, dy in CARDINAL_DIRECTIONS]
         surrounding_cells = [self[row + dy][col + dx] for dx, dy in EIGHT_DIRECTIONS]
         return (sum(cell in [current_color, []] for cell in surrounding_cells) <= 3 and sum(cell in [current_color, []] for cell in cardinal_cells) <= 1) or all(cell != current_color for cell in surrounding_cells)
+    
+    def get_surrounding_values(self, row: int, col: int):
+        surrounding_points = GridRegion([GridPoint(col, row)]).get_surrounding_points()
+        values = [self[point.y][point.x] for point in surrounding_points]
+        values = [v for v in values if v != [] and v != self.background_color]
+        return values
     
     def _shrink(self, factor):
         """Shrink a grid by the given factor while maintaining pattern structure."""
@@ -548,11 +560,13 @@ class Grid(SafeList):
     def has_yellow_block(self):
         return Color.YELLOW.value in self.get_unique_values()
     
-    def get_unique_values(self):
+    def get_unique_values(self, sort=True):
         # sort by count
         values_count = self.get_values_count()
-        values_count = sorted(values_count.items(), key=lambda x: x[1], reverse=True)
-        return [value for value, _ in values_count]
+        if sort:
+            values_count = sorted(values_count.items(), key=lambda x: x[1], reverse=True)
+            return [value for value, _ in values_count]
+        return list(values_count.keys())
     
 
     def get_total_dots(self) -> int:
@@ -641,6 +655,71 @@ class Grid(SafeList):
             for col in row:
                 line += f"{col:>{max_digits}} "
             logger.info(line)
+    
+    def get_holes_count(self, max_count: int | None = None) -> int:
+        """Count the number of distinct hole regions (connected components of background color)."""
+        rows, cols = len(self), len(self[0])
+        visited = [[False for _ in range(cols)] for _ in range(rows)]
+        
+        # First, mark all background cells connected to the border as visited (not holes)
+        q : deque[tuple[int, int]] = deque()
+
+        for r in range(rows):
+            # Left border
+            if self[r][0] == self.background_color and not visited[r][0]:
+                q.append((r, 0))
+                visited[r][0] = True
+            # Right border
+            if self[r][cols - 1] == self.background_color and not visited[r][cols - 1]:
+                q.append((r, cols - 1))
+                visited[r][cols - 1] = True
+
+        for c in range(cols): # Avoid double-adding corners
+            # Top border
+            if self[0][c] == self.background_color and not visited[0][c]:
+                q.append((0, c))
+                visited[0][c] = True
+            # Bottom border
+            if self[rows - 1][c] == self.background_color and not visited[rows - 1][c]:
+                q.append((rows - 1, c))
+                visited[rows - 1][c] = True
+
+        # Flood fill from border background cells
+        while q:
+            r, c = q.popleft()
+            for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and \
+                self[nr][nc] == self.background_color and not visited[nr][nc]:
+                    visited[nr][nc] = True
+                    q.append((nr, nc))
+
+        # Now count distinct hole regions (unvisited background cells)
+        hole_regions = 0
+        for r in range(rows):
+            for c in range(cols):
+                if self[r][c] == self.background_color and not visited[r][c]:
+                    # Found a new hole region, flood fill it
+                    hole_regions += 1
+                    if max_count and hole_regions == max_count:
+                        return hole_regions
+                    
+                    # Mark all cells in this hole region as visited
+                    region_q = deque([(r, c)])
+                    visited[r][c] = True
+                    
+                    while region_q:
+                        cr, cc = region_q.popleft()
+                        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                            nr, nc = cr + dr, cc + dc
+                            if 0 <= nr < rows and 0 <= nc < cols and \
+                            self[nr][nc] == self.background_color and not visited[nr][nc]:
+                                visited[nr][nc] = True
+                                region_q.append((nr, nc))
+
+        return hole_regions
+    
+
 
 class SubGrid(Grid):
     def __init__(self, region: GridRegion, parent_grid: Grid, obj_color: int | None = None, points: list[GridPoint] | None = None):
@@ -650,14 +729,10 @@ class SubGrid(Grid):
         self.points = points
         self.background_color = self.parent_grid.background_color
         subgrid_data = self.get_subgrid(obj_color)
+        self.color = obj_color
         super().__init__(subgrid_data, self.background_color, allow_negative_index=True, region=region)
         self.height = self.h = self.region.y2 - self.region.y1 + 1
         self.width = self.w = self.region.x2 - self.region.x1 + 1
-        self.color = obj_color
-        self.colors = self.get_unique_values()
-        if self.color is None:
-            if len(self.colors) == 1:
-                self.color = self.colors[0]
 
     def remove_border(self, border: int = 1):
         new_grid_region = GridRegion([GridPoint(self.region.x1 + border, self.region.y1 + border), GridPoint(self.region.x2 - border, self.region.y2 - border)])
@@ -808,70 +883,6 @@ class SubGrid(Grid):
         """
         return self.get_holes_count(max_count=1)
     
-    def get_holes_count(self, max_count: int | None = None) -> int:
-        """Count the number of distinct hole regions (connected components of background color)."""
-        rows, cols = len(self), len(self[0])
-        visited = [[False for _ in range(cols)] for _ in range(rows)]
-        
-        # First, mark all background cells connected to the border as visited (not holes)
-        q : deque[tuple[int, int]] = deque()
-
-        for r in range(rows):
-            # Left border
-            if self[r][0] == self.background_color and not visited[r][0]:
-                q.append((r, 0))
-                visited[r][0] = True
-            # Right border
-            if self[r][cols - 1] == self.background_color and not visited[r][cols - 1]:
-                q.append((r, cols - 1))
-                visited[r][cols - 1] = True
-
-        for c in range(cols): # Avoid double-adding corners
-            # Top border
-            if self[0][c] == self.background_color and not visited[0][c]:
-                q.append((0, c))
-                visited[0][c] = True
-            # Bottom border
-            if self[rows - 1][c] == self.background_color and not visited[rows - 1][c]:
-                q.append((rows - 1, c))
-                visited[rows - 1][c] = True
-
-        # Flood fill from border background cells
-        while q:
-            r, c = q.popleft()
-            for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols and \
-                self[nr][nc] == self.background_color and not visited[nr][nc]:
-                    visited[nr][nc] = True
-                    q.append((nr, nc))
-
-        # Now count distinct hole regions (unvisited background cells)
-        hole_regions = 0
-        for r in range(rows):
-            for c in range(cols):
-                if self[r][c] == self.background_color and not visited[r][c]:
-                    # Found a new hole region, flood fill it
-                    hole_regions += 1
-                    if max_count and hole_regions == max_count:
-                        return hole_regions
-                    
-                    # Mark all cells in this hole region as visited
-                    region_q = deque([(r, c)])
-                    visited[r][c] = True
-                    
-                    while region_q:
-                        cr, cc = region_q.popleft()
-                        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                            nr, nc = cr + dr, cc + dc
-                            if 0 <= nr < rows and 0 <= nc < cols and \
-                            self[nr][nc] == self.background_color and not visited[nr][nc]:
-                                visited[nr][nc] = True
-                                region_q.append((nr, nc))
-
-        return hole_regions
-    
-
 
 def split_into_square_boxes(original_grid: Grid, size: int, obj_color: int | None = None, required_color: int | None = None) -> list[SubGrid]:
     grid = deepcopy(original_grid)
