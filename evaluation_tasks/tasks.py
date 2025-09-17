@@ -70,6 +70,7 @@ from task_65 import move_the_frames
 from task_66 import rope_stretch
 from task_67 import shooting_stars
 from task_68 import hole_counter
+from task_69 import enlarge_and_fit
 # marker
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object

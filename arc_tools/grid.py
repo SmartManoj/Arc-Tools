@@ -186,6 +186,15 @@ class Grid(SafeList):
             else:
                 self.color = None
     
+    def enlarge(self, factor: int):
+        data = []
+        for i in range(self.height):
+            row = []
+            for j in range(self.width):
+                row.extend([self[i][j]] * factor)
+            data.extend([row] * factor)
+        return Grid(data, self.background_color)
+    
     def is_solo(self, row: int, col: int):
         current_color = self[row][col]
         cardinal_cells = [self[row + dy][col + dx] for dx, dy in CARDINAL_DIRECTIONS]
@@ -332,11 +341,12 @@ class Grid(SafeList):
     def as_sub_grid(self):
         return SubGrid(GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)]), self)
 
-    def is_similar(self, other, ignore_color = False):
-        if self.height > self.width:
-            self = self.rotate()
-        if other.height > other.width:
-            other = other.rotate()
+    def is_similar(self, other, ignore_color = False, rotate=True):
+        if rotate:
+            if self.height > self.width:
+                self = self.rotate()
+            if other.height > other.width:
+                other = other.rotate()
         if not isinstance(other, Grid):
             return False
         # if height and width are the same, then compare the points
@@ -354,13 +364,15 @@ class Grid(SafeList):
                                 return False
                 return True
             
-            # check all rotatations
-            for _ in range(4):
+            if rotate:
                 for _ in range(4):
-                    if check(self, other):
-                        return True
-                    other = other.rotate()
-                self = self.rotate()
+                    for _ in range(4):
+                        if check(self, other):
+                            return True
+                        other = other.rotate()
+                    self = self.rotate()
+            else:
+                return check(self, other)
         return False
     
     def rotate(self) -> 'Grid':
