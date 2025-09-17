@@ -1066,6 +1066,7 @@ def copy_object(object_to_copy: SubGrid, dx: int, dy: int, grid: Grid, extend_gr
             value = object_to_copy[row][col]
             row_index = row + dy1
             col_index = col + dx1
+            logger.debug(f"Copying object {value} to {row_index}, {col_index}")
             if value != grid.background_color:
                 if 0 <= row_index < len(grid) and 0 <= col_index < len(grid[0]):
                     if greedy or grid[row_index][col_index] == grid.background_color:

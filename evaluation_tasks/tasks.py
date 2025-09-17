@@ -67,8 +67,9 @@ from task_62 import mirror_it
 from task_63 import water_tanks
 from task_64 import pathways
 from task_65 import move_the_frames
-# marker
 from task_66 import rope_stretch
+from task_67 import shooting_stars
+# marker
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object
 from task_90 import move_object_without_collision
