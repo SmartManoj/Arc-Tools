@@ -73,6 +73,7 @@ from task_68 import hole_counter
 from task_69 import enlarge_and_fit
 from task_70 import fill_the_tanks
 from task_71 import projector
+from task_72 import symmetry
 # marker
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object
