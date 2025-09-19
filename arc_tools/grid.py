@@ -115,12 +115,16 @@ class GridRegion:
         return hash((self.x1, self.x2, self.y1, self.y2))
     
     def contains(self, obj):
+        if isinstance(obj, tuple):
+            obj = GridPoint(*obj)
         if isinstance(obj, Grid):
             return self.contains(obj.region)
         if isinstance(obj, GridPoint):
             return self.x1 <= obj.x <= self.x2 and self.y1 <= obj.y <= self.y2
         elif isinstance(obj, GridRegion):
             return self.x1 <= obj.x1 <= self.x2 and self.y1 <= obj.y1 <= self.y2 and self.x1 <= obj.x2 <= self.x2 and self.y1 <= obj.y2 <= self.y2
+        else:
+            logger.info(f'Unknown object type: {type(obj)}')
         return False
     
     def get_surrounding_points(self):
