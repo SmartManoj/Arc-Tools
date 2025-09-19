@@ -66,7 +66,10 @@ class GridPoint:
         return next(self.x, self.y)
     
     def __repr__(self):
-        return f"({self.x}, {self.y}, {self.value})"
+        if self.value is None:
+            return f"({self.x}, {self.y})"
+        else:
+            return f"({self.x}, {self.y}, {self.value})"
     
     def __eq__(self, other):
         if isinstance(other, GridPoint):
@@ -874,7 +877,7 @@ class SubGrid(Grid):
         grid = [cls([self.parent_grid.background_color for _ in range(self.region.x2 - self.region.x1 + 1)]) for _ in range(self.region.y2 - self.region.y1 + 1)]
         for row in range(self.region.y1, self.region.y2 + 1):
             for col in range(self.region.x1, self.region.x2 + 1):
-                if obj_color is None or self.parent_grid[row][col] == obj_color:
+                if (obj_color is None or self.parent_grid[row][col] == obj_color) and (col, row) in self.points:
                     grid[row - self.region.y1][col - self.region.x1] = self.parent_grid[row][col]
         return cls(grid)
     
@@ -1113,15 +1116,12 @@ def flip_vertically(object: Grid) -> Grid:
 if __name__ == "__main__":
     # Create a test grid
     test_grid = Grid([
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
+        [1, 0, 2],
+        [0, 0, 2],
+        [2, 2, 2],
     ], background_color=0)
-    # load from json
-    with open('grid.json', 'r') as f:
-        test_grid = Grid(json.load(f))
-    objects = detect_objects(test_grid, required_color=8, required_object=Square(3))
-    logger.info(f"Found {len(objects)} objects")
+    
+    objects = detect_objects(test_grid,)
     # log first object
     logger.info(f"First object: {objects[0]}")
     plot_grids([test_grid]+objects)
