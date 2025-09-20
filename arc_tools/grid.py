@@ -183,6 +183,7 @@ class Grid(SafeList):
         self.background_color = background_color
         self.height = self.h = len(self)
         self.width = self.w = len(self[0])
+        self.shape = (self.width, self.height)
         self.region = region or GridRegion([GridPoint(0, 0), GridPoint(self.width - 1, self.height - 1)])
         self.cx = self.region.x1 + self.region.width // 2
         self.cy = self.region.y1 + self.region.height // 2
