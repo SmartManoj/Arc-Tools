@@ -75,6 +75,7 @@ from task_70 import fill_the_tanks
 from task_71 import projector
 from task_72 import symmetry
 from task_73 import counter
+from task_74 import borderify
 # marker
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object
