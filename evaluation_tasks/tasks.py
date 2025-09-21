@@ -78,6 +78,7 @@ from task_73 import counter
 from task_74 import borderify
 from task_75 import playground
 from task_76 import energy_bars
+from task_77 import cropped_reflection_symmetry_v2
 # marker
 from task_81 import fit_or_swap_fit
 from task_87 import dot_to_object
