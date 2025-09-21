@@ -3,7 +3,7 @@ from enum import Enum
 import json
 import numpy as np
 from copy import deepcopy
-from typing import Optional
+from typing import Optional, override
 
 from arc_tools.constants import CARDINAL_DIRECTIONS, EIGHT_DIRECTIONS
 from arc_tools.logger import logger
@@ -503,11 +503,16 @@ class Grid(SafeList):
         self.colors = self.get_unique_values()
         return self
     
-    def replace_all_color(self, new_color):
+    def replace_all_color(self, new_color, in_place: bool = False):
+        if isinstance(new_color, Color):
+            new_color = new_color.value
         for row in range(self.height):
             for col in range(self.width):
                 if self[row][col] != self.background_color:
-                    self[row][col] = new_color
+                    if in_place:
+                        self.parent_grid[row+self.region.y1][col+self.region.x1] = new_color
+                    else:
+                        self[row][col] = new_color
         return self
     
     def fill_color(self, point: GridPoint, new_color: int):
@@ -556,6 +561,12 @@ class Grid(SafeList):
                     self[row+obj.region.y1][col+obj.region.x1] = background_color
         return self
 
+    def remove_objects(self, objs: list['SubGrid']):
+        for obj in objs:
+            self.remove_object(obj)
+        return self
+
+    @override
     def copy(self):
         new_grid_data = [list(row) for row in self]
         return Grid(new_grid_data, self.background_color, self.allow_negative_index)
