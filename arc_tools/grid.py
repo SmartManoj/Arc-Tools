@@ -746,7 +746,7 @@ class SubGrid(Grid):
         logger.debug(f"Creating SubGrid from region {region}  and obj_color {obj_color}")
         self.parent_grid = parent_grid
         self.region = region
-        self.points = points
+        self.points = points or []
         self.background_color = self.parent_grid.background_color
         subgrid_data = self.get_subgrid(obj_color)
         self.color = obj_color
@@ -882,7 +882,7 @@ class SubGrid(Grid):
         grid = [cls([self.parent_grid.background_color for _ in range(self.region.x2 - self.region.x1 + 1)]) for _ in range(self.region.y2 - self.region.y1 + 1)]
         for row in range(self.region.y1, self.region.y2 + 1):
             for col in range(self.region.x1, self.region.x2 + 1):
-                if (obj_color is None or self.parent_grid[row][col] == obj_color) and (col, row) in self.points:
+                if (obj_color is None or self.parent_grid[row][col] == obj_color) and (not self.points or (col, row) in self.points):
                     grid[row - self.region.y1][col - self.region.x1] = self.parent_grid[row][col]
         return cls(grid)
     
@@ -944,7 +944,7 @@ class Square(Shape):
         
         
 
-def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color| int | None = None, ignore_color: Color| int | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None, ignore_corners: bool = False, point: GridPoint | None = None) -> list[SubGrid]:
+def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color| int | None = None, ignore_color: Color| int | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None, ignore_corners: bool = False, point: GridPoint | None = None, width: int | None = None, height: int | None = None) -> list[SubGrid]:
     if isinstance(required_color, Color):
         required_color = required_color.value
     if isinstance(ignore_color, Color):
@@ -1027,6 +1027,14 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                         for new_obj in new_objects:
                             if new_obj.height == size and new_obj.width == size:
                                 objects.append(new_obj)
+                elif width and width != obj.width:
+                    for w in range(0, obj.width, width):
+                        region = GridRegion([GridPoint(obj.region.x1 + w, obj.region.y1), GridPoint(obj.region.x1 + w + width - 1, obj.region.y2)])
+                        objects.append(detect_objects(SubGrid(region, obj.parent_grid))[0])
+                elif height and height != obj.height:
+                    for h in range(0, obj.height, height):
+                        region = GridRegion([GridPoint(obj.region.x1, obj.region.y1 + h), GridPoint(obj.region.x2, obj.region.y1 + h + height - 1)])
+                        objects.append(detect_objects(SubGrid(region, obj.parent_grid))[0])
                 else:
                     objects.append(obj)
                 if point:
