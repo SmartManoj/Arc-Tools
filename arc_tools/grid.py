@@ -552,6 +552,13 @@ class Grid(SafeList):
     def crop(self, region: GridRegion):
         return Grid([[self[row][col] for col in range(region.x1, region.x2 + 1)] for row in range(region.y1, region.y2 + 1)], self.background_color)
 
+    def swap_colors(self):
+        colors = self.get_unique_values()
+        self.replace_color(colors[0], -1, replace_in_parent_grid=False)
+        self.replace_color(colors[1], colors[0], replace_in_parent_grid=False)
+        self.replace_color(-1, colors[1], replace_in_parent_grid=False)
+        return self
+    
     def remove_object(self, obj: 'SubGrid', background_color: int | None = None):
         if background_color is None:
             background_color = self.background_color
