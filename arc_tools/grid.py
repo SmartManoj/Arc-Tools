@@ -209,11 +209,19 @@ class Grid(SafeList):
         surrounding_cells = [self[row + dy][col + dx] for dx, dy in EIGHT_DIRECTIONS]
         return (sum(cell in [current_color, []] for cell in surrounding_cells) <= 3 and sum(cell in [current_color, []] for cell in cardinal_cells) <= 1) or all(cell != current_color for cell in surrounding_cells)
     
-    def get_surrounding_values(self, row: int, col: int):
-        surrounding_points = GridRegion([GridPoint(col, row)]).get_surrounding_points()
-        values = [self[point.y][point.x] for point in surrounding_points]
-        values = [v for v in values if v != [] and v != self.background_color]
-        return values
+    def get_surrounding_points(self, row: int | None = None, col: int | None = None) -> list[GridPoint]:
+        if row is None or col is None:
+            region = self.region
+        else:
+            region = GridRegion([GridPoint(col, row)])
+
+        sp = region.get_surrounding_points()
+        if type(self) == SubGrid:
+            self = self.parent_grid
+        for point in sp:
+            point.value = self[point.y][point.x]
+        sp = [p for p in sp if p.value != [] and p.value != self.background_color]
+        return sp
     
     def _shrink(self, factor):
         """Shrink a grid by the given factor while maintaining pattern structure."""
@@ -962,11 +970,11 @@ class Square(Shape):
         
         
 
-def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color| int | None = None, ignore_color: Color| int | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None, ignore_corners: bool = False, point: GridPoint | None = None, width: int | None = None, height: int | None = None) -> list[SubGrid]:
+def detect_objects(grid: Grid, required_object: Shape | None = None, invert: bool = False, required_color: Color| int | None = None, ignore_colors: list[Color| int] | None = None, single_color_only: bool = False, go_diagonal: bool = True, max_count: int | None = None, ignore_corners: bool = False, point: GridPoint | None = None, width: int | None = None, height: int | None = None) -> list[SubGrid]:
     if isinstance(required_color, Color):
         required_color = required_color.value
-    if isinstance(ignore_color, Color):
-        ignore_color = ignore_color.value
+    if ignore_colors:
+        ignore_colors = [color.value if isinstance(color, Color) else color for color in ignore_colors]
     is_subgrid = type(grid) == SubGrid
     if is_subgrid:
         grid = grid.get_full_grid()
@@ -978,8 +986,8 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
     y_offset = grid.region.y1 if is_subgrid else 0
     def compare(a):
         val = a != grid.background_color
-        if ignore_color:
-            val = val and a != ignore_color
+        if ignore_colors:
+            val = val and a not in ignore_colors
         if required_color:
             val = val and a == required_color
         if invert:
@@ -1155,4 +1163,4 @@ if __name__ == "__main__":
     objects = detect_objects(test_grid,)
     # log first object
     logger.info(f"First object: {objects[0]}")
-    plot_grids([test_grid]+objects)
+    # plot_grids([test_grid]+objects)
