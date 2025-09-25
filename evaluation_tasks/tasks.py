@@ -87,6 +87,7 @@ from task_82 import role_model_v2
 from task_83 import role_model_v3
 from task_84 import extractor
 from task_85 import look_through
+from task_86 import border_n_fill
 # marker
 from task_87 import dot_to_object
 from task_90 import move_object_without_collision

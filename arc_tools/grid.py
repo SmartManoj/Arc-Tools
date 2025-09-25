@@ -748,14 +748,14 @@ class Grid(SafeList):
                     q.append((nr, nc))
 
         # Now count distinct hole regions (unvisited background cells)
-        hole_regions = 0
+        hole_regions_count = 0
         for r in range(rows):
             for c in range(cols):
                 if self[r][c] == self.background_color and not visited[r][c]:
                     # Found a new hole region, flood fill it
-                    hole_regions += 1
-                    if max_count and hole_regions == max_count:
-                        return hole_regions
+                    hole_regions_count += 1
+                    if max_count and hole_regions_count == max_count:
+                        return hole_regions_count
                     
                     # Mark all cells in this hole region as visited
                     region_q = deque([(r, c)])
@@ -770,7 +770,7 @@ class Grid(SafeList):
                                 visited[nr][nc] = True
                                 region_q.append((nr, nc))
 
-        return hole_regions
+        return hole_regions_count
     
 
 
