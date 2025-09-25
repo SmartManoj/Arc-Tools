@@ -209,6 +209,9 @@ class Grid(SafeList):
         surrounding_cells = [self[row + dy][col + dx] for dx, dy in EIGHT_DIRECTIONS]
         return (sum(cell in [current_color, []] for cell in surrounding_cells) <= 3 and sum(cell in [current_color, []] for cell in cardinal_cells) <= 1) or all(cell != current_color for cell in surrounding_cells)
     
+    def get_border_points(self):
+        return self.region.get_border_points()
+
     def get_surrounding_points(self, row: int | None = None, col: int | None = None) -> list[GridPoint]:
         if row is None or col is None:
             region = self.region
@@ -476,9 +479,10 @@ class Grid(SafeList):
         bottom_right = self[self.height - 1][self.width - 1]
         return [top_left, top_right, bottom_left, bottom_right]
     
-    def compare(self, other):
+    def compare(self, other, silent=False):
         if len(self) != len(other):
-            logger.info(f"Row length mismatch: Expected: {len(self)}, Actual: {len(other)}")
+            if not silent:
+                logger.info(f"Row length mismatch: Expected: {len(self)}, Actual: {len(other)}")
             return False
         for i in range(len(self)):
             if self[i] != other[i]:
@@ -603,6 +607,9 @@ class Grid(SafeList):
                     values[col] += 1
         return values
     
+    def get_background_dots_count(self):
+        return self.get_values_count(all=True)[self.background_color]
+    
     def has_yellow_block(self):
         return Color.YELLOW.value in self.get_unique_values()
     
@@ -611,8 +618,8 @@ class Grid(SafeList):
         values_count = self.get_values_count()
         if sort:
             values_count = sorted(values_count.items(), key=lambda x: x[1], reverse=True)
-            return [value for value, _ in values_count]
-        return list(values_count.keys())
+            return tuple([value for value, _ in values_count])
+        return tuple(values_count.keys())
     
 
     def get_total_dots(self) -> int:

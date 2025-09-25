@@ -58,7 +58,7 @@ jigsaw_task_fns = [
 
 DEBUG_OUTPUT = 1
 def debug_output(grid, expected_output, output, window_title='result'):
-    if grid.compare(output):
+    if grid.compare(output, silent=True):
         logger.info(f"Output is still the same as the input - No changes, idiot.")
         exit(1)
     if not DEBUG_OUTPUT:
