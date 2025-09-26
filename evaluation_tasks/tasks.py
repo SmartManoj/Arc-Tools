@@ -88,8 +88,9 @@ from task_83 import role_model_v3
 from task_84 import extractor
 from task_85 import look_through
 from task_86 import border_n_fill
-# marker
 from task_87 import dot_to_object
+from task_88 import shape_smith
+# marker
 from task_90 import move_object_without_collision
 from task_99 import check_fit
 from task_102 import highlight_the_box
