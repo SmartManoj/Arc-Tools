@@ -91,8 +91,9 @@ from task_86 import border_n_fill
 from task_87 import dot_to_object
 from task_88 import shape_smith
 from task_89 import role_model
-# marker
 from task_90 import move_object_without_collision
+from task_91 import remove_the_stick
+# marker
 from task_99 import check_fit
 from task_102 import highlight_the_box
 from task_111 import hole_color

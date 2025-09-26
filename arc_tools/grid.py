@@ -95,7 +95,9 @@ class GridPoint:
         return abs(self.x - other.x) + abs(self.y - other.y)
 
 class GridRegion:
-    def __init__(self, points: list[GridPoint]):
+    def __init__(self, points: list[GridPoint | tuple]):
+        if isinstance(points[0], tuple):
+            points = [GridPoint(*p) for p in points]
         self.x1 = min(p.x for p in points)
         self.x2 = max(p.x for p in points)
         self.y1 = min(p.y for p in points)
@@ -793,7 +795,7 @@ class SubGrid(Grid):
         return SubGrid(new_grid_region, self.parent_grid, None)
     
     def __hash__(self) -> int: # type: ignore
-        return hash((self.region, self.parent_grid, self.background_color))
+        return hash((self.region, self.background_color))
     
     def new_region(self, dx1: int = 0, dy1: int = 0, dx2: int = 0, dy2: int = 0, region: GridRegion | None = None):
         if not region:

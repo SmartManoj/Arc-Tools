@@ -7,7 +7,7 @@ task_id = paste()
 assert len(task_id) == 8, "Task ID must be 8 characters long"
 function_name = prompt("Enter the function name:").replace(" ", "_")
 code_snippet = f"""import os
-from arc_tools.grid import Grid, detect_objects
+from arc_tools.grid import Grid, detect_objects, Color
 from arc_tools import logger
 from arc_tools.plot import plot_grids
 
