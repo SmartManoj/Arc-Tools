@@ -93,6 +93,7 @@ from task_88 import shape_smith
 from task_89 import role_model
 from task_90 import move_object_without_collision
 from task_91 import remove_the_stick
+from task_92 import consistency
 # marker
 from task_99 import check_fit
 from task_102 import highlight_the_box

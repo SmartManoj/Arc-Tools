@@ -457,7 +457,9 @@ class Grid(SafeList):
     def get_right_side(self):
         return [GridPoint(self.region.x2, self.region.y1 + i, self[i][self.width - 1]) for i in range(self.height)]
     
-    def get_edge_data(self, side: BorderSide):
+    def get_edge_points(self, side: BorderSide | str) -> list[GridPoint]:
+        if isinstance(side, str):
+            side = BorderSide(side)
         if side == BorderSide.TOP:
             return self.get_top_side()
         elif side == BorderSide.BOTTOM:
