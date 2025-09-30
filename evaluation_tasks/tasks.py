@@ -95,6 +95,7 @@ from task_90 import move_object_without_collision
 from task_91 import remove_the_stick
 from task_92 import consistency
 from task_93 import cult
+from task_94 import light_rays
 # marker
 from task_99 import check_fit
 from task_102 import highlight_the_box
