@@ -4,7 +4,7 @@ from arc_tools.grid import Grid, detect_objects, Color, flip_vertically, place_o
 from arc_tools import logger
 from arc_tools.plot import plot_grids
 
-def role_model(grid: Grid):
+def role_model_v4(grid: Grid):
     '''
     Blue line divider - replicate the main object to all quadrants by flipping accordingly
     '''
@@ -58,4 +58,4 @@ def role_model(grid: Grid):
 
 if __name__ == "__main__":
     os.environ['initial_file'] = os.path.splitext(os.path.basename(__file__))[0]
-    os.system("python main.py b10624e5 role_model") 
+    os.system("python main.py b10624e5 role_model_v4") 
