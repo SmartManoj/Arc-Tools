@@ -97,6 +97,7 @@ from task_92 import consistency
 from task_93 import cult
 from task_94 import light_rays
 from task_95 import role_model_v5
+from task_96 import cult_v2
 # marker
 from task_99 import check_fit
 from task_102 import highlight_the_box
