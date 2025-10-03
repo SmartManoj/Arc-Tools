@@ -116,6 +116,9 @@ class GridRegion:
     def __hash__(self):
         return hash((self.x1, self.x2, self.y1, self.y2))
     
+    def expand(self, factor):
+        return GridRegion([GridPoint(self.x1 - factor, self.y1 - factor), GridPoint(self.x2 + factor, self.y2 + factor)])
+
     def contains(self, obj):
         if isinstance(obj, tuple):
             obj = GridPoint(*obj)
