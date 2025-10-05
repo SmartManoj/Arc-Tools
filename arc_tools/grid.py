@@ -132,20 +132,25 @@ class GridRegion:
             logger.info(f'Unknown object type: {type(obj)}')
         return False
     
-    def get_surrounding_points(self):
+    def get_surrounding_points(self, ignore_corner = False, only_edge_center = False):
         new_x1 = self.x1 - 1
         new_y1 = self.y1 - 1
         new_x2 = self.x2 + 1
         new_y2 = self.y2 + 1
         new_region = GridRegion([GridPoint(new_x1, new_y1), GridPoint(new_x2, new_y2)])
-        return new_region.get_border_points()
+        return new_region.get_border_points(ignore_corner=ignore_corner, only_edge_center=only_edge_center)
 
-    def get_border_points(self):
+    def get_border_points(self, ignore_corner = False, only_edge_center = False):
         points = []
-        for row in range(self.y1, self.y2 + 1):
-            for col in range(self.x1, self.x2 + 1):
-                if row == self.y1 or row == self.y2 or col == self.x1 or col == self.x2:
-                    points.append(GridPoint(col, row))
+        # log self.x1
+        for x in range(self.x1, self.x2 + 1):
+            for y in range(self.y1, self.y2 + 1):
+                if y == self.y1 or y == self.y2 or x == self.x1 or x == self.x2:
+                    if ignore_corner and x in [self.x1, self.x2] and y in [self.y1, self.y2]:
+                        continue
+                    if only_edge_center and not ((x in [(self.x1 + self.x2) // 2] or y in [(self.y1 + self.y2) // 2])):
+                        continue
+                    points.append(GridPoint(x, y))
         return points
 
 class CustomIndexError(IndexError):
@@ -215,15 +220,15 @@ class Grid(SafeList):
         return (sum(cell in [current_color, []] for cell in surrounding_cells) <= 3 and sum(cell in [current_color, []] for cell in cardinal_cells) <= 1) or all(cell != current_color for cell in surrounding_cells)
     
     def get_border_points(self):
-        return self.region.get_border_points()
+        return [GridPoint(x, y, self.parent_grid[y][x]) for x, y in self.region.get_border_points() if self.parent_grid[y][x] != self.background_color]
 
-    def get_surrounding_points(self, row: int | None = None, col: int | None = None) -> list[GridPoint]:
+    def get_surrounding_points(self, row: int | None = None, col: int | None = None, ignore_corner = False, only_edge_center = False) -> list[GridPoint]:
         if row is None or col is None:
             region = self.region
         else:
             region = GridRegion([GridPoint(col, row)])
 
-        sp = region.get_surrounding_points()
+        sp = region.get_surrounding_points(ignore_corner=ignore_corner, only_edge_center=only_edge_center)
         if type(self) == SubGrid:
             self = self.parent_grid
         for point in sp:

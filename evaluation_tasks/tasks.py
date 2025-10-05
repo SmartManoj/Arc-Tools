@@ -100,8 +100,9 @@ from task_95 import role_model_v5
 from task_96 import cult_v2
 from task_97 import be_like_others
 from task_98 import safe_distance
-# marker
 from task_99 import check_fit
+from task_100 import long_live_connections
+# marker
 from task_102 import highlight_the_box
 from task_111 import hole_color
 from task_117 import jigsaw_puzzle
