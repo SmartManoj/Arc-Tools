@@ -102,6 +102,7 @@ from task_97 import be_like_others
 from task_98 import safe_distance
 from task_99 import check_fit
 from task_100 import long_live_connections
+from task_101 import remove_specific_objects
 # marker
 from task_102 import highlight_the_box
 from task_111 import hole_color
