@@ -183,7 +183,7 @@ def jigsaw_v1(grid: Grid) -> Grid:
         if obj.color is None:
             objects.remove(obj)
             for _ in range(4):
-                if obj[0][0] == Color.LIGHT_GRAY.value:
+                if obj[0][0] == Color.GRAY.value:
                     first_object = obj
                     break
                 obj = obj.rotate()

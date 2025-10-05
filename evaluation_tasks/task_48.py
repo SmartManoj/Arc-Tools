@@ -15,13 +15,13 @@ def role_model(grid: Grid):
     the shape will get the last layer color
     grey color is the divider.
     '''
-    objects = detect_objects(grid, ignore_color=Color.LIGHT_GRAY)
+    objects = detect_objects(grid, ignore_color=Color.GRAY)
     for y in range(grid.height - 1, -1, -1):
         n_objects = len(set([grid.get(i, y) for i in range(grid.width) if grid.get(i, y) != grid.background_color]))
         if n_objects:
             break
     # first row, first divider pos 
-    object_shape = next(i for i, v in enumerate(grid.get_top_side()) if v == Color.LIGHT_GRAY.value) 
+    object_shape = next(i for i, v in enumerate(grid.get_top_side()) if v == Color.GRAY.value) 
     first_layer = objects[0:n_objects]
     second_layer = objects[n_objects:-n_objects]
     third_layer = objects[-n_objects:]

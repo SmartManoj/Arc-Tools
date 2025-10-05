@@ -5,7 +5,7 @@ def update_fuel(obj: SubGrid, distance: int, orientation: str):
     if orientation == 'top':
         for row in range(obj.height):
             for col in range(obj.width):
-                if obj[row][col] == Color.LIGHT_GRAY.value:
+                if obj[row][col] == Color.GRAY.value:
                     obj[row][col] = Color.ORANGE.value
                     distance -= 1
                     if distance == 0:
@@ -13,7 +13,7 @@ def update_fuel(obj: SubGrid, distance: int, orientation: str):
     elif orientation == 'bottom':
         for row in reversed(range(obj.height)):
             for col in reversed(range(obj.width)):
-                if obj[row][col] == Color.LIGHT_GRAY.value:
+                if obj[row][col] == Color.GRAY.value:
                     obj[row][col] = Color.ORANGE.value
                     distance -= 1
                     if distance == 0:
@@ -22,7 +22,7 @@ def update_fuel(obj: SubGrid, distance: int, orientation: str):
         # start_x, start_y = 1, obj.height - 1
         for col in range(obj.width):
             for row in reversed(range(obj.height)):
-                if obj[row][col] == Color.LIGHT_GRAY.value:
+                if obj[row][col] == Color.GRAY.value:
                     obj[row][col] = Color.ORANGE.value
                     distance -= 1
                     if distance == 0:
@@ -30,7 +30,7 @@ def update_fuel(obj: SubGrid, distance: int, orientation: str):
     elif orientation == 'right':
         for col in reversed(range(obj.width)):
             for row in range(obj.height):
-                if obj[row][col] == Color.LIGHT_GRAY.value:
+                if obj[row][col] == Color.GRAY.value:
                     obj[row][col] = Color.ORANGE.value
                     distance -= 1
                     if distance == 0:
@@ -43,7 +43,7 @@ def move_rocket(obj: SubGrid):
     x2, y2 = obj.region.x2, obj.region.y2
 
     # Count grey squares to determine max movement
-    max_steps = obj.get_values_count()[Color.LIGHT_GRAY.value]
+    max_steps = obj.get_values_count()[Color.GRAY.value]
     if max_steps == 0:
         return
     

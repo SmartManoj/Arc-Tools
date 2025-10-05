@@ -168,7 +168,7 @@ def route_finder(grid: Grid):
             if road_idx < len(roads):
                 road = roads[road_idx]
                 for point in road.points:
-                    result[point.y][point.x] = Color.LIGHT_GRAY.value
+                    result[point.y][point.x] = Color.GRAY.value
 
     return result
 

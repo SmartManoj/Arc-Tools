@@ -8,7 +8,7 @@ directions = {
     'up': (0, -1),
     'down': (0, 1)
 }
-LIGHT_GRAY = Color.LIGHT_GRAY.value
+GRAY = Color.GRAY.value
 MAROON = Color.MAROON.value
 LIGHT_BLUE = Color.LIGHT_BLUE.value
 def find_other_end(point: tuple, direction: str, grid: Grid, obj_color: Color):
@@ -16,7 +16,7 @@ def find_other_end(point: tuple, direction: str, grid: Grid, obj_color: Color):
     x, y = point
     # move until the direction is not grid.background_color
     steps = 0
-    pipe_colors = [LIGHT_BLUE, LIGHT_GRAY]
+    pipe_colors = [LIGHT_BLUE, GRAY]
     while steps < 60:
         steps += 1
         if grid[y+dy][x+dx] in [grid.background_color, obj_color]:
@@ -84,7 +84,7 @@ def extractor(grid: Grid):
     4 dot object and 5 dot object should be joined by light blue pipe.
     '''
     
-    objects = detect_objects(grid, ignore_colors=[Color.LIGHT_BLUE, Color.MAROON, Color.LIGHT_GRAY])
+    objects = detect_objects(grid, ignore_colors=[Color.LIGHT_BLUE, Color.MAROON, Color.GRAY])
     # plot_grids(objects[:])
     for obj in objects:
         td = obj.get_total_dots()

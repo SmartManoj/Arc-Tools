@@ -20,7 +20,7 @@ def good_will_win(grid: Grid):
     red_lives = 0
     for life in lives:
         if any(life.region.x1 == red_plate.region.x1 for red_plate in red_plates):
-            life.replace_all_color(Color.LIGHT_GRAY, in_place=True)
+            life.replace_all_color(Color.GRAY, in_place=True)
             red_lives += 1
     for life in lives:
         if life.region.x1 == green_plate.region.x1:

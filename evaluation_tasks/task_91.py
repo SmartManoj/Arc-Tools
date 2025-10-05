@@ -90,7 +90,7 @@ def remove_the_stick(grid: Grid):
             for h_line2 in horizontal_lines:
                 if h_line2.color in remove_colors:
                     continue
-                if h_line.color == Color.RED.value and h_line2.color == Color.LIGHT_GRAY.value:
+                if h_line.color == Color.RED.value and h_line2.color == Color.GRAY.value:
                     logger.debug(f'h_line: {h_line}')
                     logger.debug(f'h_line2: {h_line2}')
                     logger.debug(f'{h_line.region.y1 == h_line2.region.y2 + 1 and h_line.region.x1 <= h_line2.region.x1 <= h_line.region.x2}')
