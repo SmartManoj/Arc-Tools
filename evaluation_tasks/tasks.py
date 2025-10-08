@@ -106,6 +106,7 @@ from task_101 import remove_specific_objects
 from task_102 import highlight_the_box
 from task_103 import spiral
 from task_104 import expand
+from task_105 import blue_link
 # marker
 from task_111 import hole_color
 from task_117 import jigsaw_puzzle
