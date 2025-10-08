@@ -108,6 +108,7 @@ from task_103 import spiral
 from task_104 import expand
 from task_105 import blue_link
 from task_106 import fillers
+from task_107 import attract
 # marker
 from task_111 import hole_color
 from task_117 import jigsaw_puzzle
