@@ -111,6 +111,7 @@ from task_106 import fillers
 from task_107 import attract
 from task_108 import fill_the_gap
 from task_109 import dot_com_bubble
+from task_110 import colliding_rays
 # marker
 from task_111 import hole_color
 from task_117 import jigsaw_puzzle
