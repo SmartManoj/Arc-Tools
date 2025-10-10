@@ -200,7 +200,7 @@ class Grid(SafeList):
         self.cy = self.region.y1 + self.region.height // 2
         self.center = GridPoint(self.cx, self.cy)
         self.colors = self.get_unique_values()
-        self.all_points = product(range(self.region.start.y, self.region.end.y + 1), range(self.region.start.x, self.region.end.x + 1))
+        self.all_points = [GridPoint(x, y) for y, x in product(range(self.region.start.y, self.region.end.y + 1), range(self.region.start.x, self.region.end.x + 1))]
         if getattr(self, 'color', None) is None:
             if len(self.colors) == 1:
                 self.color = self.colors[0]
