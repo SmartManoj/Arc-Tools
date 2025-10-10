@@ -112,8 +112,9 @@ from task_107 import attract
 from task_108 import fill_the_gap
 from task_109 import dot_com_bubble
 from task_110 import colliding_rays
-# marker
 from task_111 import hole_color
+from task_112 import equity
+# marker
 from task_117 import jigsaw_puzzle
 from task_118 import row_col_color_data
 
