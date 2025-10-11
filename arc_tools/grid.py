@@ -592,12 +592,12 @@ class Grid(SafeList):
         self.replace_color(-1, colors[1], replace_in_parent_grid=False)
         return self
     
-    def remove_object(self, obj: 'SubGrid', background_color: int | None = None):
+    def remove_object(self, obj: 'SubGrid', background_color: int | None = None, clean_area: bool = False):
         if background_color is None:
             background_color = self.background_color
         for row in range(obj.height):
             for col in range(obj.width):
-                if obj[row][col] != background_color:
+                if obj[row][col] != background_color or clean_area:
                     self[row+obj.region.y1][col+obj.region.x1] = background_color
         return self
 
