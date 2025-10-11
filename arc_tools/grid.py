@@ -97,7 +97,7 @@ class GridPoint:
 
 class GridRegion:
     def __init__(self, points: list[GridPoint | tuple]):
-        if isinstance(points[0], tuple):
+        if isinstance(points[0], (tuple, list)):
             points = [GridPoint(*p) for p in points]
         self.x1 = min(p.x for p in points)
         self.x2 = max(p.x for p in points)
@@ -1115,7 +1115,8 @@ def place_object_on_new_grid(object_to_place: SubGrid, x: int, y: int, grid: Gri
     for row in range(object_to_place.height):
         for col in range(object_to_place.width):
             if object_to_place[row][col] != object_to_place.background_color:
-                grid[y+row][x+col] = fill_color or object_to_place[row][col]
+                if 0 <= y+row < len(grid) and 0 <= x+col < len(grid[0]):
+                    grid[y+row][x+col] = fill_color or object_to_place[row][col]
     return SubGrid(GridRegion([GridPoint(x, y), GridPoint(x + object_to_place.width - 1, y + object_to_place.height - 1)]), grid, object_to_place.color)
 
 

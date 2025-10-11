@@ -117,6 +117,7 @@ from task_112 import equity
 from task_113 import fit_it
 from task_114 import bouncer
 from task_115 import sculpt
+from task_116 import join_the_forces
 # marker
 from task_117 import jigsaw_puzzle
 from task_118 import row_col_color_data
