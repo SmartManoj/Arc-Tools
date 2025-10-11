@@ -453,14 +453,15 @@ class Grid(SafeList):
     def get(self, x: int, y: int) -> int:
         return self[y][x]
     
-    def get_cell(self, x: int, y: int) -> int:
+    def get_value(self, x: int, y: int) -> int:
         return self[y][x]
     
     def set(self, x: int, y: int, value: int):
         self[y][x] = value
 
-    def set_cell(self, x: int, y: int, value: int):
-        self[y][x] = value
+    def set_value(self, x: int, y: int, value: int):
+        if 0 <= x < self.width and 0 <= y < self.height:
+            self[y][x] = value
 
     def get_top_side(self):
         return [GridPoint(self.region.x1 + i, self.region.y1, self[0][i]) for i in range(self.width)]
