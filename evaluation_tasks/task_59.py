@@ -5,10 +5,9 @@ from arc_tools.plot import plot_grids
 
 def straight_snake(grid: Grid):
     '''
-    add the function description first.
+    vertically align the points
     '''
     object = detect_objects(grid)[0]
-    # vertically align the points
     straight_snake = []
     for point in object.points:
         straight_snake.append([grid.get(point.x, point.y)])
