@@ -1,7 +1,5 @@
 import os
 from arc_tools.grid import Grid, detect_objects
-from arc_tools import logger
-from arc_tools.plot import plot_grids
 
 def straight_snake(grid: Grid):
     '''
@@ -12,7 +10,6 @@ def straight_snake(grid: Grid):
     for point in object.points:
         straight_snake.append([grid.get(point.x, point.y)])
 
-    
     return Grid(straight_snake)
 
 if __name__ == "__main__":
