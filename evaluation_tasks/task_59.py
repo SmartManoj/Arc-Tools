@@ -6,11 +6,7 @@ def straight_snake(grid: Grid):
     vertically align the points
     '''
     object = detect_objects(grid)[0]
-    straight_snake = []
-    for point in object.points:
-        straight_snake.append([grid.get(point.x, point.y)])
-
-    return Grid(straight_snake)
+    return Grid([[grid.get(point.x, point.y)] for point in object.points])
 
 if __name__ == "__main__":
     os.environ['initial_file'] = os.path.splitext(os.path.basename(__file__))[0]
