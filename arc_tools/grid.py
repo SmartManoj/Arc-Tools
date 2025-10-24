@@ -1036,7 +1036,7 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                 
                 while q:
                     row, col = q.popleft()
-                    current_object_points.append(GridPoint(col, row)) # x=col, y=row
+                    current_object_points.append(GridPoint(col, row, grid[row][col])) # x=col, y=row
                     if go_diagonal:
                         directions = EIGHT_DIRECTIONS
                     else:
@@ -1054,7 +1054,7 @@ def detect_objects(grid: Grid, required_object: Shape | None = None, invert: boo
                 
                 if is_subgrid:
                     # add x1 and y1 to current_object_points
-                    current_object_points = [GridPoint(p.x + x_offset, p.y + y_offset) for p in current_object_points]
+                    current_object_points = [GridPoint(p.x + x_offset, p.y + y_offset, grid[p.y][p.x]) for p in current_object_points]
                     
                 # filter only the corner points
                 current_object_corner_points = [
