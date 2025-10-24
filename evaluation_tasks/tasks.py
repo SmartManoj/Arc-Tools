@@ -60,7 +60,7 @@ from task_55 import make_red_regions
 from task_56 import join_the_pipes
 from task_57 import route_finder
 from task_58 import jigsaw_v1
-from task_59 import straight_snake
+from task_59 import transform
 from task_60 import broken_rope
 from task_61 import magnetic_nets
 from task_62 import mirror_it
