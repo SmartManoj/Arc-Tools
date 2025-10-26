@@ -122,9 +122,5 @@ from task_117 import jigsaw_puzzle
 from task_118 import row_col_color_data
 from task_119 import bottom_view
 from task_120 import rotate_n_flip
+from test_task import transform
 # marker
-
-
-
-
-
