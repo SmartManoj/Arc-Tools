@@ -1,5 +1,4 @@
 import os
-from turtle import right
 from arc_tools.grid import Grid, GridPoint, GridRegion, detect_objects, Color, place_object_on_new_grid
 from arc_tools import logger
 from arc_tools.plot import plot_grid, plot_grids
@@ -25,7 +24,7 @@ def role_model_v2(grid: Grid):
         
     center_region = GridRegion([GridPoint(pipes[0] + 1, 0), GridPoint(pipes[1] - 1, grid.height-1)])
     center_grid = grid.crop(center_region)
-    box, shape, position, orientation = detect_objects(left_grid, ignore_color=Color.MAGENTA)
+    box, shape, position, orientation = detect_objects(left_grid, ignore_colors=[Color.MAGENTA])
     # swap shape colors
     box.swap_colors()
     x,y = orientation.region.start
@@ -66,7 +65,7 @@ def role_model_v2(grid: Grid):
                 place_object_on_new_grid(box, col1, row1  ,  center_grid)
     if right_grid:
         # Process right region similar to left region
-        right_box, right_shape, right_position, right_orientation = detect_objects(right_grid, ignore_color=Color.MAGENTA)
+        right_box, right_shape, right_position, right_orientation = detect_objects(right_grid, ignore_colors=[Color.MAGENTA])
         # swap shape colors
         right_box.swap_colors()
         x,y = right_orientation.region.start
