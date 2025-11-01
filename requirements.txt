@@ -1,0 +1,9 @@
+openai==2.6.1
+PyAutoGUI==0.9.54
+PyMsgBox==1.0.9
+pyperclip==1.9.0
+python-dotenv==1.2.1
+sympy==1.14.0
+numpy==2.3.4
+matplotlib==3.10.7
+matplotlib-inline==0.2.1
